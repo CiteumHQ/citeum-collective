@@ -1,0 +1,31 @@
+{
+  "extends": ["airbnb-base", "plugin:prettier/recommended"],
+  "parser": "babel-eslint",
+  "env": {"jest": true},
+  "rules": {
+    "max-len": [
+      "error", 180, 2, {
+        "ignoreUrls": true,
+        "ignoreComments": false,
+        "ignoreRegExpLiterals": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["./*.js"],
+      "rules": {
+        "import/no-commonjs": "off",
+        "no-console": "off"
+      }
+    },
+    {
+      "files": ["./src/migrations/*.js"],
+      "rules": {
+        "no-await-in-loop": "off"
+      }
+    }
+  ]
+}

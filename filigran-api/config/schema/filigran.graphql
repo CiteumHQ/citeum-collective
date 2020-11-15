@@ -1,0 +1,35 @@
+### DIRECTIVES
+
+directive @auth(for: [Capabilities] = [], and: Boolean = false) on OBJECT | FIELD_DEFINITION
+
+### SCALAR
+
+scalar DateTime
+scalar Upload
+enum Capabilities {
+  TEST
+}
+
+type AppInfo {
+  app: String
+  postgre: String
+}
+
+### QUERIES
+
+type Query {
+  about: AppInfo
+}
+
+### MUTATIONS
+
+### MUTATIONS DECLARATION
+input UserLoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  token(input: UserLoginInput): String
+  logout: ID @auth
+}

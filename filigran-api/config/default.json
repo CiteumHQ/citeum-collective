@@ -1,0 +1,25 @@
+{
+  "app": {
+    "port": 4000,
+    "logs": "./logs",
+    "logs_level": "info",
+    "rate_protection": {
+      "time_window": 1,
+      "max_requests": 100
+    },
+    "cookie_secure": false,
+    "base_path" : "",
+    "admin": {
+      "email": "admin@opencti.io",
+      "password": "ChangeMe",
+      "token": "ChangeMe"
+    }
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "port": "5432",
+    "user": "filigran_dev",
+    "password": "filigran_dev",
+    "base": "filigran"
+  }
+}
