@@ -5,9 +5,10 @@ import { dissocPath } from 'ramda';
 import createSchema from './schema';
 import { DEV_MODE } from '../config/conf';
 import { UnknownError, ValidationError } from '../config/errors';
-import loggerPlugin from './plugins/loggerPlugin';
+import LoggerPlugin from './plugins/LoggerPlugin';
 import SerialMetaPlugin from './plugins/SerialMetaPlugin';
 import TransactionPlugin from './plugins/TransactionPlugin';
+import UserContextPlugin from './plugins/UserContextPlugin';
 
 export const extractTokenFromBearer = (bearer) =>
   bearer && bearer.length > 10 ? bearer.substring('Bearer '.length) : null;
@@ -20,23 +21,12 @@ const createApolloServer = (db) => {
         'request.credentials': 'same-origin',
       },
     },
-    async context({ req, res, connection }) {
-      if (connection) return { user: connection.context.user }; // For websocket connection.
-      // let token = req.cookies ? req.cookies[FILIGRAN_TOKEN] : null;
-      // token = token || extractTokenFromBearer(req.headers.authorization);
-      const auth = null; // await authentication(token);
-      if (!auth) return { res, user: auth };
-      const origin = {
-        source: 'client',
-        ip: req.ip,
-        user_id: auth.id,
-        applicant_id: req.headers['opencti-applicant-id'],
-      };
-      const authMeta = Object.assign(auth, { origin });
-      return { res, user: authMeta };
-    },
+    context: ({ req, res }) => ({
+      req,
+      res,
+    }),
     tracing: DEV_MODE,
-    plugins: [SerialMetaPlugin([TransactionPlugin(db), loggerPlugin])],
+    plugins: [SerialMetaPlugin([TransactionPlugin(db), UserContextPlugin, LoggerPlugin])],
     formatError: (error) => {
       let e = apolloFormatError(error);
       if (e instanceof GraphQLError) {

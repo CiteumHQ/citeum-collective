@@ -15,10 +15,15 @@ type AppInfo {
   postgre: String
 }
 
+type User {
+  email: ID!
+}
+
 ### QUERIES
 
 type Query {
   about: AppInfo
+  me: User @auth
 }
 
 ### MUTATIONS

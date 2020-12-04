@@ -1,14 +1,16 @@
 // Admin user initialization
 import { logger } from './config/conf';
 import migrate from './migrate';
+import { initProvider } from './config/authentication';
 
 // Initialize
-const initializeSchema = async () => {
-  // TODO
-  return true;
-};
+// const initializeSchema = async (db) => {
+//   const schemaFile = path.resolve(__dirname, 'schema.sql');
+//   const content = fs.readFileSync(schemaFile, 'utf8');
+//   await db.execute({ sql: content });
+// };
 
-const initializeMigration = async (db) => {
+const migrateDatabase = async (db) => {
   try {
     const [batchNo, log] = await migrate(db);
     if (log.length === 0) {
@@ -39,11 +41,12 @@ const isEmptyPlatform = async () => {
 
 const platformInit = async (db) => {
   try {
+    await initProvider(db);
+    await migrateDatabase(db);
     const needToBeInitialized = await isEmptyPlatform();
     if (needToBeInitialized) {
       logger.info(`[INIT] New platform detected, initialization...`);
-      await initializeSchema();
-      await initializeMigration(db);
+      // await initializeSchema(db);
       await initializeData();
       // await initializeAdminUser();
     } else {

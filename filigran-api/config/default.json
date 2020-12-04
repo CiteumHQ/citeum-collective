@@ -3,16 +3,23 @@
     "port": 4000,
     "logs": "./logs",
     "logs_level": "info",
+    "session_secret": "change_me",
     "rate_protection": {
       "time_window": 1,
       "max_requests": 100
     },
     "cookie_secure": false,
     "base_path" : "",
-    "admin": {
-      "email": "admin@opencti.io",
-      "password": "ChangeMe",
-      "token": "ChangeMe"
+    "auth_jwt" : {
+      "secret": "change_me",
+      "expiration": 86400
+    },
+    "auth_provider": {
+      "issuer": "https://.../openid-configuration",
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "redirect_uris": ["http://localhost/login/callback"],
+      "logout_uri": "https://.../openid-connect/logout?redirect_uri=http://localhost:3000"
     }
   },
   "database": {

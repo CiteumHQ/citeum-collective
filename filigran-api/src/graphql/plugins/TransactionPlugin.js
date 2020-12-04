@@ -5,17 +5,15 @@ export default (db) => ({
         context,
         operation: { operation },
       } = requestContext;
-      const [contextualizedDb, dbStats] = db.contextualize();
-      Object.assign(requestContext, { dbStats });
       if (operation === 'mutation') {
         // mutation will execute in a database transaction
-        const trx = await contextualizedDb.transaction();
+        const trx = await db.transaction();
         context.db = trx;
         // put trx in request context to handle automatic transaction commit/rollback in willSendResponse
         Object.assign(requestContext, { trx });
       } else if (operation === 'query') {
         // query is directly executed on the database without transaction so GraphQL can parallelize the database queries
-        context.db = contextualizedDb;
+        context.db = db;
       }
     },
     willSendResponse: async ({ response, trx }) => {

@@ -4,7 +4,7 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 
 const DEFAULT_ENV = 'production';
-export const FILIGRAN_TOKEN = 'filigran_token';
+export const COOKIE_NAME = 'filigran';
 
 // Environment from NODE_ENV environment variable
 nconf.env({ separator: '__', lowerCase: true, parseValues: true });

@@ -1,6 +1,6 @@
 import { dissoc, head, includes } from 'ramda';
 import { stripIgnoredCharacters } from 'graphql';
-import { logger } from '../../config/conf';
+import {DEV_MODE, logger} from '../../config/conf';
 
 const resolveKeyPromises = async (object) => {
   const resolvedObject = {};
@@ -35,7 +35,7 @@ export default {
         const size = Buffer.byteLength(JSON.stringify(context.request.variables));
         const isWrite = context.operation && context.operation.operation === 'mutation';
         const contextUser = context.context.user;
-        const user = contextUser ? { id: contextUser.id, email: contextUser.user_email } : undefined;
+        const user = contextUser ? { id: contextUser.id, email: contextUser.email } : undefined;
         const [variables] = await tryResolveKeyPromises(context.request.variables);
         const isCallError = context.errors && context.errors.length > 0;
         // Compute inner relations
@@ -55,7 +55,9 @@ export default {
           const { data, path, stack } = callError;
           const error = { data, path, stacktrace: stack.split('\n').map((line) => line.trim()) };
           if (includes(callError.name, ['AuthRequired', 'AuthFailure', 'ForbiddenAccess'])) {
-            logger.warn(API_CALL_MESSAGE, Object.assign(dissoc('variables', callMetaData), { error }));
+            if (!DEV_MODE) {
+              logger.warn(API_CALL_MESSAGE, Object.assign(dissoc('variables', callMetaData), { error }));
+            }
           } else {
             logger.error(API_CALL_MESSAGE, Object.assign(callMetaData, { error }));
           }

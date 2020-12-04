@@ -35,7 +35,7 @@ export const knexConfig = {
   migrations: {
     tableName: 'migrations',
     directory: nconf.resolvePath('src/migrations'),
-    stub: nconf.resolvePath('src/migrations/migration.js.stub'),
+    stub: nconf.resolvePath('src/utils/migration-template.js'),
   },
 };
 
@@ -48,10 +48,10 @@ const queryRows = async (knexObj, sqlQuery) => {
 
 const queryOne = async (knexObj, sqlQuery) => {
   const rows = await queryRows(knexObj, sqlQuery);
-  if (rows.length !== 1) {
+  if (rows.length > 1) {
     throw new Error(`Query result expected to return a single row but ${rows.length} rows received`);
   }
-  return rows[0];
+  return rows && rows[0];
 };
 
 const queryCount = async (knexObj, sqlQuery) => {
@@ -94,43 +94,5 @@ export const connectDatabase = () => {
   //   bridgeSql(trx, trx);
   //   return trx;
   // };
-
-  database.contextualize = () => {
-    let count = 0;
-    const stacks = [];
-    const onNewQuery = () => {
-      count += 1;
-      if (nconf.inDev) {
-        stacks.push(new Error().stack);
-      }
-    };
-
-    const dbProxy = new Proxy(database, {
-      apply: (target, thisArg, args) => {
-        onNewQuery();
-        return target(...args);
-      },
-      get: (target, prop, receiver) => {
-        if (
-          prop === 'execute' ||
-          prop === 'queryRows' ||
-          prop === 'queryOne' ||
-          prop === 'queryCount' ||
-          prop === 'queryNumber'
-        ) {
-          onNewQuery();
-        }
-        return Reflect.get(target, prop, receiver);
-      },
-    });
-
-    const stats = {
-      count: () => count,
-      stacks: () => stacks,
-    };
-
-    return [dbProxy, stats];
-  };
-
   return database;
 };

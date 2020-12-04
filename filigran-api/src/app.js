@@ -13,7 +13,8 @@ import { isEmpty } from 'ramda';
 import nconf from 'nconf';
 import RateLimit from 'express-rate-limit';
 import sanitize from 'sanitize-filename';
-import { DEV_MODE, logger } from './config/conf';
+import conf, { COOKIE_NAME, DEV_MODE, logger } from './config/conf';
+import passport, { setAuthenticationCookie } from './config/authentication';
 
 const createApp = async (apolloServer) => {
   // Init the http server
@@ -25,7 +26,7 @@ const createApp = async (apolloServer) => {
       res.status(429).send({ message: 'Too many requests, please try again later.' });
     },
   });
-  const sessionSecret = nconf.get('app:session_secret') || nconf.get('app:admin:password');
+  const sessionSecret = nconf.get('app:session_secret');
   const scriptSrc = ["'self'", "'unsafe-inline'", 'http://cdn.jsdelivr.net/npm/@apollographql/'];
   if (DEV_MODE) scriptSrc.push("'unsafe-eval'");
   app.use(session({ secret: sessionSecret, saveUninitialized: true, resave: true }));
@@ -60,7 +61,7 @@ const createApp = async (apolloServer) => {
   const AppBasePath = nconf.get('app:base_path').trim();
   const contextPath = isEmpty(AppBasePath) || AppBasePath === '/' ? '' : AppBasePath;
   const basePath = isEmpty(AppBasePath) || contextPath.startsWith('/') ? contextPath : `/${contextPath}`;
-  // const urlencodedParser = bodyParser.urlencoded({ extended: true });
+  const urlencodedParser = bodyParser.urlencoded({ extended: true });
 
   // -- Generated CSS with correct base path
   app.get(`${basePath}/static/css/*`, (req, res) => {
@@ -74,7 +75,7 @@ const createApp = async (apolloServer) => {
 
   // -- File download
   // app.get(`${basePath}/storage/get/:file(*)`, async (req, res) => {
-  //   let token = req.cookies ? req.cookies[FILIGRAN_TOKEN] : null;
+  //   let token = req.cookies ? req.cookies[COOKIE_NAME] : null;
   //   token = token || extractTokenFromBearer(req.headers.authorization);
   //   const auth = await authentication(token);
   //   if (!auth) res.sendStatus(403);
@@ -86,7 +87,7 @@ const createApp = async (apolloServer) => {
 
   // -- File view
   // app.get(`${basePath}/storage/view/:file(*)`, async (req, res) => {
-  //   let token = req.cookies ? req.cookies[FILIGRAN_TOKEN] : null;
+  //   let token = req.cookies ? req.cookies[COOKIE_NAME] : null;
   //   token = token || extractTokenFromBearer(req.headers.authorization);
   //   const auth = await authentication(token);
   //   if (!auth) res.sendStatus(403);
@@ -98,23 +99,25 @@ const createApp = async (apolloServer) => {
   //   stream.pipe(res);
   // });
 
+  app.get(`${basePath}/logout`, (req, res) => {
+    req.logout();
+    res.clearCookie(COOKIE_NAME);
+    res.redirect(conf.get('app:auth_provider:logout_uri'));
+  });
+
   // -- Passport login
-  // app.get(`${basePath}/auth/:provider`, (req, res, next) => {
-  //   const { provider } = req.params;
-  //   passport.authenticate(provider)(req, res, next);
-  // });
+  app.get(`${basePath}/login`, (req, res, next) => {
+    passport.authenticate('oic')(req, res, next);
+  });
 
   // -- Passport callback
-  // app.get(`${basePath}/auth/:provider/callback`, urlencodedParser, passport.initialize(), (req, res, next) => {
-  //   const { provider } = req.params;
-  //   passport.authenticate(provider, (err, token) => {
-  //     if (err || !token) {
-  //       return res.redirect(`/login?message=${err.message}`);
-  //     }
-  //     // setAuthenticationCookie(token, res);
-  //     return res.redirect('/dashboard');
-  //   })(req, res, next);
-  // });
+  app.get(`${basePath}/login/callback`, urlencodedParser, passport.initialize(), (req, res, next) => {
+    passport.authenticate('oic', (err, user) => {
+      if (err || !user) return res.redirect(`${basePath}/auth/oic`);
+      setAuthenticationCookie(user, res);
+      return res.redirect('/');
+    })(req, res, next);
+  });
 
   const serverHealthCheck = () => true;
   apolloServer.applyMiddleware({ app, onHealthCheck: serverHealthCheck, path: `${basePath}/graphql` });
