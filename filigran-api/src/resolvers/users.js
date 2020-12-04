@@ -1,6 +1,8 @@
+import { getUserInfo } from '../domain/users';
+
 const usersResolvers = {
   Query: {
-    me: (_, __, ctx) => ctx.user,
+    me: (_, __, ctx) => getUserInfo(ctx),
   },
 };
 

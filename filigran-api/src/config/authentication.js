@@ -39,12 +39,12 @@ export const extractUserTokenFromRequest = (req) => {
   return undefined;
 };
 
-const loginFromProvider = async (db, email) => {
-  let user = await getUserByEmail({ db }, email);
-  if (user === undefined) {
-    user = await createUser({ db }, { email });
+const loginFromProvider = async (db, user) => {
+  let existingUser = await getUserByEmail({ db }, user.email);
+  if (existingUser === undefined) {
+    existingUser = await createUser({ db }, user);
   }
-  return user;
+  return existingUser;
 };
 
 export const initProvider = (db) => {
@@ -55,8 +55,8 @@ export const initProvider = (db) => {
     const options = { client, params: { scope: 'openid email profile' } };
     const openIDStrategy = new OpenIDStrategy(options, (tokenset, userinfo, done) => {
       logger.debug(`[OPENID] Successfully logged`, { userinfo });
-      const { email } = userinfo;
-      return loginFromProvider(db, email)
+      const { email, sub: id } = userinfo;
+      return loginFromProvider(db, { id, email })
         .then((user) => {
           done(null, user);
         })

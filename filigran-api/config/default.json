@@ -22,6 +22,12 @@
       "logout_uri": "https://.../openid-connect/logout?redirect_uri=http://localhost:3000"
     }
   },
+  "keycloak": {
+    "token": "https://.../auth/realms/master/protocol/openid-connect/token",
+    "realm": "https://.../auth/admin/realms/myrealm",
+    "username": "change_me",
+    "password": "change_me"
+  },
   "database": {
     "host": "127.0.0.1",
     "port": "5432",

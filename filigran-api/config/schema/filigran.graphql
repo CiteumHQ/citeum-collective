@@ -15,8 +15,18 @@ type AppInfo {
   postgre: String
 }
 
+type Identity {
+  identityProvider: String
+  userId: String
+  userName: String
+}
+
 type User {
-  email: ID!
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  federatedIdentities: [Identity]
 }
 
 ### QUERIES

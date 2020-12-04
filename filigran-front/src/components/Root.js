@@ -1,12 +1,15 @@
 import { gql } from '@apollo/client';
 import React from 'react';
-import logo from '../logo.svg';
+import logo from './Logo_text.png';
 import './Root.css';
 import { useBasicQuery } from '../network/Apollo';
 
 const QUERY_ME = gql`
     query GetMe {
         me {
+            id
+            firstName
+            lastName
             email
         }
     }
@@ -18,7 +21,7 @@ function Root() {
         <div className="App">
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo"/>
-                <p>{data?.me?.email} - <a href='/logout'>Logout</a> </p>
+                <p>{data?.me?.firstName} {data?.me?.lastName} - {data?.me?.email} - <a href='/logout'>Logout</a> </p>
             </header>
         </div>
   );
