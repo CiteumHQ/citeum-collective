@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { gql } from '@apollo/client';
 import React from 'react';
 import logo from './Logo_text.png';
@@ -17,11 +18,15 @@ const QUERY_ME = gql`
 
 function Root() {
   const { data } = useBasicQuery(QUERY_ME);
+  const me = data?.me;
   return (
         <div className="App">
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo"/>
-                <p>{data?.me?.firstName} {data?.me?.lastName} - {data?.me?.email} - <a href='/logout'>Logout</a> </p>
+                {me
+                  ? <p>{me.firstName} {me.lastName} - {me.email} - <a href='/logout'>Logout</a> </p>
+                  : <p><CircularProgress /></p>
+                }
             </header>
         </div>
   );
