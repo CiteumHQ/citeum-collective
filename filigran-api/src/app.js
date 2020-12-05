@@ -107,15 +107,17 @@ const createApp = async (apolloServer) => {
 
   // -- Passport login
   app.get(`${basePath}/login`, (req, res, next) => {
+    req.session.redirect_override = req.get('Referrer');
     passport.authenticate('oic')(req, res, next);
   });
 
   // -- Passport callback
   app.get(`${basePath}/login/callback`, urlencodedParser, passport.initialize(), (req, res, next) => {
     passport.authenticate('oic', (err, user) => {
-      if (err || !user) return res.redirect(`${basePath}/auth/oic`);
+      if (err || !user) res.redirect(`/`);
       setAuthenticationCookie(user, res);
-      return res.redirect('/');
+      res.redirect(req.session.redirect_override || '/');
+      req.session.redirect_override = '';
     })(req, res, next);
   });
 

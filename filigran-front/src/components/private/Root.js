@@ -1,9 +1,11 @@
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { Route, Switch } from 'react-router-dom';
 import { gql } from '@apollo/client';
 import React from 'react';
-import logo from './Logo_text.png';
-import './Root.css';
-import { useBasicQuery } from '../network/Apollo';
+import logo from '../Logo_text.png';
+import '../../App.css';
+import { useBasicQuery } from '../../network/Apollo';
+import Home from './home/Home';
 
 const QUERY_ME = gql`
     query GetMe {
@@ -28,6 +30,12 @@ function Root() {
                   : <p><CircularProgress /></p>
                 }
             </header>
+            {me
+            && <div>
+                <Switch>
+                    <Route exact path='/app' component={Home} />
+                </Switch>
+            </div>}
         </div>
   );
 }
