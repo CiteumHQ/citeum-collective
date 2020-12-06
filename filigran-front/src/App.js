@@ -16,7 +16,7 @@ function App() {
                 <CssBaseline />
                 <Switch>
                     <Route exact path='/' component={PublicRoot} />
-                    <Route exact path='/app' component={PrivateRoot} />
+                    <Route path='/app' component={PrivateRoot} />
                 </Switch>
             </ApolloProvider>
         </BrowserRouter>

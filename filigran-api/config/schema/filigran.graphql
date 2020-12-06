@@ -39,12 +39,16 @@ type Query {
 ### MUTATIONS
 
 ### MUTATIONS DECLARATION
+input UserProfileInput {
+  firstName: String!
+  lastName: String!
+}
+
 input UserLoginInput {
   email: String!
   password: String!
 }
 
 type Mutation {
-  token(input: UserLoginInput): String
-  logout: ID @auth
+  updateProfile(input: UserProfileInput): User @auth
 }

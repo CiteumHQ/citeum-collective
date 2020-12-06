@@ -1,8 +1,11 @@
-import { getUserInfo } from '../domain/users';
+import { getUser, updateUser } from '../domain/users';
 
 const usersResolvers = {
   Query: {
-    me: (_, __, ctx) => getUserInfo(ctx),
+    me: (_, __, ctx) => getUser(ctx),
+  },
+  Mutation: {
+    updateProfile: (_, { input }, ctx) => updateUser(ctx, input),
   },
 };
 

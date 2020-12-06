@@ -1,7 +1,9 @@
 import { bridgeSql } from '../database/postgre';
 import { sql } from '../utils/sql';
+import conf, { MAIN_ASSOCIATION_ID } from '../config/conf';
 
 export const up = async (knex, db = bridgeSql(knex)) => {
+  const associationName = conf.get('app:main_association');
   await db.execute(sql`
         CREATE TABLE "users"
         (
@@ -11,11 +13,11 @@ export const up = async (knex, db = bridgeSql(knex)) => {
         );
         CREATE TABLE "associations"
         (
-            id SERIAL  PRIMARY KEY,
-            name VARCHAR(255) UNIQUE,
+            id          VARCHAR(255) PRIMARY KEY,
+            name        VARCHAR(255) UNIQUE,
             register_at timestamp
         );
-        INSERT INTO associations (name, register_at) VALUES ('Filigran', current_timestamp);
+        INSERT INTO associations (id, name, register_at) VALUES (${MAIN_ASSOCIATION_ID}, ${associationName}, current_timestamp);
     `);
 };
 

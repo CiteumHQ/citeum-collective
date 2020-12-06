@@ -88,11 +88,15 @@ export const connectDatabase = () => {
 
   bridgeSql(database, database);
 
-  // const originalTransaction = database.transaction;
-  // database.transaction = async (...args) => {
-  //   const trx = await originalTransaction.call(database, ...args);
-  //   bridgeSql(trx, trx);
-  //   return trx;
-  // };
+  const originalTransaction = database.transaction;
+  // Object.defineProperty must be used instead of database.transaction assignation since https://github.com/knex/knex/pull/3717/files#diff-a3c5ee73d04684a19f3b2beb31b5c47e
+  Object.defineProperty(database, 'transaction', {
+    value: async (...args) => {
+      const trx = await originalTransaction.call(database, ...args);
+      bridgeSql(trx, trx);
+      return trx;
+    },
+    configurable: true,
+  });
   return database;
 };

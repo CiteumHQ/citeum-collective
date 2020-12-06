@@ -3,6 +3,8 @@
     "port": 4000,
     "logs": "./logs",
     "logs_level": "info",
+    "admin": "admin@citeum.org",
+    "main_association": "Citeum",
     "session_secret": "change_me",
     "rate_protection": {
       "time_window": 1,
@@ -23,8 +25,7 @@
     }
   },
   "keycloak": {
-    "token": "https://.../auth/realms/master/protocol/openid-connect/token",
-    "realm": "https://.../auth/admin/realms/myrealm",
+    "uri": "https://...",
     "username": "change_me",
     "password": "change_me"
   },

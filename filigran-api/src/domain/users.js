@@ -1,8 +1,12 @@
 import { sql } from '../utils/sql';
-import { userInfo } from '../database/keycloak';
+import { getUserInfo, updateUserInfo } from '../database/keycloak';
 
-export const getUserInfo = async (ctx) => {
-  return userInfo(ctx.user.id);
+export const getUser = async (ctx) => {
+  return getUserInfo(ctx.user.id);
+};
+
+export const updateUser = async (ctx, input) => {
+  return updateUserInfo(ctx.user.id, input);
 };
 
 export const getUserByEmail = (ctx, email) => {

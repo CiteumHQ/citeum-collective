@@ -45,8 +45,12 @@ class AuthDirective extends SchemaDirectiveVisitor {
       const matchingCapabilities = filter((r) => includes(checkCapability, r), userCapabilities);
       if (matchingCapabilities.length > 0) availableCapabilities.push(checkCapability);
     }
-    if (availableCapabilities.length === 0) throw ForbiddenAccess();
-    if (requiredAll && availableCapabilities.length !== requiredCapabilities.length) throw ForbiddenAccess();
+    if (availableCapabilities.length === 0) {
+      throw ForbiddenAccess();
+    }
+    if (requiredAll && availableCapabilities.length !== requiredCapabilities.length) {
+      throw ForbiddenAccess();
+    }
     return func.apply(this, args);
   }
 

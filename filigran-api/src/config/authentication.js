@@ -5,7 +5,7 @@ import conf, { COOKIE_NAME, logger } from './conf';
 import { createUser, getUserByEmail } from '../domain/users';
 
 const generateJwtAccessToken = (user) => {
-  const jwtBody = { email: user.email };
+  const jwtBody = { id: user.id, email: user.email };
   const jwtOptions = {
     expiresIn: conf.get('app:auth_jwt:expiration'), // will generate the exp claim in the jwtBody
     mutatePayload: true, // this allow to get back the generated exp value after sign operation
@@ -30,7 +30,7 @@ export const extractUserTokenFromRequest = (req) => {
     if (authCookie) {
       try {
         const jwtBody = jwt.verify(authCookie, conf.get('app:auth_jwt:secret'));
-        return { email: jwtBody.email, expirationTime: jwtBody.exp };
+        return { id: jwtBody.id, email: jwtBody.email, expirationTime: jwtBody.exp };
       } catch (e) {
         logger.error('Unable to verify JWT token', { token: authCookie, error: e });
       }
@@ -52,7 +52,7 @@ export const initProvider = (db) => {
   return OpenIDIssuer.discover(provider.issuer).then((issuer) => {
     const { Client } = issuer;
     const client = new Client(provider);
-    const options = { client, params: { scope: 'openid email profile' } };
+    const options = { client, params: { scope: 'openid email profile roles' } };
     const openIDStrategy = new OpenIDStrategy(options, (tokenset, userinfo, done) => {
       logger.debug(`[OPENID] Successfully logged`, { userinfo });
       const { email, sub: id } = userinfo;
