@@ -19,6 +19,10 @@ const QUERY_ME = gql`
             firstName
             lastName
             email
+            accessRights {
+                name
+                roles
+            }
         }
     }
 `;

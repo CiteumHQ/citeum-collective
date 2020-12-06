@@ -35,6 +35,10 @@ const Profile = () => {
       <br/>
       <input type="submit" value="Save!"/>
     </form>
+    <hr/>
+    <ul>
+      {me.accessRights.map((access, index) => <li key={ index }><b>{access.name}</b>: {access.roles.join(', ')}</li>)}
+    </ul>
   </div>);
 };
 

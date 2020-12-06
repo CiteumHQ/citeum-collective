@@ -3,7 +3,7 @@ import conf from '../config/conf';
 
 const api = (token) => {
   const bearer = token.data.access_token;
-  const realName = conf.get('app:main_association');
+  const realName = conf.get('keycloak:base_realm');
   return axios.create({
     baseURL: `${conf.get('keycloak:uri')}/auth/admin/realms/${realName}`,
     headers: { Authorization: `Bearer ${bearer}` },
@@ -25,11 +25,9 @@ const getAdminToken = () => {
   return instance.post('/', params);
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const getUserInfo = async (userId) => {
   const token = await getAdminToken();
   const answer = await api(token).get(`/users/${userId}`);
-  // const rolesAnswer = await api(token).get(`/users/${userId}/role-mappings`);
   return answer.data;
 };
 

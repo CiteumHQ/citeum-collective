@@ -3,7 +3,7 @@ import { sql } from '../utils/sql';
 import conf, { MAIN_ASSOCIATION_ID } from '../config/conf';
 
 export const up = async (knex, db = bridgeSql(knex)) => {
-  const associationName = conf.get('app:main_association');
+  const associationName = conf.get('keycloak:base_realm');
   await db.execute(sql`
         CREATE TABLE "users"
         (

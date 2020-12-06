@@ -22,35 +22,11 @@ class AuthDirective extends SchemaDirectiveVisitor {
     field._requiredAll = this.args.and;
   }
 
-  authenticationControl(func, args, objectType, field) {
-    // Get the required Role from the field first, falling back
-    // to the objectType if no Role is required by the field:
-    const requiredCapabilities = field._requiredCapabilities || objectType._requiredCapabilities || [];
-    const requiredAll = field._requiredAll || objectType._requiredAll || false;
+  authenticationControl(func, args) {
     // If a role is required
     const context = args[2];
     const { user } = context;
     if (!user) throw AuthRequired(); // User must be authenticated.
-    // Start checking capabilities
-    if (requiredCapabilities.length === 0) return func.apply(this, args);
-    // Compute user capabilities
-    const userCapabilities = map((c) => c.name, user.capabilities);
-    // Accept everything if bypass capability or the system user (protection).
-    const shouldBypass = false; // userCapabilities.includes(BYPASS) || user.id === OPENCTI_ADMIN_UUID;
-    if (shouldBypass) return func.apply(this, args);
-    // Check the user capabilities
-    const availableCapabilities = [];
-    for (let index = 0; index < requiredCapabilities.length; index += 1) {
-      const checkCapability = requiredCapabilities[index];
-      const matchingCapabilities = filter((r) => includes(checkCapability, r), userCapabilities);
-      if (matchingCapabilities.length > 0) availableCapabilities.push(checkCapability);
-    }
-    if (availableCapabilities.length === 0) {
-      throw ForbiddenAccess();
-    }
-    if (requiredAll && availableCapabilities.length !== requiredCapabilities.length) {
-      throw ForbiddenAccess();
-    }
     return func.apply(this, args);
   }
 

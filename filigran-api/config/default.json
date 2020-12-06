@@ -4,7 +4,6 @@
     "logs": "./logs",
     "logs_level": "info",
     "admin": "admin@citeum.org",
-    "main_association": "Citeum",
     "session_secret": "change_me",
     "rate_protection": {
       "time_window": 1,
@@ -25,6 +24,7 @@
     }
   },
   "keycloak": {
+    "base_realm": "Citeum",
     "uri": "https://...",
     "username": "change_me",
     "password": "change_me"

@@ -1,14 +1,11 @@
 ### DIRECTIVES
 
-directive @auth(for: [Capabilities] = [], and: Boolean = false) on OBJECT | FIELD_DEFINITION
+directive @auth on OBJECT | FIELD_DEFINITION
 
 ### SCALAR
 
 scalar DateTime
 scalar Upload
-enum Capabilities {
-  TEST
-}
 
 type AppInfo {
   app: String
@@ -21,11 +18,17 @@ type Identity {
   userName: String
 }
 
+type UserAccess {
+  name: String!
+  roles: [String]
+}
+
 type User {
   id: ID!
   email: String!
   firstName: String
   lastName: String
+  accessRights: [UserAccess]
   federatedIdentities: [Identity]
 }
 
