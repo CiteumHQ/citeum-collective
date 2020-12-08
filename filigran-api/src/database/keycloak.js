@@ -1,38 +1,72 @@
-import axios from 'axios';
+import KcAdminClient from 'keycloak-admin';
+import normalize from 'normalize-name';
+import { Issuer } from 'openid-client';
 import conf from '../config/conf';
 
-const api = (token) => {
-  const bearer = token.data.access_token;
-  const realName = conf.get('keycloak:base_realm');
-  return axios.create({
-    baseURL: `${conf.get('keycloak:uri')}/auth/admin/realms/${realName}`,
-    headers: { Authorization: `Bearer ${bearer}` },
-    timeout: 1000,
+const kcAdminClient = new KcAdminClient({
+  baseUrl: `${conf.get('keycloak:uri')}/auth`,
+});
+
+// Authorize with username / password
+export const connectKeycloak = async () => {
+  const username = conf.get('keycloak:username');
+  const password = conf.get('keycloak:password');
+  await kcAdminClient.auth({
+    username,
+    password,
+    grantType: 'password',
+    clientId: 'admin-cli',
   });
+  const keycloakIssuer = await Issuer.discover(`${conf.get('keycloak:uri')}/auth/realms/master`);
+  const client = new keycloakIssuer.Client({
+    client_id: 'admin-cli', // Same as `clientId` passed to client.auth()
+    token_endpoint_auth_method: 'none', // to send only client_id in the header
+  });
+  let tokenSet = await client.grant({
+    grant_type: 'password',
+    username,
+    password,
+  });
+  // Periodically using refresh_token grant flow to get new access token here
+  return setInterval(async () => {
+    const refreshToken = tokenSet.refresh_token;
+    tokenSet = await client.refresh(refreshToken);
+    kcAdminClient.setAccessToken(tokenSet.access_token);
+  }, 58 * 1000); // 58 seconds
 };
 
-const getAdminToken = () => {
-  const params = new URLSearchParams();
-  params.append('client_id', 'admin-cli');
-  params.append('grant_type', 'password');
-  params.append('username', conf.get('keycloak:username'));
-  params.append('password', conf.get('keycloak:password'));
-  const instance = axios.create({
-    baseURL: `${conf.get('keycloak:uri')}/auth/realms/master/protocol/openid-connect/token`,
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    timeout: 1000,
-  });
-  return instance.post('/', params);
+const basic = () => {
+  kcAdminClient.setConfig({ realmName: conf.get('keycloak:base_realm') });
+  return kcAdminClient;
 };
 
-export const getUserInfo = async (userId) => {
-  const token = await getAdminToken();
-  const answer = await api(token).get(`/users/${userId}`);
-  return answer.data;
+export const getUserInfo = (userId) => {
+  return basic().users.findOne({ id: userId });
 };
 
 export const updateUserInfo = async (userId, input) => {
-  const token = await getAdminToken();
-  await api(token).put(`/users/${userId}`, input);
+  await basic().users.update({ id: userId }, input);
   return getUserInfo(userId);
+};
+
+export const associationClientId = (association) => normalize(association.name).toLowerCase();
+
+export const grantRoleToUser = async (roleName, user) => {
+  const role = await basic().roles.findOneByName({ name: roleName });
+  return basic().users.addRealmRoleMappings({
+    id: user.id,
+    roles: [{ id: role.id, name: role.name }],
+  });
+};
+
+export const createAssociationAdminRole = async (association) => {
+  const roleName = `${associationClientId(association)}_admin`;
+  const input = { name: roleName, description: `Admin role for ${association.name}` };
+  await basic().roles.create(input);
+  return roleName;
+};
+
+export const createApplicationClient = async (association) => {
+  const input = { name: association.name, clientId: associationClientId(association) };
+  await basic().clients.create(input);
 };

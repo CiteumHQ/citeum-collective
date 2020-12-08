@@ -4,7 +4,7 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 
 const DEFAULT_ENV = 'production';
-export const COOKIE_NAME = 'filigran';
+export const COOKIE_NAME = 'citeumcollective';
 export const MAIN_ASSOCIATION_ID = '7720784e-25d1-41a7-9fcb-172e523aec0b';
 
 // Environment from NODE_ENV environment variable

@@ -4,19 +4,16 @@ import { makeExecutableSchema } from 'graphql-tools';
 import { constraintDirective } from 'graphql-constraint-directive';
 import usersResolvers from '../resolvers/users';
 import settingsResolvers from '../resolvers/settings';
+import associationsResolvers from '../resolvers/associations';
 import AuthDirectives, { AUTH_DIRECTIVE } from './authDirective';
-import typeDefs from '../../config/schema/filigran.graphql';
+import typeDefs from '../../config/schema/citeumcollective.graphql';
 
 const createSchema = () => {
   const globalResolvers = {
     DateTime: GraphQLDateTime,
   };
 
-  const resolvers = mergeResolvers([
-    globalResolvers,
-    usersResolvers,
-    settingsResolvers,
-  ]);
+  const resolvers = mergeResolvers([globalResolvers, usersResolvers, settingsResolvers, associationsResolvers]);
 
   return makeExecutableSchema({
     typeDefs,

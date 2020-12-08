@@ -6,8 +6,8 @@ import createApolloServer from './graphql/graphql';
 
 const PORT = conf.get('app:port');
 // const broadcaster = initBroadcaster();
-const createHttpServer = async (db) => {
-  const apolloServer = createApolloServer(db);
+const createHttpServer = async (db, kc) => {
+  const apolloServer = createApolloServer(db, kc);
   const { app, seeMiddleware } = await createApp(apolloServer);
   const httpServer = http.createServer(app);
   apolloServer.installSubscriptionHandlers(httpServer);
@@ -34,11 +34,11 @@ export const listenServer = async (db) => {
     }
   });
 };
-export const restartServer = async (httpServer) => {
+export const restartServer = async (db, httpServer) => {
   return new Promise((resolve, reject) => {
     httpServer.close(() => {
       logger.info('[FILIGRAN] GraphQL server stopped');
-      listenServer()
+      listenServer(db)
         .then((server) => resolve(server))
         .catch((e) => reject(e));
     });

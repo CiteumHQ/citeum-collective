@@ -17,5 +17,5 @@ export const getUserByEmail = (ctx, email) => {
 export const createUser = async (ctx, user) => {
   const { sub: id, email } = user;
   await ctx.db.execute(sql`insert INTO users (id, email, register_at) values (${id}, ${email}, current_timestamp)`);
-  return getUserByEmail(email);
+  return getUserByEmail(ctx, email);
 };

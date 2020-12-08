@@ -18,6 +18,11 @@ type Identity {
   userName: String
 }
 
+type Association {
+  id: ID!
+  name: String!
+}
+
 type UserAccess {
   name: String!
   roles: [String]
@@ -37,11 +42,16 @@ type User {
 type Query {
   about: AppInfo
   me: User @auth
+  association: Association @auth
 }
 
 ### MUTATIONS
 
 ### MUTATIONS DECLARATION
+input AssociationAddInput {
+ name: String!
+}
+
 input UserProfileInput {
   firstName: String!
   lastName: String!
@@ -54,4 +64,5 @@ input UserLoginInput {
 
 type Mutation {
   updateProfile(input: UserProfileInput): User @auth
+  associationAdd(input: AssociationAddInput): Association @auth
 }
