@@ -55,7 +55,7 @@ const platformInit = async (db) => {
       // await initializeAdminUser();
     }
   } catch (e) {
-    logger.error(`[FILIGRAN] Platform initialization fail`, { error: e });
+    logger.error(`[CITEUMCOLLECTIVE] Platform initialization fail`, { error: e });
     throw e;
   }
   return true;

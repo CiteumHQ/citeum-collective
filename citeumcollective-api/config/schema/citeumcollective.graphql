@@ -21,6 +21,7 @@ type Identity {
 type Association {
   id: ID!
   name: String!
+  code: String!
 }
 
 type UserAccess {
@@ -49,6 +50,7 @@ type Query {
 
 ### MUTATIONS DECLARATION
 input AssociationAddInput {
+ code: String!
  name: String!
 }
 

@@ -32,7 +32,7 @@ if (DEV_MODE && module.hot) {
 
 (async () => {
   try {
-    logger.info(`[FILIGRAN] Starting platform`);
+    logger.info(`[CITEUMCOLLECTIVE] Starting platform`);
     await platformInit(db);
     kc = await connectKeycloak();
     server = await listenServer(db);

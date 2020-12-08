@@ -17,14 +17,16 @@
     },
     "auth_provider": {
       "issuer": "https://.../openid-configuration",
-      "client_id": "client_id",
       "client_secret": "client_secret",
       "redirect_uris": ["http://localhost/login/callback"],
       "logout_uri": "https://.../openid-connect/logout?redirect_uri=http://localhost:3000"
     }
   },
+  "association": {
+    "identifier": "citeum",
+    "name": "Citeum"
+  },
   "keycloak": {
-    "base_realm": "Citeum",
     "uri": "https://...",
     "username": "change_me",
     "password": "change_me"

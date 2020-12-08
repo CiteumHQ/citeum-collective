@@ -24,12 +24,12 @@ export const listenServer = async (db) => {
           // seeMiddleware.shutdown();
         });
         httpServer.listen(PORT, () => {
-          logger.info(`[FILIGRAN] Servers ready on port ${PORT}`);
+          logger.info(`[CITEUMCOLLECTIVE] Servers ready on port ${PORT}`);
           resolve(httpServer);
         });
       });
     } catch (e) {
-      logger.error(`[FILIGRAN] Start http server fail`, { error: e });
+      logger.error(`[CITEUMCOLLECTIVE] Start http server fail`, { error: e });
       reject(e);
     }
   });
@@ -37,7 +37,7 @@ export const listenServer = async (db) => {
 export const restartServer = async (db, httpServer) => {
   return new Promise((resolve, reject) => {
     httpServer.close(() => {
-      logger.info('[FILIGRAN] GraphQL server stopped');
+      logger.info('[CITEUMCOLLECTIVE] GraphQL server stopped');
       listenServer(db)
         .then((server) => resolve(server))
         .catch((e) => reject(e));

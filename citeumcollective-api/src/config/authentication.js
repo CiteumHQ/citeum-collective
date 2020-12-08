@@ -11,7 +11,7 @@ const computeAccessUserRights = (user) => {
   let access = { global: user.realm_access, ...user.resource_access };
   if (user.email === conf.get('app:admin')) {
     // User is the base association admin, must grant a special access role.
-    const clientApp = conf.get('app:auth_provider:client_id');
+    const clientApp = conf.get('association:identifier');
     const baseRoles = user.resource_access[clientApp].roles;
     const appAdminRole = `${clientApp}_admin`;
     if (!baseRoles.includes(appAdminRole)) {
@@ -67,7 +67,7 @@ const initUserInDatabase = async (db, user) => {
 };
 
 export const initProvider = (db) => {
-  const provider = conf.get('app:auth_provider');
+  const provider = { ...{ client_id: conf.get('association:identifier') }, ...conf.get('app:auth_provider') };
   return OpenIDIssuer.discover(provider.issuer).then((issuer) => {
     const { Client } = issuer;
     const client = new Client(provider);

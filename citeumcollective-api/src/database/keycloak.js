@@ -36,7 +36,7 @@ export const connectKeycloak = async () => {
 };
 
 const basic = () => {
-  kcAdminClient.setConfig({ realmName: conf.get('keycloak:base_realm') });
+  kcAdminClient.setConfig({ realmName: conf.get('association:identifier') });
   return kcAdminClient;
 };
 
