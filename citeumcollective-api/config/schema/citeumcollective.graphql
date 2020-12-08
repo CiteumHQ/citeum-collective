@@ -39,6 +39,7 @@ type Query {
   about: AppInfo
   me: User @auth
   association: Association @auth
+  userAssociations: [Association] @auth
 }
 
 ### MUTATIONS

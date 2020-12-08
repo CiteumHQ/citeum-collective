@@ -2,6 +2,7 @@ import KcAdminClient from 'keycloak-admin';
 import normalize from 'normalize-name';
 import { Issuer } from 'openid-client';
 import conf from '../config/conf';
+import { ROLE_ASSO_PREFIX, ROLE_ROOT } from './constants';
 
 const kcAdminClient = new KcAdminClient({
   baseUrl: `${conf.get('keycloak:uri')}/auth`,
@@ -40,7 +41,6 @@ const basic = () => {
   return kcAdminClient;
 };
 
-const ROLE_ROOT = 'root';
 export const getUserInfo = async (userId) => {
   const input = { id: userId };
   const user = await basic().users.findOne(input);
@@ -68,7 +68,7 @@ export const grantRoleToUser = async (roleName, user) => {
 };
 
 export const createAssociationAdminRole = async (association) => {
-  const roleName = `${associationClientId(association)}_admin`;
+  const roleName = `${ROLE_ASSO_PREFIX}${associationClientId(association)}_admin`;
   const input = { name: roleName, description: `Admin role for ${association.name}` };
   await basic().roles.create(input);
   return roleName;
