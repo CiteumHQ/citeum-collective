@@ -1,3 +1,3 @@
-# Getting Started with filigran
+# Getting Started with Citeum Collective
 
 TODO
