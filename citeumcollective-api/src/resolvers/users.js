@@ -1,8 +1,8 @@
-import { getUser, updateUser } from '../domain/users';
+import { updateUser } from '../domain/users';
 
 const usersResolvers = {
   Query: {
-    me: (_, __, ctx) => getUser(ctx),
+    me: (_, __, ctx) => ctx.user,
   },
   Mutation: {
     updateProfile: (_, { input }, ctx) => updateUser(ctx, input),

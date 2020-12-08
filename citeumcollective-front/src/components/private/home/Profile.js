@@ -12,7 +12,7 @@ const UPDATE_PROFILE = gql`
 `;
 
 const Profile = () => {
-  const { me, update } = useContext(UserContext);
+  const { me, isRoot, update } = useContext(UserContext);
   const [updateProfile] = useMutation(UPDATE_PROFILE, {
     onCompleted(data) {
       update({ ...me, ...data.updateProfile });
@@ -36,9 +36,9 @@ const Profile = () => {
       <input type="submit" value="Save!"/>
     </form>
     <hr/>
-    <ul>
-      {me.accessRights.map((access, index) => <li key={ index }><b>{access.name}</b>: {access.roles.join(', ')}</li>)}
-    </ul>
+    <div>isRoot: {isRoot() ? 'true' : 'false'}</div>
+    <hr/>
+    <b>{me?.roles?.join(', ')}</b>
   </div>);
 };
 

@@ -19,10 +19,7 @@ const QUERY_ME = gql`
             firstName
             lastName
             email
-            accessRights {
-                name
-                roles
-            }
+            roles
         }
     }
 `;
@@ -44,8 +41,14 @@ const Root = (props) => {
       setUserDetail(data.me);
     }
   }, [loading, data]);
+  const userData = {
+    me: userDetail,
+    isRoot: () => userDetail.roles.includes('root'),
+    isGranted: (association, role) => userDetail.roles.includes(`${association}_${role}`),
+    update,
+  };
   return (
-        <UserContext.Provider value={{ me: userDetail, update }}>
+        <UserContext.Provider value={userData}>
             <header className="App-header">
                 {userDetail
                   ? <div>{userDetail.firstName} {userDetail.lastName} - {userDetail.email} - <a href='/logout'>Logout</a> </div>
@@ -71,6 +74,7 @@ const Root = (props) => {
                 <Switch>
                     <Route exact path='/app' component={Profile} />
                     <Route exact path='/app/applications' component={Applications} />
+                    <Route exact path='/app/administration' component={Applications} />
                 </Switch>
             </div>}
         </UserContext.Provider>

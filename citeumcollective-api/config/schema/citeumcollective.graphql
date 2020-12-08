@@ -24,17 +24,12 @@ type Association {
   code: String!
 }
 
-type UserAccess {
-  name: String!
-  roles: [String]
-}
-
 type User {
   id: ID!
   email: String!
   firstName: String
   lastName: String
-  accessRights: [UserAccess]
+  roles: [String]
   federatedIdentities: [Identity]
 }
 

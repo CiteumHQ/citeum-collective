@@ -1,31 +1,13 @@
 import { Issuer as OpenIDIssuer, Strategy as OpenIDStrategy } from 'openid-client';
 import passport from 'passport';
-import * as R from 'ramda';
 // eslint-disable-next-line camelcase
 import jwt_decode from 'jwt-decode';
 import * as jwt from 'jsonwebtoken';
 import conf, { COOKIE_NAME, logger } from './conf';
 import { createUser, getUserByEmail } from '../domain/users';
 
-const computeAccessUserRights = (user) => {
-  let access = { global: user.realm_access, ...user.resource_access };
-  if (user.email === conf.get('app:admin')) {
-    // User is the base association admin, must grant a special access role.
-    const clientApp = conf.get('association:identifier');
-    const baseRoles = user.resource_access[clientApp].roles;
-    const appAdminRole = `${clientApp}_admin`;
-    if (!baseRoles.includes(appAdminRole)) {
-      baseRoles.push(appAdminRole);
-    }
-    access = { global: user.realm_access, ...user.resource_access };
-  }
-  return access;
-};
-
 const generateJwtAccessToken = (user) => {
-  const access = computeAccessUserRights(user);
-  const formattedAccess = R.map(([name, r]) => ({ name, roles: r.roles }), R.toPairs(access));
-  const jwtBody = { id: user.sub, accessRights: formattedAccess };
+  const jwtBody = { id: user.sub };
   const jwtOptions = {
     expiresIn: conf.get('app:auth_jwt:expiration'), // will generate the exp claim in the jwtBody
     mutatePayload: true, // this allow to get back the generated exp value after sign operation

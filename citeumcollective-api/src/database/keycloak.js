@@ -40,8 +40,16 @@ const basic = () => {
   return kcAdminClient;
 };
 
-export const getUserInfo = (userId) => {
-  return basic().users.findOne({ id: userId });
+const ROLE_ROOT = 'root';
+export const getUserInfo = async (userId) => {
+  const input = { id: userId };
+  const user = await basic().users.findOne(input);
+  const realmRoles = await basic().users.listRealmRoleMappings(input);
+  const roles = realmRoles.map((r) => r.name);
+  if (user.email === conf.get('app:admin') && !roles.includes(ROLE_ROOT)) {
+    roles.push(ROLE_ROOT);
+  }
+  return Object.assign(user, { roles });
 };
 
 export const updateUserInfo = async (userId, input) => {

@@ -1,10 +1,7 @@
 import { sql } from '../utils/sql';
 import { getUserInfo, updateUserInfo } from '../database/keycloak';
 
-export const getUser = async (ctx) => {
-  const userInfo = await getUserInfo(ctx.user.id);
-  return Object.assign(ctx.user, userInfo);
-};
+export const getUser = async (userId) => getUserInfo(userId);
 
 export const updateUser = async (ctx, input) => {
   return updateUserInfo(ctx.user.id, input);
