@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import * as R from 'ramda';
 import { sql } from '../utils/sql';
 import { createAssociationAdminRole, grantRoleToUser } from '../database/keycloak';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
@@ -13,12 +14,14 @@ export const getAssociationByCode = (ctx, code) => {
 
 export const userAssociations = async (ctx) => {
   const userRoles = ctx.user.roles;
-  const assoCodes = userRoles
-    .filter((f) => f.startsWith(ROLE_ASSO_PREFIX))
-    .map((a) => {
-      const [, association] = a.split(ROLE_ASSO_SEPARATOR);
-      return association;
-    });
+  const assoCodes = R.uniq(
+    userRoles
+      .filter((f) => f.startsWith(ROLE_ASSO_PREFIX))
+      .map((a) => {
+        const [, association] = a.split(ROLE_ASSO_SEPARATOR);
+        return association;
+      })
+  );
   return ctx.db.queryRows(sql`SELECT * from associations where code in (${sql.bindings(assoCodes)})`);
 };
 
