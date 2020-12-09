@@ -24,6 +24,7 @@
   "association": {
     "identifier": "citeum",
     "name": "Citeum",
+    "email": "contact@citeum.org",
     "admin": "admin@citeum.org"
   },
   "keycloak": {

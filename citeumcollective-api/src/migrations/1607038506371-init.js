@@ -19,8 +19,9 @@ export const up = async (knex, db = bridgeSql(knex)) => {
             id          VARCHAR(255) PRIMARY KEY,
             code        VARCHAR(255) UNIQUE,
             name        VARCHAR(255) UNIQUE,
+            email       VARCHAR(255) UNIQUE,
             register_at timestamp
-        );       
+        );
         CREATE TABLE "memberships"
         (
             id              VARCHAR(255) PRIMARY KEY,
@@ -38,7 +39,8 @@ export const up = async (knex, db = bridgeSql(knex)) => {
   const admin = await getUserByName(conf.get('association:admin'));
   const associationName = conf.get('association:name');
   const associationCode = conf.get('association:identifier');
-  const asso = { name: associationName, code: associationCode };
+  const associationEmail = conf.get('association:email');
+  const asso = { name: associationName, email: associationEmail, code: associationCode };
   const association = await createAssociation({ db, user: admin }, asso);
   await createMembership({ db }, association, { name: 'Supporter', code: 'supporter' });
 };

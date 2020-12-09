@@ -10,17 +10,17 @@ import AppTheme from './AppTheme';
 
 function App() {
   return (
-      <ThemeProvider theme={createMuiTheme(AppTheme)}>
-        <BrowserRouter>
-            <ApolloProvider client={client}>
-                <CssBaseline />
-                <Switch>
-                    <Route exact path='/' component={PublicRoot} />
-                    <Route path='/app' component={PrivateRoot} />
-                </Switch>
-            </ApolloProvider>
-        </BrowserRouter>
-      </ThemeProvider>
+    <ThemeProvider theme={createMuiTheme(AppTheme)}>
+      <BrowserRouter>
+        <ApolloProvider client={client}>
+          <CssBaseline />
+          <Switch>
+            <Route exact path="/" component={PublicRoot} />
+            <Route path="/app" component={PrivateRoot} />
+          </Switch>
+        </ApolloProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

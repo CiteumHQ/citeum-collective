@@ -24,16 +24,22 @@ export const getErrorCode = (error) => {
 
 export const useBasicQuery = (query, variables, options) => {
   const queryResult = useQuery(query, { ...options, variables });
-  if (queryResult.error && getErrorCode(queryResult.error) === errorCodes.UNAUTHENTICATED_CODE) {
+  if (
+    queryResult.error
+    && getErrorCode(queryResult.error) === errorCodes.UNAUTHENTICATED_CODE
+  ) {
     window.location.href = '/login';
   }
   const optionOnCompleted = options && options.onCompleted;
   const queryResultRefetch = queryResult.refetch;
-  const refetch = useCallback(async (vars) => {
-    const result = await queryResultRefetch(vars);
-    optionOnCompleted?.(result.data);
-    return result;
-  }, [optionOnCompleted, queryResultRefetch]);
+  const refetch = useCallback(
+    async (vars) => {
+      const result = await queryResultRefetch(vars);
+      optionOnCompleted?.(result.data);
+      return result;
+    },
+    [optionOnCompleted, queryResultRefetch],
+  );
 
   return { ...queryResult, refetch };
 };

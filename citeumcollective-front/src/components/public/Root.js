@@ -35,21 +35,44 @@ const styles = () => ({
 });
 
 const Root = ({ classes }) => (
-        <div className={classes.container}>
-            <img src={logo} className={classes.logo} alt="logo" />
-            <Typography variant='h5'>Welcome Citeum Federation&apos;s workspace.</Typography>
-            <Button variant="contained" color="secondary" style={{ marginTop: 40 }} component={Link} to='/app'>
-                Access to the dashboard
-            </Button>
-            <div className={classes.logosContainer}>
-                <div className={classes.item}><img src={logoLuatix} alt="logo_luatix" className={classes.itemLogo} /></div>
-                <div className={classes.item}><img src={logoLimeo} alt="logo_limeo" className={classes.itemLogo} /></div>
-            </div>
-            <div className={classes.footer}>
-                <hr style={{ border: 0, height: 1, backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0))' }} />
-                <img src={initiativeWhite} alt="initiative" className={classes.itemLogo} />
-            </div>
-        </div>
+  <div className={classes.container}>
+    <img src={logo} className={classes.logo} alt="logo" />
+    <Typography variant="h5">
+      Welcome Citeum Federation&apos;s workspace.
+    </Typography>
+    <Button
+      variant="contained"
+      color="secondary"
+      style={{ marginTop: 40 }}
+      component={Link}
+      to="/app"
+    >
+      Access to the dashboard
+    </Button>
+    <div className={classes.logosContainer}>
+      <div className={classes.item}>
+        <img src={logoLuatix} alt="logo_luatix" className={classes.itemLogo} />
+      </div>
+      <div className={classes.item}>
+        <img src={logoLimeo} alt="logo_limeo" className={classes.itemLogo} />
+      </div>
+    </div>
+    <div className={classes.footer}>
+      <hr
+        style={{
+          border: 0,
+          height: 1,
+          backgroundImage:
+            'linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0))',
+        }}
+      />
+      <img
+        src={initiativeWhite}
+        alt="initiative"
+        className={classes.itemLogo}
+      />
+    </div>
+  </div>
 );
 
 Root.propTypes = {

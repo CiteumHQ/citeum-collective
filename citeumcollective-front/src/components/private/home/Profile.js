@@ -25,19 +25,21 @@ const Profile = () => {
     const input = { firstName, lastName };
     updateProfile({ variables: { input } });
   };
-  return (<div>
-    <form onSubmit={formSubmit}>
-      <input type='text' disabled value={me.email}/>
-      <br/>
-      <input type='text' name='firstName' defaultValue={me.firstName}/>
-      <br/>
-      <input type='text' name='lastName' defaultValue={me.lastName}/>
-      <br/>
-      <input type="submit" value="Save!"/>
-    </form>
-    <hr/>
-    <b>{me?.roles?.join(', ')}</b>
-  </div>);
+  return (
+    <div>
+      <form onSubmit={formSubmit}>
+        <input type="text" disabled value={me.email} />
+        <br />
+        <input type="text" name="firstName" defaultValue={me.firstName} />
+        <br />
+        <input type="text" name="lastName" defaultValue={me.lastName} />
+        <br />
+        <input type="submit" value="Save!" />
+      </form>
+      <hr />
+      <b>{me?.roles?.join(', ')}</b>
+    </div>
+  );
 };
 
 export default Profile;

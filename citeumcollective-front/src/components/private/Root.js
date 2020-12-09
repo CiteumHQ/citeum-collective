@@ -9,18 +9,19 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useBasicQuery } from '../../network/Apollo';
 import Profile from './home/Profile';
 import { UserContext } from './Context';
-import Applications from './home/Applications';
+import Applications from './organization/Applications';
+import LeftBar from './nav/LeftBar';
 
 const QUERY_ME = gql`
-    query GetMe {
-        me {
-            id
-            firstName
-            lastName
-            email
-            roles
-        }
+  query GetMe {
+    me {
+      id
+      firstName
+      lastName
+      email
+      roles
     }
+  }
 `;
 
 const useStyles = makeStyles((theme) => ({
@@ -46,36 +47,45 @@ const Root = (props) => {
     update,
   };
   return (
-        <UserContext.Provider value={userData}>
-            <header className="App-header">
-                {userDetail
-                  ? <div>{userDetail.firstName} {userDetail.lastName} - {userDetail.email} - <a href='/logout'>Logout</a> </div>
-                  : <div><CircularProgress /></div>
-                }
-            </header>
-            <div>
-                <Paper className={classes.root}>
-                    <Tabs
-                        value={props.history.location.pathname}
-                        onChange={handleChange}
-                        indicatorColor="primary"
-                        textColor="primary">
-                        <Tab label="Profile" value={'/app'} />
-                        <Tab label="Applications" value={'/app/applications'} />
-                        <Tab label="Documents" value={'/app/documents'} />
-                        <Tab label="Membership" value={'/app/memberships'} />
-                    </Tabs>
-                </Paper>
-            </div>
-            {userDetail
-            && <div>
-                <Switch>
-                    <Route exact path='/app' component={Profile} />
-                    <Route exact path='/app/applications' component={Applications} />
-                    <Route exact path='/app/administration' component={Applications} />
-                </Switch>
-            </div>}
-        </UserContext.Provider>
+    <UserContext.Provider value={userData}>
+      <LeftBar />
+      <header className="App-header">
+        {userDetail ? (
+          <div>
+            {userDetail.firstName} {userDetail.lastName} - {userDetail.email} -{' '}
+            <a href="/logout">Logout</a>{' '}
+          </div>
+        ) : (
+          <div>
+            <CircularProgress />
+          </div>
+        )}
+      </header>
+      <div>
+        <Paper className={classes.root}>
+          <Tabs
+            value={props.history.location.pathname}
+            onChange={handleChange}
+            indicatorColor="primary"
+            textColor="primary"
+          >
+            <Tab label="Profile" value={'/app'} />
+            <Tab label="Applications" value={'/app/applications'} />
+            <Tab label="Documents" value={'/app/documents'} />
+            <Tab label="Membership" value={'/app/memberships'} />
+          </Tabs>
+        </Paper>
+      </div>
+      {userDetail && (
+        <div>
+          <Switch>
+            <Route exact path="/app" component={Profile} />
+            <Route exact path="/app/applications" component={Applications} />
+            <Route exact path="/app/administration" component={Applications} />
+          </Switch>
+        </div>
+      )}
+    </UserContext.Provider>
   );
 };
 
