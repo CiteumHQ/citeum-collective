@@ -6,6 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { client } from './network/Apollo';
 import PublicRoot from './components/public/Root';
 import PrivateRoot from './components/private/Root';
+import ErrorNotFound from './components/ErrorNotFound';
 import AppTheme from './AppTheme';
 
 function App() {
@@ -16,7 +17,8 @@ function App() {
           <CssBaseline />
           <Switch>
             <Route exact path="/" component={PublicRoot} />
-            <Route path="/app" component={PrivateRoot} />
+            <Route path="/dashboard" component={PrivateRoot} />
+            <Route path="/" component={ErrorNotFound} />
           </Switch>
         </ApolloProvider>
       </BrowserRouter>

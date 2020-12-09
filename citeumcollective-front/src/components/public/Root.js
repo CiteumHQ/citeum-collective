@@ -45,7 +45,7 @@ const Root = ({ classes }) => (
       color="secondary"
       style={{ marginTop: 40 }}
       component={Link}
-      to="/app"
+      to="/dashboard"
     >
       Access to the dashboard
     </Button>

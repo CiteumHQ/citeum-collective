@@ -1,16 +1,24 @@
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { Route, Switch, withRouter } from 'react-router-dom';
+import {
+  Route, Redirect, Switch, withRouter,
+} from 'react-router-dom';
 import { gql } from '@apollo/client';
 import React, { useEffect, useState } from 'react';
-import Paper from '@material-ui/core/Paper';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
 import { makeStyles } from '@material-ui/core/styles';
 import { useBasicQuery } from '../../network/Apollo';
-import Profile from './home/Profile';
 import { UserContext } from './Context';
-import Applications from './organization/Applications';
 import LeftBar from './nav/LeftBar';
+import RootOrganization from './organization/Root';
+import ErrorNotFound from '../ErrorNotFound';
+
+const useStyles = makeStyles(() => ({
+  content: {
+    width: '100%',
+    height: '100%',
+    flexGrow: 1,
+    padding: '0 0 0 60px',
+    minWidth: 0,
+  },
+}));
 
 const QUERY_ME = gql`
   query GetMe {
@@ -21,70 +29,56 @@ const QUERY_ME = gql`
       email
       roles
     }
+    federation {
+      id
+      name
+      email
+    }
   }
 `;
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
-
-const Root = (props) => {
+const Root = () => {
   const classes = useStyles();
   const { data, loading } = useBasicQuery(QUERY_ME);
-  const handleChange = (event, value) => props.history.push(value);
   const [userDetail, setUserDetail] = useState();
+  const [federationDetail, setFederationDetail] = useState();
   const update = (updated) => setUserDetail(updated);
   useEffect(() => {
     if (loading === false && data) {
       setUserDetail(data.me);
+      setFederationDetail(data.federation);
     }
   }, [loading, data]);
   const userData = {
     me: userDetail,
+    federation: federationDetail,
     isGranted: (assoName, role) => userDetail.roles.includes(`asso_${assoName}_${role}`),
     update,
   };
   return (
     <UserContext.Provider value={userData}>
       <LeftBar />
-      <header className="App-header">
-        {userDetail ? (
-          <div>
-            {userDetail.firstName} {userDetail.lastName} - {userDetail.email} -{' '}
-            <a href="/logout">Logout</a>{' '}
-          </div>
-        ) : (
-          <div>
-            <CircularProgress />
-          </div>
-        )}
-      </header>
-      <div>
-        <Paper className={classes.root}>
-          <Tabs
-            value={props.history.location.pathname}
-            onChange={handleChange}
-            indicatorColor="primary"
-            textColor="primary"
-          >
-            <Tab label="Profile" value={'/app'} />
-            <Tab label="Applications" value={'/app/applications'} />
-            <Tab label="Documents" value={'/app/documents'} />
-            <Tab label="Membership" value={'/app/memberships'} />
-          </Tabs>
-        </Paper>
-      </div>
-      {userDetail && (
-        <div>
+      <main className={classes.content}>
+        {userDetail && (
           <Switch>
-            <Route exact path="/app" component={Profile} />
-            <Route exact path="/app/applications" component={Applications} />
-            <Route exact path="/app/administration" component={Applications} />
+            <Redirect
+              exact
+              from="/dashboard"
+              to={`/dashboard/organizations/${userData.federation.id}`}
+            />
+            <Redirect
+                exact
+                from="/dashboard/profile"
+                to={`/dashboard/organizations/${userData.federation.id}`}
+            />
+            <Route
+              path="/dashboard/organizations/:organizationId"
+              component={RootOrganization}
+            />
+            <Route path="/dashboard" component={ErrorNotFound} />
           </Switch>
-        </div>
-      )}
+        )}
+      </main>
     </UserContext.Provider>
   );
 };
