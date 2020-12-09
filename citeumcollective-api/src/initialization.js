@@ -2,6 +2,7 @@
 import { logger } from './config/conf';
 import migrate from './migrate';
 import { initProvider } from './config/authentication';
+import { connectKeycloak, initPlatformAdmin } from './database/keycloak';
 
 // Initialize
 // const initializeSchema = async (db) => {
@@ -39,9 +40,18 @@ const isEmptyPlatform = async () => {
   return true;
 };
 
+const initKeycloakAdmin = async () => {
+  const kc = await connectKeycloak();
+  await initPlatformAdmin();
+  return kc;
+};
+
 const platformInit = async (db) => {
+  let kc;
   try {
     await initProvider(db);
+    kc = await initKeycloakAdmin(db);
+    // Keycloak must be init before migration
     await migrateDatabase(db);
     const needToBeInitialized = await isEmptyPlatform();
     if (needToBeInitialized) {
@@ -58,7 +68,7 @@ const platformInit = async (db) => {
     logger.error(`[CITEUMCOLLECTIVE] Platform initialization fail`, { error: e });
     throw e;
   }
-  return true;
+  return kc;
 };
 
 export default platformInit;

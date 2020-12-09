@@ -3,7 +3,6 @@
     "port": 4000,
     "logs": "./logs",
     "logs_level": "info",
-    "admin": "admin@citeum.org",
     "session_secret": "change_me",
     "rate_protection": {
       "time_window": 1,
@@ -24,7 +23,8 @@
   },
   "association": {
     "identifier": "citeum",
-    "name": "Citeum"
+    "name": "Citeum",
+    "admin": "admin@citeum.org"
   },
   "keycloak": {
     "uri": "https://...",

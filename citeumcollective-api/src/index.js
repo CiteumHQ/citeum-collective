@@ -33,8 +33,7 @@ if (DEV_MODE && module.hot) {
 (async () => {
   try {
     logger.info(`[CITEUMCOLLECTIVE] Starting platform`);
-    await platformInit(db);
-    kc = await connectKeycloak();
+    kc = await platformInit(db);
     server = await listenServer(db);
   } catch (e) {
     process.exit(1);
