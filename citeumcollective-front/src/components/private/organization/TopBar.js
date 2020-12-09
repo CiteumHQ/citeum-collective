@@ -19,17 +19,31 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   appbar: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: '#3f535c',
+    minHeight: 250,
   },
-  toolbar: {
-    padding: '5px 10px 0 20px',
+  container: {
+    position: 'relative',
+    width: '100%',
+    padding: '10px 0 0 0',
+    textAlign: 'center',
   },
   title: {
+    marginTop: 10,
     flexGrow: 1,
   },
+  subtitle: {
+    flexGrow: 1,
+    padding: 10,
+  },
+  topAvatar: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+  },
   small: {
-    width: theme.spacing(3),
-    height: theme.spacing(3),
+    width: theme.spacing(5),
+    height: theme.spacing(5),
   },
 }));
 
@@ -45,19 +59,29 @@ const TopBar = () => {
   };
   const { organization } = useContext(OrganizationContext);
   const { me } = useContext(UserContext);
-  const gravatarUrl = gravatar.url(me.email, {
+  const organizationGravatarUrl = gravatar.url(organization.email, {
     protocol: 'https',
-    s: '200',
+    s: '150',
+  });
+  const userGravatarUrl = gravatar.url(me.email, {
+    protocol: 'https',
+    s: '100',
   });
   return (
     <div className={classes.root}>
       <AppBar position="static" className={classes.appbar}>
-        <Toolbar className={classes.toolbar}>
-          <Typography className={classes.title} variant="h2" noWrap>
-            {organization.name}
-          </Typography>
-          <IconButton onClick={handleOpenMenu}>
-            <Avatar src={gravatarUrl} className={classes.small} />
+        <Toolbar>
+          <div className={classes.container}>
+            <img src={organizationGravatarUrl} alt="logo" />
+            <Typography className={classes.title} variant="h2" noWrap>
+              {organization.name}
+            </Typography>
+            <Typography className={classes.subtitle} variant="body1" noWrap>
+              {organization.description}
+            </Typography>
+          </div>
+          <IconButton onClick={handleOpenMenu} className={classes.topAvatar}>
+            <Avatar src={userGravatarUrl} className={classes.small} />
           </IconButton>
           <Menu
             id="menu-appbar"

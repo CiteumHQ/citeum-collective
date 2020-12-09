@@ -19,6 +19,7 @@ export const up = async (knex, db = bridgeSql(knex)) => {
             id          VARCHAR(255) PRIMARY KEY,
             code        VARCHAR(255) UNIQUE,
             name        VARCHAR(255) UNIQUE,
+            description VARCHAR(255) UNIQUE,
             email       VARCHAR(255) UNIQUE,
             register_at timestamp
         );
@@ -40,7 +41,12 @@ export const up = async (knex, db = bridgeSql(knex)) => {
   const associationName = conf.get('association:name');
   const associationCode = conf.get('association:identifier');
   const associationEmail = conf.get('association:email');
-  const asso = { name: associationName, email: associationEmail, code: associationCode };
+  const asso = {
+    name: associationName,
+    description: 'Open Source solutions of general interest',
+    email: associationEmail,
+    code: associationCode,
+  };
   const association = await createAssociation({ db, user: admin }, asso);
   await createMembership({ db }, association, { name: 'Supporter', code: 'supporter' });
 };

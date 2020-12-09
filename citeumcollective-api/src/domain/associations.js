@@ -25,7 +25,7 @@ export const userAssociations = async (ctx) => {
   );
   if (assoCodes.length === 0) return [];
   // TODO Add the way to user to organize the associations.
-  const associations = await ctx.db.queryRows(sql`SELECT id, code, name, email from associations 
+  const associations = await ctx.db.queryRows(sql`SELECT id, code, name, description, email from associations 
         where code in (${sql.bindings(assoCodes)})
         order by name`);
   // Remove the default main association
@@ -33,14 +33,14 @@ export const userAssociations = async (ctx) => {
 };
 
 export const createAssociation = async (ctx, input) => {
-  const { name, email, code } = input;
+  const { name, description, email, code } = input;
   const association = await getAssociationByCode(ctx, code);
   if (association) return association;
   const id = uuidv4();
   // Create the association
   await ctx.db.execute(
-    sql`insert INTO associations (id, name, email, code, register_at) 
-                values (${id}, ${name}, ${email}, ${code}, current_timestamp)`
+    sql`insert INTO associations (id, name, description, email, code, register_at) 
+                values (${id}, ${name}, ${description}, ${email}, ${code}, current_timestamp)`
   );
   // Create the keycloak admin role for this association
   const adminRoleName = await createAssociationAdminRole(input);

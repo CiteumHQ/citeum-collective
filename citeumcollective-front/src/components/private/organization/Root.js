@@ -30,6 +30,7 @@ const QUERY_ASSOCIATION = gql`
     association(id: $id) {
       id
       name
+      description
       email
     }
   }

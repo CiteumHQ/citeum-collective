@@ -21,6 +21,7 @@ type Identity {
 type Association {
   id: ID!
   name: String!
+  description: String!
   email: String!
   code: String!
 }
@@ -50,6 +51,7 @@ type Query {
 input AssociationAddInput {
  code: String!
  name: String!
+ description: String!
  email: String!
 }
 
