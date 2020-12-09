@@ -42,8 +42,7 @@ const Root = (props) => {
   }, [loading, data]);
   const userData = {
     me: userDetail,
-    isRoot: () => userDetail.roles.includes('root'),
-    isGranted: (association, role) => userDetail.roles.includes(`${association}_${role}`),
+    isGranted: (assoName, role) => userDetail.roles.includes(`asso_${assoName}_${role}`),
     update,
   };
   return (

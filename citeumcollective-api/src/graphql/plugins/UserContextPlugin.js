@@ -5,9 +5,8 @@ export default {
   requestDidStart: () => ({
     didResolveOperation: async (requestContext) => {
       const { context } = requestContext;
-      // noinspection UnnecessaryLocalVariableJS
       const extractedUser = await extractUserTokenFromRequest(context.req);
-      context.user = await getUser(extractedUser.id);
+      context.user = extractedUser && (await getUser(extractedUser.id));
     },
   }),
 };

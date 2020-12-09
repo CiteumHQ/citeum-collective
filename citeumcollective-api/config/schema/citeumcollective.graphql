@@ -38,6 +38,7 @@ type User {
 type Query {
   about: AppInfo
   me: User @auth
+  federation: Association @auth
   association: Association @auth
   userAssociations: [Association] @auth
 }

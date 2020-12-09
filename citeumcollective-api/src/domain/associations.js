@@ -3,6 +3,7 @@ import * as R from 'ramda';
 import { sql } from '../utils/sql';
 import { createAssociationAdminRole, grantRoleToUser } from '../database/keycloak';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
+import conf from '../config/conf';
 
 export const getAssociationById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from associations where id = ${id}`);
@@ -22,7 +23,12 @@ export const userAssociations = async (ctx) => {
         return association;
       })
   );
-  return ctx.db.queryRows(sql`SELECT * from associations where code in (${sql.bindings(assoCodes)})`);
+  // TODO Add the way to user to organize the associations.
+  const associations = await ctx.db.queryRows(sql`SELECT id, code, name from associations 
+        where code in (${sql.bindings(assoCodes)})
+        order by name`);
+  // Remove the default main association
+  return associations.filter((a) => a.code !== conf.get('association:identifier'));
 };
 
 export const createAssociation = async (ctx, input) => {
