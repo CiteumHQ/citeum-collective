@@ -32,6 +32,7 @@ type Association {
   description: String!
   email: String!
   code: String!
+  members: [User]!
   memberships: [Membership]!
 }
 
@@ -84,5 +85,6 @@ input UserLoginInput {
 type Mutation {
   updateProfile(input: UserProfileInput): User @auth
   membershipAdd(input: MembershipAddInput): Membership @auth
+  membershipRemove(id: ID!): Association @auth
   associationAdd(input: AssociationAddInput): Association @auth
 }

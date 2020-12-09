@@ -2,9 +2,11 @@ import { createAssociation, getAssociationByCode, getAssociationById } from '../
 import conf from '../config/conf';
 import {
   createMembership,
+  getAssociationMembers,
   getAssociationMemberships,
   getMembershipAssociation,
   getMembershipById,
+  removeMembership,
 } from '../domain/memberships';
 
 const usersResolvers = {
@@ -14,6 +16,7 @@ const usersResolvers = {
     federation: (_, __, ctx) => getAssociationByCode(ctx, conf.get('association:identifier')),
   },
   Association: {
+    members: (association, _, ctx) => getAssociationMembers(ctx, association),
     memberships: (association, _, ctx) => getAssociationMemberships(ctx, association),
   },
   Membership: {
@@ -22,6 +25,7 @@ const usersResolvers = {
   Mutation: {
     associationAdd: (_, { input }, ctx) => createAssociation(ctx, input),
     membershipAdd: (_, { input }, ctx) => createMembership(ctx, input),
+    membershipRemove: (_, { id }, ctx) => removeMembership(ctx, id),
   },
 };
 

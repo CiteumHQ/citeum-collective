@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sql } from '../utils/sql';
-import { createAssociationRole } from '../database/keycloak';
+import { createRoleForAssociation, deleteAssociationRole, getUsersWithRole, roleGen } from '../database/keycloak';
 import { getAssociationById } from './associations';
 
 export const getMembershipById = (ctx, id) => {
@@ -15,9 +15,27 @@ export const getAssociationMemberships = (ctx, association) => {
   return ctx.db.queryRows(sql`select * from memberships where association_id = ${association.id}`);
 };
 
-export const getMembershipByCode = (ctx, association, code) => {
-  return ctx.db.queryOne(sql`select * from memberships 
-                                where association_id = ${association.id} and code = ${code}`);
+export const getAssociationMembers = async (ctx, association) => {
+  const memberships = await getAssociationMemberships(ctx, association);
+  const roles = memberships.map((m) => roleGen(association, m.code));
+  const members = [];
+  for (let index = 0; index < roles.length; index += 1) {
+    const role = roles[index];
+    // eslint-disable-next-line no-await-in-loop
+    const users = await getUsersWithRole(role);
+    members.push(...users.map((u) => Object.assign(u, { roles: [role] })));
+  }
+  return members;
+};
+
+export const removeMembership = async (ctx, id) => {
+  // Remove the role in keycloak
+  const membership = await getMembershipById(ctx, id);
+  const association = await getMembershipAssociation(ctx, membership);
+  await deleteAssociationRole(association, membership);
+  // Remove in db
+  await ctx.db.execute(sql`delete from memberships where id = ${id}`);
+  return association;
 };
 
 export const createMembership = async (ctx, input) => {
@@ -33,7 +51,7 @@ export const createMembership = async (ctx, input) => {
                 values (${id}, ${name}, ${code}, ${association.id})`
   );
   // Create the keycloak admin role for this association
-  await createAssociationRole(association, code);
+  await createRoleForAssociation(association, code, `${name} role for ${association.name}`);
   // Return the created membership
   return getMembershipById(ctx, id);
 };

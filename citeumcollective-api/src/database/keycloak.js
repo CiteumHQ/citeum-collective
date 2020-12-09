@@ -34,6 +34,9 @@ const kc = {
   },
 };
 
+export const roleGen = (association, roleName) =>
+  `${ROLE_ASSO_PREFIX}${association.code}${ROLE_ASSO_SEPARATOR}${roleName}`;
+
 // Authorize with username / password
 export const connectKeycloak = async () => {
   const username = conf.get('keycloak:username');
@@ -69,6 +72,11 @@ export const getUserInfo = async (userId) => {
   return Object.assign(user, { roles });
 };
 
+export const getUsersWithRole = async (name) => {
+  const api = await kc.get();
+  return api.roles.findUsersWithRole({ name });
+};
+
 export const getUserByName = async (username) => {
   const api = await kc.get();
   const findUser = await api.users.find({ username });
@@ -93,18 +101,24 @@ export const grantRoleToUser = async (roleName, user) => {
   });
 };
 
-export const createAssociationRole = async (association, roleName) => {
+export const createRoleForAssociation = async (association, roleName, description) => {
   const api = await kc.get();
-  const roleNameToCreate = `${ROLE_ASSO_PREFIX}${association.code}${ROLE_ASSO_SEPARATOR}${roleName}`;
+  const roleNameToCreate = roleGen(association, roleName);
   const role = await api.roles.findOneByName({ name: roleNameToCreate });
   if (role) return role.name;
-  const input = { name: roleNameToCreate, description: `Admin role for ${association.name}` };
+  const input = { name: roleNameToCreate, description };
   await api.roles.create(input);
   return roleNameToCreate;
 };
 
+export const deleteAssociationRole = async (association, membership) => {
+  const api = await kc.get();
+  const roleNameToDelete = roleGen(association, membership.code);
+  await api.roles.delByName({ name: roleNameToDelete });
+};
+
 export const createAssociationAdminRole = async (association) => {
-  return createAssociationRole(association, `admin`);
+  return createRoleForAssociation(association, `admin`, `Admin role for ${association.name}`);
 };
 
 export const createApplicationClient = async (association) => {
