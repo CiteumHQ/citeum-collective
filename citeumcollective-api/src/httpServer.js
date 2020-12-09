@@ -3,6 +3,7 @@ import http from 'http';
 import conf, { logger } from './config/conf';
 import createApp from './app';
 import createApolloServer from './graphql/graphql';
+import { connectKeycloak } from './database/keycloak';
 
 const PORT = conf.get('app:port');
 // const broadcaster = initBroadcaster();
@@ -35,6 +36,7 @@ export const listenServer = async (db) => {
   });
 };
 export const restartServer = async (db, httpServer) => {
+  await connectKeycloak();
   return new Promise((resolve, reject) => {
     httpServer.close(() => {
       logger.info('[CITEUMCOLLECTIVE] GraphQL server stopped');

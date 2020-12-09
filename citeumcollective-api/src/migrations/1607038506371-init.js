@@ -6,6 +6,7 @@ import { getUserByName } from '../database/keycloak';
 import { createMembership } from '../domain/memberships';
 
 export const up = async (knex, db = bridgeSql(knex)) => {
+  const admin = await getUserByName(conf.get('association:admin'));
   // Create structure
   await db.execute(sql`
         CREATE TABLE "users"
@@ -37,7 +38,7 @@ export const up = async (knex, db = bridgeSql(knex)) => {
         );
     `);
   // Provide data
-  const admin = await getUserByName(conf.get('association:admin'));
+  // 01- Create default association
   const associationName = conf.get('association:name');
   const associationCode = conf.get('association:identifier');
   const associationEmail = conf.get('association:email');
@@ -48,6 +49,7 @@ export const up = async (knex, db = bridgeSql(knex)) => {
     code: associationCode,
   };
   const association = await createAssociation({ db, user: admin }, asso);
+  // 02- Create default membership
   await createMembership({ db }, association, { name: 'Supporter', code: 'supporter' });
 };
 
