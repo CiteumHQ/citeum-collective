@@ -57,12 +57,6 @@ export const connectKeycloak = async () => {
   kc.client.setAccessToken(tokenSet.access_token);
   kc.issuer = issuer;
   kc.refreshToken = tokenSet.refresh_token;
-  // Periodically using refresh_token grant flow to get new access token here
-  // return setInterval(async () => {
-  //   const refreshToken = tokenSet.refresh_token;
-  //   tokenSet = await client.refresh(refreshToken);
-  //   kcAdminClient.setAccessToken(tokenSet.access_token);
-  // }, 58 * 1000); // 58 seconds
 };
 
 export const getUserInfo = async (userId) => {
@@ -135,7 +129,7 @@ export const initPlatformAdmin = async () => {
   const api = await kc.get();
   user = await api.users.create({
     email,
-    emailVerified: false,
+    emailVerified: true,
     enabled: true,
   });
   await grantRoleToUser(adminRole, user);

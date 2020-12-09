@@ -18,12 +18,21 @@ type Identity {
   userName: String
 }
 
+type Membership {
+  id: ID!
+  name: String!
+  code: String!
+  description: String
+  association: Association!
+}
+
 type Association {
   id: ID!
   name: String!
   description: String!
   email: String!
   code: String!
+  memberships: [Membership]!
 }
 
 type User {
@@ -32,6 +41,7 @@ type User {
   firstName: String
   lastName: String
   roles: [String]
+  associations: [Association] @auth
   federatedIdentities: [Identity]
 }
 
@@ -41,13 +51,19 @@ type Query {
   about: AppInfo
   me: User @auth
   federation: Association @auth
+  membership(id: String!): Membership @auth
   association(id: String!): Association @auth
-  userAssociations: [Association] @auth
 }
 
 ### MUTATIONS
 
 ### MUTATIONS DECLARATION
+input MembershipAddInput {
+  associationId: String!
+  code: String!
+  name: String!
+}
+
 input AssociationAddInput {
  code: String!
  name: String!
@@ -67,5 +83,6 @@ input UserLoginInput {
 
 type Mutation {
   updateProfile(input: UserProfileInput): User @auth
+  membershipAdd(input: MembershipAddInput): Membership @auth
   associationAdd(input: AssociationAddInput): Association @auth
 }

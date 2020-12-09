@@ -31,10 +31,12 @@ const QUERY_ASSOCIATIONS = gql`
       name
       email
     }
-    userAssociations {
-      id
-      name
-      email
+    me {
+      associations {
+        id
+        name
+        email
+      }
     }
   }
 `;
@@ -43,7 +45,7 @@ const LeftBar = ({ location }) => {
   const classes = useStyles();
   const { data } = useBasicQuery(QUERY_ASSOCIATIONS);
   if (data) {
-    const { federation, userAssociations } = data;
+    const { federation, me: { associations } } = data;
     const gravatarUrl = gravatar.url(federation.email, {
       protocol: 'https',
       s: '40',
@@ -65,7 +67,7 @@ const LeftBar = ({ location }) => {
               <img src={gravatarUrl} alt="logo" />
             </ListItemIcon>
           </MenuItem>
-          {userAssociations.map((association) => {
+          {associations.map((association) => {
             const associationGravatarUrl = gravatar.url(association.email, {
               protocol: 'https',
               s: '40',
