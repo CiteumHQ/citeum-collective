@@ -43,8 +43,9 @@ const basic = () => {
 
 export const getUserInfo = async (userId) => {
   const input = { id: userId };
-  const user = await basic().users.findOne(input);
-  const realmRoles = await basic().users.listRealmRoleMappings(input);
+  const userPromise = basic().users.findOne(input);
+  const realmRolesPromise = basic().users.listRealmRoleMappings(input);
+  const [user, realmRoles] = await Promise.all([userPromise, realmRolesPromise]);
   const roles = realmRoles.map((r) => r.name);
   return Object.assign(user, { roles });
 };

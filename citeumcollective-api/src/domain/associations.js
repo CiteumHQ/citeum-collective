@@ -23,6 +23,7 @@ export const userAssociations = async (ctx) => {
         return association;
       })
   );
+  if (assoCodes.length === 0) return [];
   // TODO Add the way to user to organize the associations.
   const associations = await ctx.db.queryRows(sql`SELECT id, code, name, email from associations 
         where code in (${sql.bindings(assoCodes)})
