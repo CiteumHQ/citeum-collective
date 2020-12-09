@@ -34,6 +34,7 @@ const kc = {
   },
 };
 
+export const ADMIN_ROLE_CODE = `admin`;
 export const roleGen = (association, roleName) =>
   `${ROLE_ASSO_PREFIX}${association.code}${ROLE_ASSO_SEPARATOR}${roleName}`;
 
@@ -118,7 +119,7 @@ export const deleteAssociationRole = async (association, membership) => {
 };
 
 export const createAssociationAdminRole = async (association) => {
-  return createRoleForAssociation(association, `admin`, `Admin role for ${association.name}`);
+  return createRoleForAssociation(association, ADMIN_ROLE_CODE, `Admin role for ${association.name}`);
 };
 
 export const createApplicationClient = async (association) => {

@@ -1,10 +1,23 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sql } from '../utils/sql';
-import { createRoleForAssociation, deleteAssociationRole, getUsersWithRole, roleGen } from '../database/keycloak';
-import { getAssociationById } from './associations';
+import {
+  ADMIN_ROLE_CODE,
+  createRoleForAssociation,
+  deleteAssociationRole,
+  getUsersWithRole,
+  roleGen,
+} from '../database/keycloak';
+
+export const getAssociationById = (ctx, id) => {
+  return ctx.db.queryOne(sql`select * from associations where id = ${id}`);
+};
 
 export const getMembershipById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from memberships where id = ${id}`);
+};
+
+export const getMembershipByCode = (ctx, code) => {
+  return ctx.db.queryOne(sql`select * from memberships where code = ${code}`);
 };
 
 export const getMembershipAssociation = (ctx, membership) => {
@@ -40,6 +53,7 @@ export const removeMembership = async (ctx, id) => {
 
 export const createMembership = async (ctx, input) => {
   const { associationId, name, code } = input;
+  if (code === ADMIN_ROLE_CODE) throw Error('admin is a reserved membership keyword');
   const association = await getAssociationById(ctx, associationId);
   if (!association) {
     throw Error('Cant find the association to create the membership');

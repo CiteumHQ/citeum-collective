@@ -36,12 +36,19 @@ type Association {
   memberships: [Membership]!
 }
 
+type Subscription {
+  association: Association!
+  membership: Membership!
+}
+
 type User {
   id: ID!
   email: String!
   firstName: String
   lastName: String
   roles: [String]
+  subscription(associationId: ID!): Membership,
+  subscriptions: [Subscription],
   associations: [Association] @auth
   federatedIdentities: [Identity]
 }

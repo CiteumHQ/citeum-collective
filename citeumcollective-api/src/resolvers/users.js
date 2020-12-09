@@ -1,5 +1,5 @@
 import { updateUser } from '../domain/users';
-import { userAssociations } from '../domain/associations';
+import { userSubscriptions, userAssociations, userSubscription } from '../domain/associations';
 
 const usersResolvers = {
   Query: {
@@ -7,6 +7,8 @@ const usersResolvers = {
   },
   User: {
     associations: (_, __, ctx) => userAssociations(ctx),
+    subscription: (_, { associationId }, ctx) => userSubscription(ctx, associationId),
+    subscriptions: (_, __, ctx) => userSubscriptions(ctx),
   },
   Mutation: {
     updateProfile: (_, { input }, ctx) => updateUser(ctx, input),
