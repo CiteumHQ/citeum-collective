@@ -6,8 +6,8 @@ export default {
     primary: { main: '#5f7d8a' },
     secondary: { main: '#f44336' },
     background: {
-      paper: '#323232',
-      default: '#37474f',
+      paper: '#22353e',
+      default: '#162026',
     },
     divider: 'rgba(255, 255, 255, 0.2)',
   },
@@ -24,8 +24,9 @@ export default {
       padding: 0,
       color: '#ffffff',
       fontWeight: 300,
-      fontSize: 20,
-      textTransform: 'none',
+      fontSize: 30,
+      textTransform: 'uppercase',
+      letterSpacing: '0.3em',
     },
     h5: {
       color: '#ffffff',

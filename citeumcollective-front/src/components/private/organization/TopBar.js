@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import * as PropTypes from 'prop-types';
+import { Link, withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import gravatar from 'gravatar';
 import AppBar from '@material-ui/core/AppBar';
@@ -9,6 +10,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import { OrganizationContext, UserContext } from '../Context';
 
 const useStyles = makeStyles((theme) => ({
@@ -19,22 +22,21 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   appbar: {
-    backgroundColor: '#3f535c',
-    minHeight: 250,
+    backgroundColor: '#182a31',
+    minHeight: 200,
   },
   container: {
     position: 'relative',
     width: '100%',
-    padding: '10px 0 0 0',
+    padding: '30px 0 20px 0',
     textAlign: 'center',
   },
   title: {
-    marginTop: 10,
+    marginTop: 20,
     flexGrow: 1,
   },
   subtitle: {
     flexGrow: 1,
-    padding: 10,
   },
   topAvatar: {
     position: 'absolute',
@@ -47,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TopBar = () => {
+const TopBar = ({ location }) => {
   const classes = useStyles();
   const [menuOpen, setMenuOpen] = useState({ open: false, anchorEl: null });
   const handleOpenMenu = (event) => {
@@ -58,15 +60,18 @@ const TopBar = () => {
     setMenuOpen({ open: false, anchorEl: null });
   };
   const { organization } = useContext(OrganizationContext);
-  const { me } = useContext(UserContext);
+  const { me, federation } = useContext(UserContext);
   const organizationGravatarUrl = gravatar.url(organization.email, {
     protocol: 'https',
-    s: '150',
+    s: '100',
   });
   const userGravatarUrl = gravatar.url(me.email, {
     protocol: 'https',
     s: '100',
   });
+  const page = location.pathname.split('/')[
+    location.pathname.split('/').length - 1
+  ];
   return (
     <div className={classes.root}>
       <AppBar position="static" className={classes.appbar}>
@@ -75,9 +80,6 @@ const TopBar = () => {
             <img src={organizationGravatarUrl} alt="logo" />
             <Typography className={classes.title} variant="h2" noWrap>
               {organization.name}
-            </Typography>
-            <Typography className={classes.subtitle} variant="body1" noWrap>
-              {organization.description}
             </Typography>
           </div>
           <IconButton onClick={handleOpenMenu} className={classes.topAvatar}>
@@ -102,9 +104,46 @@ const TopBar = () => {
             </MenuItem>
           </Menu>
         </Toolbar>
+        <Tabs
+          indicatorColor="secondary"
+          textColor="primary"
+          variant="fullWidth"
+          value={page}
+        >
+          {organization.id === federation.id && (
+            <Tab
+              value="profile"
+              label="Profile"
+              component={Link}
+              to={`/dashboard/organizations/${organization.id}/profile`}
+            />
+          )}
+          <Tab
+            value="applications"
+            label="Applications"
+            component={Link}
+            to={`/dashboard/organizations/${organization.id}/applications`}
+          />
+          <Tab
+            value="documents"
+            label="Documents"
+            component={Link}
+            to={`/dashboard/organizations/${organization.id}/documents`}
+          />
+          <Tab
+            value="membership"
+            label="Membership"
+            component={Link}
+            to={`/dashboard/organizations/${organization.id}/membership`}
+          />
+        </Tabs>
       </AppBar>
     </div>
   );
 };
 
-export default TopBar;
+TopBar.propTypes = {
+  location: PropTypes.object,
+};
+
+export default withRouter(TopBar);

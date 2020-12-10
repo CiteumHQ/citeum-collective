@@ -11,6 +11,10 @@ import Drawer from '@material-ui/core/Drawer';
 import { useBasicQuery } from '../../../network/Apollo';
 
 const useStyles = makeStyles((theme) => ({
+  drawer: {
+    width: 60,
+    flexShrink: 0,
+  },
   drawerPaper: {
     minHeight: '100vh',
     width: 60,
@@ -26,11 +30,6 @@ const useStyles = makeStyles((theme) => ({
 
 const QUERY_ASSOCIATIONS = gql`
   query GetAssociations {
-    federation {
-      id
-      name
-      email
-    }
     me {
       associations {
         id
@@ -45,28 +44,16 @@ const LeftBar = ({ location }) => {
   const classes = useStyles();
   const { data } = useBasicQuery(QUERY_ASSOCIATIONS);
   if (data) {
-    const { federation, me: { associations } } = data;
-    const gravatarUrl = gravatar.url(federation.email, {
-      protocol: 'https',
-      s: '40',
-    });
+    const {
+      me: { associations },
+    } = data;
     return (
-      <Drawer variant="permanent" classes={{ paper: classes.drawerPaper }}>
+      <Drawer
+        variant="permanent"
+        classes={{ paper: classes.drawerPaper }}
+        className={classes.drawer}
+      >
         <MenuList component="nav">
-          <MenuItem
-            key={federation.id}
-            component={Link}
-            to={`/dashboard/organizations/${federation.id}`}
-            selected={
-              location.pathname === `/dashboard/organizations/${federation.id}`
-            }
-            dense={false}
-            classes={{ root: classes.menuItem }}
-          >
-            <ListItemIcon>
-              <img src={gravatarUrl} alt="logo" />
-            </ListItemIcon>
-          </MenuItem>
           {associations.map((association) => {
             const associationGravatarUrl = gravatar.url(association.email, {
               protocol: 'https',
@@ -77,10 +64,9 @@ const LeftBar = ({ location }) => {
                 key={association.id}
                 component={Link}
                 to={`/dashboard/organizations/${association.id}`}
-                selected={
-                  location.pathname
-                  === `/dashboard/organizations/${association.id}`
-                }
+                selected={location.pathname.includes(
+                  `/dashboard/organizations/${association.id}`,
+                )}
                 dense={false}
                 classes={{ root: classes.menuItem }}
               >

@@ -61,13 +61,22 @@ const Root = () => {
             <Switch>
               <Route exact path="/dashboard/organizations/:organizationId">
                 {organizationId === federation.id ? (
-                  <Profile />
+                  <Redirect
+                    to={`/dashboard/organizations/${organizationId}/profile`}
+                  />
                 ) : (
                   <Redirect
                     to={`/dashboard/organizations/${organizationId}/applications`}
                   />
                 )}
               </Route>
+              {organizationId === federation.id && (
+                <Route
+                  exact
+                  path="/dashboard/organizations/:organizationId/profile"
+                  component={Profile}
+                />
+              )}
               <Route
                 exact
                 path="/dashboard/organizations/:organizationId/applications"
