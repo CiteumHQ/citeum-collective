@@ -12,6 +12,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import { FileDocumentMultipleOutline } from 'mdi-material-ui';
 import { OrganizationContext, UserContext } from '../Context';
 
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +47,9 @@ const useStyles = makeStyles((theme) => ({
   small: {
     width: theme.spacing(5),
     height: theme.spacing(5),
+  },
+  tab: {
+    textTransform: 'none',
   },
 }));
 
@@ -116,6 +120,7 @@ const TopBar = ({ location }) => {
               label="Profile"
               component={Link}
               to={`/dashboard/organizations/${organization.id}/profile`}
+              className={classes.tab}
             />
           )}
           <Tab
@@ -123,18 +128,22 @@ const TopBar = ({ location }) => {
             label="Applications"
             component={Link}
             to={`/dashboard/organizations/${organization.id}/applications`}
+            className={classes.tab}
           />
           <Tab
+            icon={<FileDocumentMultipleOutline />}
             value="documents"
             label="Documents"
             component={Link}
             to={`/dashboard/organizations/${organization.id}/documents`}
+            className={classes.tab}
           />
           <Tab
             value="membership"
             label="Membership"
             component={Link}
             to={`/dashboard/organizations/${organization.id}/membership`}
+            className={classes.tab}
           />
         </Tabs>
       </AppBar>
