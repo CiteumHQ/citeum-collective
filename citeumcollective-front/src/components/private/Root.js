@@ -28,6 +28,11 @@ const QUERY_ME = gql`
       lastName
       email
       roles
+      associations {
+        id
+        name
+        email
+      }
     }
     federation {
       id
@@ -40,26 +45,24 @@ const QUERY_ME = gql`
 const Root = () => {
   const classes = useStyles();
   const { data, loading } = useBasicQuery(QUERY_ME);
-  const [userDetail, setUserDetail] = useState();
-  const [federationDetail, setFederationDetail] = useState();
-  const update = (updated) => setUserDetail(updated);
+  const [contextData, setContextData] = useState();
+  const update = (updated) => setContextData(updated);
   useEffect(() => {
     if (loading === false && data) {
-      setUserDetail(data.me);
-      setFederationDetail(data.federation);
+      setContextData(data);
     }
   }, [loading, data]);
   const userData = {
-    me: userDetail,
-    federation: federationDetail,
-    isGranted: (assoName, role) => userDetail.roles.includes(`asso_${assoName}_${role}`),
+    me: contextData?.me,
+    federation: contextData?.federation,
+    isGranted: (assoName, role) => contextData.me.roles.includes(`asso_${assoName}_${role}`),
     update,
   };
   return (
     <UserContext.Provider value={userData}>
       <LeftBar />
       <main className={classes.content}>
-        {userDetail && (
+        {userData.me && userData.federation && (
           <Switch>
             <Redirect
               exact
@@ -67,9 +70,9 @@ const Root = () => {
               to={`/dashboard/organizations/${userData.federation.id}`}
             />
             <Redirect
-                exact
-                from="/dashboard/profile"
-                to={`/dashboard/organizations/${userData.federation.id}`}
+              exact
+              from="/dashboard/profile"
+              to={`/dashboard/organizations/${userData.federation.id}`}
             />
             <Route
               path="/dashboard/organizations/:organizationId"

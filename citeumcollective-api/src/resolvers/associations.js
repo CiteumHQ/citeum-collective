@@ -1,4 +1,4 @@
-import { createAssociation, getAssociationByCode } from '../domain/associations';
+import { createAssociation, getAssociationByCode, getAssociations } from '../domain/associations';
 import conf from '../config/conf';
 import {
   createMembership,
@@ -15,6 +15,7 @@ const usersResolvers = {
   Query: {
     membership: (_, { id }, ctx) => getMembershipById(ctx, id),
     association: (_, { id }, ctx) => getAssociationById(ctx, id),
+    associations: (_, __, ctx) => getAssociations(ctx),
     federation: (_, __, ctx) => getAssociationByCode(ctx, conf.get('association:identifier')),
   },
   Subscription: {

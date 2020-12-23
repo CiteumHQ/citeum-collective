@@ -36,6 +36,17 @@ export const up = async (knex, db = bridgeSql(knex)) => {
               FOREIGN KEY (association_id)
                 REFERENCES associations (id)
         );
+        CREATE TABLE "notifications"
+        (
+            id          VARCHAR(255) PRIMARY KEY,
+            date        timestamp,
+            type        VARCHAR(255),
+            content     text,
+            association_id  VARCHAR(255) NOT NULL,
+            CONSTRAINT fk_association
+              FOREIGN KEY (association_id)
+                REFERENCES associations (id)
+        );
     `);
   // Provide data
   // 01- Create default association

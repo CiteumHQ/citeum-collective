@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
 import { Link, withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import gravatar from 'gravatar';
@@ -12,7 +13,12 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { FileDocumentMultipleOutline } from 'mdi-material-ui';
+import {
+  PersonOutlined,
+  WidgetsOutlined,
+  SettingsOutlined,
+} from '@material-ui/icons';
+import { FileDocumentMultipleOutline, WalletTravel } from 'mdi-material-ui';
 import { OrganizationContext, UserContext } from '../Context';
 
 const useStyles = makeStyles((theme) => ({
@@ -22,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   menuButton: {
     marginRight: theme.spacing(2),
   },
-  appbar: {
+  appBar: {
     backgroundColor: '#182a31',
     minHeight: 200,
   },
@@ -73,12 +79,18 @@ const TopBar = ({ location }) => {
     protocol: 'https',
     s: '100',
   });
-  const page = location.pathname.split('/')[
-    location.pathname.split('/').length - 1
-  ];
+  // eslint-disable-next-line no-useless-escape
+  const regex = new RegExp(`/${organization.id}/([a-z]+)`, 'g');
+  const match = [...location.pathname.matchAll(regex)];
+  let page = null;
+  if (match[0]) {
+    // eslint-disable-next-line prefer-destructuring
+    [, page] = match[0];
+  }
+  const isAdmin = R.includes(`asso_${organization.code}_admin`, me.roles);
   return (
     <div className={classes.root}>
-      <AppBar position="static" className={classes.appbar}>
+      <AppBar position="static" className={classes.appBar}>
         <Toolbar>
           <div className={classes.container}>
             <img src={organizationGravatarUrl} alt="logo" />
@@ -116,6 +128,7 @@ const TopBar = ({ location }) => {
         >
           {organization.id === federation.id && (
             <Tab
+              icon={<PersonOutlined />}
               value="profile"
               label="Profile"
               component={Link}
@@ -124,6 +137,7 @@ const TopBar = ({ location }) => {
             />
           )}
           <Tab
+            icon={<WidgetsOutlined />}
             value="applications"
             label="Applications"
             component={Link}
@@ -139,12 +153,23 @@ const TopBar = ({ location }) => {
             className={classes.tab}
           />
           <Tab
+            icon={<WalletTravel />}
             value="membership"
             label="Membership"
             component={Link}
             to={`/dashboard/organizations/${organization.id}/membership`}
             className={classes.tab}
           />
+          {isAdmin && (
+            <Tab
+              icon={<SettingsOutlined />}
+              value="admin"
+              label="Administration"
+              component={Link}
+              to={`/dashboard/organizations/${organization.id}/admin`}
+              className={classes.tab}
+            />
+          )}
         </Tabs>
       </AppBar>
     </div>

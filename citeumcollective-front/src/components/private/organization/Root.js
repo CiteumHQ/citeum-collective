@@ -10,6 +10,7 @@ import { gql } from '@apollo/client';
 import { makeStyles } from '@material-ui/core/styles';
 import Profile from './Profile';
 import Applications from './Applications';
+import AdminRoot from './admin/Root';
 import { UserContext, OrganizationContext } from '../Context';
 import { useBasicQuery } from '../../../network/Apollo';
 import ErrorNotFound from '../../ErrorNotFound';
@@ -26,12 +27,13 @@ const useStyles = makeStyles(() => ({
 }));
 
 const QUERY_ASSOCIATION = gql`
-  query GetAssociation($id: String!) {
+  query GetAssociation($id: ID!) {
     association(id: $id) {
       id
       name
       description
       email
+      code
     }
   }
 `;
@@ -83,9 +85,8 @@ const Root = () => {
                 component={Applications}
               />
               <Route
-                exact
-                path="/dashboard/organizations/:organizationId/administration"
-                component={Applications}
+                path="/dashboard/organizations/:organizationId/admin"
+                component={AdminRoot}
               />
               <Route path="/dashboard" component={ErrorNotFound} />
             </Switch>

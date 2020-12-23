@@ -5,6 +5,10 @@ import { ADMIN_ROLE_CODE, createAssociationAdminRole, grantRoleToUser } from '..
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
 import { getAssociationById, getMembershipByCode } from './memberships';
 
+export const getAssociations = (ctx) => {
+  return ctx.db.queryRows(sql`select * from associations`);
+};
+
 export const getAssociationByCode = (ctx, code) => {
   return ctx.db.queryOne(sql`select * from associations where code = ${code}`);
 };

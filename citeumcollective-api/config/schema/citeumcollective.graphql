@@ -47,8 +47,8 @@ type User {
   firstName: String
   lastName: String
   roles: [String]
-  subscription(associationId: ID!): Membership,
-  subscriptions: [Subscription],
+  subscription(associationId: ID!): Membership
+  subscriptions: [Subscription]
   associations: [Association] @auth
   federatedIdentities: [Identity]
 }
@@ -59,8 +59,9 @@ type Query {
   about: AppInfo
   me: User @auth
   federation: Association @auth
-  membership(id: String!): Membership @auth
-  association(id: String!): Association @auth
+  membership(id: ID!): Membership @auth
+  association(id: ID!): Association @auth
+  associations: [Association] @ auth
 }
 
 ### MUTATIONS
@@ -79,6 +80,11 @@ input AssociationAddInput {
  email: String!
 }
 
+input AssociationEditInput {
+  description: String!
+  email: String!
+}
+
 input UserProfileInput {
   firstName: String!
   lastName: String!
@@ -94,4 +100,5 @@ type Mutation {
   membershipAdd(input: MembershipAddInput): Membership @auth
   membershipRemove(id: ID!): Association @auth
   associationAdd(input: AssociationAddInput): Association @auth
+  associationUpdate(input: AssociationEditInput): Association @auth
 }
