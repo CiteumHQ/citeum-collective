@@ -46,7 +46,7 @@ jobs:
           command: git submodule init && git submodule update --remote          
       - run:
           working_directory: ~/citeum-collective/deploy
-          command: git remote add ci ~/openex && git pull --no-edit -s recursive -X theirs ci master         
+          command: git remote add ci ~/citeum-collective && git pull --no-edit -s recursive -X theirs ci master         
       - run:
           working_directory: ~/citeum-collective/deploy
           command: rsync -av --delete ~/citeum-collective/citeumcollective-api/public/ ./citeumcollective-api/public/
