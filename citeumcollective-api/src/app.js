@@ -48,7 +48,7 @@ const createApp = async (apolloServer) => {
           'https://fonts.googleapis.com/',
         ],
         fontSrc: ["'self'", 'https://fonts.gstatic.com/'],
-        imgSrc: ["'self'", 'data', 'http://cdn.jsdelivr.net/npm/@apollographql/', 'https://map.opencti.io/'],
+        imgSrc: ["'self'", 'data', 'http://cdn.jsdelivr.net/npm/@apollographql/', 'https://s.gravatar.com'],
         connectSrc: ["'self'"],
         objectSrc: ["'none'"],
       },

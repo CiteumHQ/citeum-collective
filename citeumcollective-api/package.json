@@ -14,7 +14,7 @@
     "test": "jest --bail --testSequencer ./tests/utils/testSequencer.js --verbose --runInBand --forceExit --coverage --e test"
   },
   "bin": {
-    "filigran-graphql": "./build/index.js"
+    "citeumcollective-api": "./build/index.js"
   },
   "pkg": {
     "scripts": "dist/**/*.js",
