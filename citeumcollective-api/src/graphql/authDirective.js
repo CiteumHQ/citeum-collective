@@ -1,8 +1,8 @@
 /* eslint-disable no-underscore-dangle,no-param-reassign */
 import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { includes, map, filter } from 'ramda';
+import { includes, map } from 'ramda';
 import { defaultFieldResolver } from 'graphql';
-import { AuthRequired, ForbiddenAccess } from '../config/errors';
+import { AuthRequired } from '../config/errors';
 
 export const AUTH_DIRECTIVE = 'auth';
 
