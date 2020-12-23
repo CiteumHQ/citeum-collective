@@ -7,7 +7,7 @@ jobs:
       - image: cimg/node:12.20.0
     steps:
       - run:
-          command: apt-get update && apt-get install -y build-essential
+          command: sudo apt-get update && sudo apt-get install -y build-essential
       - checkout
       - run: 
           working_directory: ~/citeum-collective/citeumcollective-front
@@ -35,7 +35,7 @@ jobs:
           at: ~/
       - add_ssh_keys
       - run: ssh-keyscan -H citeum.org >> ~/.ssh/known_hosts
-      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync
+      - run: DEBIAN_FRONTEND=noninteractive sudo apt-get update -q && DEBIAN_FRONTEND=noninteractive sudo apt-get install -qq -y rsync
       - run: mkdir deploy
       - run: git config --global user.email "ci@citeumcollective.io" && git config --global user.name "Citeum Collective CircleCI"
       - run:
@@ -61,7 +61,7 @@ jobs:
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
 
 workflows:
-  openex:
+  citeum-collective:
     jobs:
       - build_platform:
           filters:
