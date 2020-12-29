@@ -2,19 +2,25 @@ import React, { useContext } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField, Switch } from 'formik-material-ui';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import * as Yup from 'yup';
 import { UserContext } from '../Context';
 
-const UPDATE_PROFILE = gql`
-  mutation UpdateProfile($input: UserProfileInput!) {
+const MUTATION_UPDATE_PROFILE = gql`
+  mutation UpdateProfile($input: UserEditInput!) {
     updateProfile(input: $input) {
       firstName
       lastName
+      birthday
+      address
+      organization
+      job_position
+      is_organization
     }
   }
 `;
@@ -24,23 +30,40 @@ const userValidation = () => Yup.object().shape({
   lastName: Yup.string().required('This field is required'),
   birthday: Yup.date(),
   address: Yup.string(),
-  company: Yup.string(),
+  organization: Yup.string(),
   job_position: Yup.string(),
-  phone: Yup.string(),
+  is_organization: Yup.boolean(),
 });
 
 const Profile = () => {
-  const { me, update } = useContext(UserContext);
-  const [updateProfile] = useMutation(UPDATE_PROFILE, {
+  const { me, federation, update } = useContext(UserContext);
+  const [updateProfile] = useMutation(MUTATION_UPDATE_PROFILE, {
     onCompleted(data) {
-      update({ ...me, ...data.updateProfile });
+      update({ federation, me: { ...me, ...data.updateProfile } });
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
-    const { firstName, lastName } = values;
-    const input = { firstName, lastName };
-    updateProfile({ variables: { input } });
-    setSubmitting(false);
+    const {
+      firstName,
+      lastName,
+      birthday,
+      address,
+      organization,
+      // eslint-disable-next-line camelcase
+      job_position,
+      // eslint-disable-next-line camelcase
+      is_organization,
+    } = values;
+    const input = {
+      firstName,
+      lastName,
+      birthday,
+      address,
+      organization,
+      job_position,
+      is_organization,
+    };
+    updateProfile({ variables: { input } }).finally(() => setSubmitting(false));
   };
   return (
     <Grid container spacing={3}>
@@ -92,7 +115,7 @@ const Profile = () => {
                 </Grid>
                 <Field
                   component={TextField}
-                  name="Address"
+                  name="address"
                   label="Address"
                   fullWidth={true}
                   multiline={true}
@@ -103,8 +126,8 @@ const Profile = () => {
                   <Grid item xs={6}>
                     <Field
                       component={TextField}
-                      name="company"
-                      label="Company"
+                      name="organization"
+                      label="Organization"
                       fullWidth={true}
                       style={{ marginTop: 20 }}
                     />
@@ -119,6 +142,18 @@ const Profile = () => {
                     />
                   </Grid>
                 </Grid>
+                <FormControlLabel
+                  control={
+                    <Field
+                      component={Switch}
+                      type="checkbox"
+                      name="is_organization"
+                    />
+                  }
+                  label="I'm representing an organization"
+                  style={{ marginTop: 20 }}
+                />
+                <div className="clearfix" />
                 <Button
                   size="small"
                   variant="contained"

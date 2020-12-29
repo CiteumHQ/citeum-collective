@@ -82,7 +82,7 @@ const TopBar = ({ location }) => {
   // eslint-disable-next-line no-useless-escape
   const regex = new RegExp(`/${organization.id}/([a-z]+)`, 'g');
   const match = [...location.pathname.matchAll(regex)];
-  let page = null;
+  let page = 'applications';
   if (match[0]) {
     // eslint-disable-next-line prefer-destructuring
     [, page] = match[0];

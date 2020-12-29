@@ -1,9 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as R from 'ramda';
 import { sql } from '../utils/sql';
-import { ADMIN_ROLE_CODE, createAssociationAdminRole, grantRoleToUser } from '../database/keycloak';
+import {
+  ADMIN_ROLE_CODE,
+  createAssociationAdminRole,
+  deleteAssociationRoles,
+  grantRoleToUser,
+} from '../database/keycloak';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
 import { getAssociationById, getMembershipByCode } from './memberships';
+import { FunctionalError } from '../config/errors';
 
 export const getAssociations = (ctx) => {
   return ctx.db.queryRows(sql`select * from associations`);
@@ -50,7 +56,7 @@ export const userSubscription = async (ctx, associationId) => {
   const associations = await userSubscriptions(ctx);
   const collective = R.find((a) => a.association.id === associationId, associations);
   if (!collective) return null;
-  return getMembershipByCode(ctx, collective.membershipCode);
+  return getMembershipByCode(ctx, associationId, collective.membershipCode);
 };
 
 export const createAssociation = async (ctx, input) => {
@@ -68,4 +74,23 @@ export const createAssociation = async (ctx, input) => {
   await grantRoleToUser(adminRoleName, ctx.user);
   // Return the created association
   return getAssociationById(ctx, id);
+};
+
+export const updateAssociation = async (ctx, id, input) => {
+  await ctx.db.execute(
+    sql`UPDATE associations SET name = ${input.name}, description = ${input.description}, email = ${
+      input.email
+    }, website = ${input.website || null} WHERE id = ${id}`
+  );
+  return getAssociationById(ctx, id);
+};
+
+export const deleteAssociation = async (ctx, id) => {
+  const association = await getAssociationById(ctx, id);
+  if (!association) {
+    throw FunctionalError('Association not found', { id });
+  }
+  await deleteAssociationRoles(association);
+  await ctx.db.execute(sql`DELETE FROM associations where id = ${id}`);
+  return id;
 };

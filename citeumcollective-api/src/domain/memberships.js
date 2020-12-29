@@ -7,6 +7,7 @@ import {
   getUsersWithRole,
   roleGen,
 } from '../database/keycloak';
+import { completeUserWithData } from './users';
 
 export const getAssociationById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from associations where id = ${id}`);
@@ -16,8 +17,8 @@ export const getMembershipById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from memberships where id = ${id}`);
 };
 
-export const getMembershipByCode = (ctx, code) => {
-  return ctx.db.queryOne(sql`select * from memberships where code = ${code}`);
+export const getMembershipByCode = (ctx, associationId, code) => {
+  return ctx.db.queryOne(sql`select * from memberships where code = ${code} and association_id = ${associationId}`);
 };
 
 export const getMembershipAssociation = (ctx, membership) => {
@@ -36,7 +37,12 @@ export const getAssociationMembers = async (ctx, association) => {
     const role = roles[index];
     // eslint-disable-next-line no-await-in-loop
     const users = await getUsersWithRole(role);
-    members.push(...users.map((u) => Object.assign(u, { roles: [role] })));
+    for (let index2 = 0; index2 < users.length; index2 += 1) {
+      const user = users[index2];
+      // eslint-disable-next-line no-await-in-loop
+      const userCompleted = await completeUserWithData(ctx, user);
+      members.push(Object.assign(userCompleted, { roles: [role] }));
+    }
   }
   return members;
 };

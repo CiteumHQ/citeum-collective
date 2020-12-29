@@ -102,6 +102,12 @@ export const grantRoleToUser = async (roleName, user) => {
   });
 };
 
+export const getRolesForAssociation = async (association) => {
+  const api = await kc.get();
+  const roles = await api.roles.find();
+  return R.filter((n) => n.name.startsWith(`${ROLE_ASSO_PREFIX}${association.name}`), roles);
+};
+
 export const createRoleForAssociation = async (association, roleName, description) => {
   const api = await kc.get();
   const roleNameToCreate = roleGen(association, roleName);
@@ -116,6 +122,16 @@ export const deleteAssociationRole = async (association, membership) => {
   const api = await kc.get();
   const roleNameToDelete = roleGen(association, membership.code);
   await api.roles.delByName({ name: roleNameToDelete });
+};
+
+export const deleteAssociationRoles = async (association) => {
+  const api = await kc.get();
+  const associationRoles = await getRolesForAssociation(association);
+  return Promise.all(
+    associationRoles.map((role) => {
+      return api.roles.delByName({ name: role.name });
+    })
+  );
 };
 
 export const createAssociationAdminRole = async (association) => {

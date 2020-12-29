@@ -9,7 +9,7 @@ export default {
       const extractedUser = await extractUserTokenFromRequest(context.req);
       if (extractedUser) {
         try {
-          context.user = await getUser(extractedUser.id);
+          context.user = await getUser(context, extractedUser.id);
         } catch (e) {
           logger.error('Error extracting user to build context', { error: e });
         }

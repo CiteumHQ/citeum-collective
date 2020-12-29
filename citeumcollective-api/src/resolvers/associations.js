@@ -1,4 +1,10 @@
-import { createAssociation, getAssociationByCode, getAssociations } from '../domain/associations';
+import {
+  createAssociation,
+  updateAssociation,
+  deleteAssociation,
+  getAssociationByCode,
+  getAssociations,
+} from '../domain/associations';
 import conf from '../config/conf';
 import {
   createMembership,
@@ -30,6 +36,8 @@ const usersResolvers = {
   },
   Mutation: {
     associationAdd: (_, { input }, ctx) => createAssociation(ctx, input),
+    associationUpdate: (_, { id, input }, ctx) => updateAssociation(ctx, id, input),
+    associationDelete: (_, { id }, ctx) => deleteAssociation(ctx, id),
     membershipAdd: (_, { input }, ctx) => createMembership(ctx, input),
     membershipRemove: (_, { id }, ctx) => removeMembership(ctx, id),
   },

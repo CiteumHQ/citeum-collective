@@ -10,6 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { UserContext } from '../../Context';
 import RightBar from './RightBar';
 import Parameters from './Parameters';
+import Memberships from './Memberships';
 import Members from './Members';
 import Organizations from './Organizations';
 
@@ -41,6 +42,11 @@ const Root = () => {
             exact
             path="/dashboard/organizations/:organizationId/admin/parameters"
             component={Parameters}
+          />
+          <Route
+              exact
+              path="/dashboard/organizations/:organizationId/admin/memberships"
+              component={Memberships}
           />
           <Route
               exact

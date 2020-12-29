@@ -44,19 +44,21 @@ const Root = () => {
   const { data, loading } = useBasicQuery(QUERY_ASSOCIATION, {
     id: organizationId,
   });
+  const [contextData, setContextData] = useState();
+  const update = (updated) => setContextData(updated);
   const { federation } = useContext(UserContext);
-  const [organizationDetail, setOrganizationDetail] = useState();
   useEffect(() => {
     if (loading === false && data) {
-      setOrganizationDetail(data.association);
+      setContextData({ organization: data.association });
     }
   }, [loading, data]);
   const organizationData = {
-    organization: organizationDetail,
+    organization: contextData?.organization,
+    update,
   };
   return (
     <OrganizationContext.Provider value={organizationData}>
-      {organizationDetail ? (
+      {organizationData.organization && (
         <div>
           <TopBar />
           <div className={classes.container}>
@@ -92,8 +94,6 @@ const Root = () => {
             </Switch>
           </div>
         </div>
-      ) : (
-        <div />
       )}
     </OrganizationContext.Provider>
   );

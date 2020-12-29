@@ -11,7 +11,7 @@ const usersResolvers = {
     subscriptions: (_, __, ctx) => userSubscriptions(ctx),
   },
   Mutation: {
-    updateProfile: (_, { input }, ctx) => updateUser(ctx, input),
+    updateProfile: (_, { input }, ctx) => updateUser(ctx, ctx.user.id, input),
   },
 };
 

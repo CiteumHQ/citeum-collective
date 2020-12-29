@@ -1,14 +1,15 @@
-import React from 'react';
-import { gql } from '@apollo/client';
+import React, { useContext } from 'react';
+import { gql, useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import * as Yup from 'yup';
 import { useBasicQuery } from '../../../../network/Apollo';
+import { OrganizationContext } from '../../Context';
 
 const QUERY_ASSOCIATION = gql`
   query GetAssociation($id: ID!) {
@@ -17,18 +18,56 @@ const QUERY_ASSOCIATION = gql`
       name
       description
       email
+      website
       code
     }
   }
 `;
 
+const MUTATION_UPDATE_ORGANIZATION = gql`
+  mutation AssociationUpdate($id: ID!, $input: AssociationEditInput!) {
+    associationUpdate(id: $id, input: $input) {
+      name
+      description
+      email
+      website
+    }
+  }
+`;
+
+const associationValidation = () => Yup.object().shape({
+  name: Yup.string().required('This field is required'),
+  email: Yup.string().required('This field is required'),
+  description: Yup.string().required('This field is required'),
+  website: Yup.string().nullable(),
+});
+
 const Parameters = () => {
   const { organizationId } = useParams();
+  const { organization, update } = useContext(OrganizationContext);
   const { data } = useBasicQuery(QUERY_ASSOCIATION, {
     id: organizationId,
   });
+  const [updateOrganization] = useMutation(MUTATION_UPDATE_ORGANIZATION, {
+    onCompleted(updatedData) {
+      update({
+        organization: { ...organization, ...updatedData.associationUpdate },
+      });
+    },
+  });
   const formSubmit = (values, { setSubmitting }) => {
-    setSubmitting(false);
+    const {
+      name, email, description, website,
+    } = values;
+    const input = {
+      name,
+      email,
+      description,
+      website,
+    };
+    updateOrganization({
+      variables: { id: organizationId, input },
+    }).finally(() => setSubmitting(false));
   };
   if (data && data.association) {
     const { association } = data;
@@ -37,6 +76,7 @@ const Parameters = () => {
         <Formik
           enableReinitialize={true}
           initialValues={association}
+          validationSchema={associationValidation()}
           onSubmit={formSubmit}
         >
           {({ submitForm, isSubmitting }) => (
@@ -49,7 +89,6 @@ const Parameters = () => {
                       name="name"
                       label="Name"
                       fullWidth={true}
-                      disabled={true}
                     />
                     <Field
                       component={TextField}
@@ -68,13 +107,10 @@ const Parameters = () => {
                       fullWidth={true}
                     />
                     <Field
-                      component={KeyboardDatePicker}
-                      name="birthday"
-                      label="Birthday"
+                      component={TextField}
+                      name="website"
+                      label="Website"
                       fullWidth={true}
-                      autoOk={true}
-                      disableFuture={true}
-                      format="yyyy-MM-dd"
                       style={{ marginTop: 20 }}
                     />
                   </Grid>

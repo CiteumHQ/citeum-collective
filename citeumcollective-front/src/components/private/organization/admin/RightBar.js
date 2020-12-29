@@ -12,7 +12,8 @@ import {
   DomainOutlined,
   GroupOutlined,
 } from '@material-ui/icons';
-import { OrganizationContext } from '../../Context';
+import { Charity } from 'mdi-material-ui';
+import { OrganizationContext, UserContext } from '../../Context';
 
 const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -34,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 const RightBar = ({ location }) => {
   const classes = useStyles();
+  const { federation } = useContext(UserContext);
   const { organization } = useContext(OrganizationContext);
   return (
     <Drawer
@@ -59,10 +61,26 @@ const RightBar = ({ location }) => {
         </MenuItem>
         <MenuItem
           component={Link}
+          to={`/dashboard/organizations/${organization.id}/admin/memberships`}
+          selected={
+            location.pathname
+            === `/dashboard/organizations/${organization.id}/admin/memberships`
+          }
+          dense={false}
+          classes={{ root: classes.menuItem }}
+        >
+          <ListItemIcon style={{ minWidth: 50 }}>
+            <Charity />
+          </ListItemIcon>
+          <ListItemText primary="Memberships" />
+        </MenuItem>
+        <MenuItem
+          component={Link}
           to={`/dashboard/organizations/${organization.id}/admin/members`}
-          selected={location.pathname.includes(
-            `/dashboard/organizations/${organization.id}/admin/members`,
-          )}
+          selected={
+            location.pathname
+            === `/dashboard/organizations/${organization.id}/admin/members`
+          }
           dense={false}
           classes={{ root: classes.menuItem }}
         >
@@ -71,20 +89,22 @@ const RightBar = ({ location }) => {
           </ListItemIcon>
           <ListItemText primary="Members" />
         </MenuItem>
-        <MenuItem
-          component={Link}
-          to={`/dashboard/organizations/${organization.id}/admin/organizations`}
-          selected={location.pathname.includes(
-            `/dashboard/organizations/${organization.id}/admin/organizations`,
-          )}
-          dense={false}
-          classes={{ root: classes.menuItem }}
-        >
-          <ListItemIcon style={{ minWidth: 50 }}>
-            <DomainOutlined />
-          </ListItemIcon>
-          <ListItemText primary="Organizations" />
-        </MenuItem>
+        {organization.id === federation.id && (
+          <MenuItem
+            component={Link}
+            to={`/dashboard/organizations/${organization.id}/admin/organizations`}
+            selected={location.pathname.includes(
+              `/dashboard/organizations/${organization.id}/admin/organizations`,
+            )}
+            dense={false}
+            classes={{ root: classes.menuItem }}
+          >
+            <ListItemIcon style={{ minWidth: 50 }}>
+              <DomainOutlined />
+            </ListItemIcon>
+            <ListItemText primary="Organizations" />
+          </MenuItem>
+        )}
       </MenuList>
     </Drawer>
   );

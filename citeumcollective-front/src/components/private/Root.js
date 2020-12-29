@@ -24,9 +24,14 @@ const QUERY_ME = gql`
   query GetMe {
     me {
       id
+      email
       firstName
       lastName
-      email
+      birthday
+      address
+      organization
+      job_position
+      is_organization
       roles
       associations {
         id
@@ -44,7 +49,9 @@ const QUERY_ME = gql`
 
 const Root = () => {
   const classes = useStyles();
-  const { data, loading } = useBasicQuery(QUERY_ME);
+  const { data, loading } = useBasicQuery(QUERY_ME, null, {
+    pollInterval: 5000,
+  });
   const [contextData, setContextData] = useState();
   const update = (updated) => setContextData(updated);
   useEffect(() => {

@@ -3,7 +3,7 @@ export default {
   palette: {
     type: 'dark',
     text: { secondary: 'rgba(255, 255, 255, 0.5)' },
-    primary: { main: '#5f7d8a' },
+    primary: { main: '#f44336' },
     secondary: { main: '#f44336' },
     background: {
       paper: '#22353e',

@@ -8,97 +8,121 @@ scalar DateTime
 scalar Upload
 
 type AppInfo {
-  app: String
-  postgre: String
+    app: String
+    postgre: String
 }
 
 type Identity {
-  identityProvider: String
-  userId: String
-  userName: String
+    identityProvider: String
+    userId: String
+    userName: String
 }
 
 type Membership {
-  id: ID!
-  name: String!
-  code: String!
-  description: String
-  association: Association!
+    id: ID!
+    name: String!
+    code: String!
+    fee: Int!
+    description: String
+    association: Association!
 }
 
 type Association {
-  id: ID!
-  name: String!
-  description: String!
-  email: String!
-  code: String!
-  members: [User]!
-  memberships: [Membership]!
+    id: ID!
+    name: String!
+    description: String!
+    email: String!
+    website: String
+    code: String!
+    members: [User]!
+    memberships: [Membership]!
 }
 
 type Subscription {
-  association: Association!
-  membership: Membership!
+    association: Association!
+    membership: Membership!
 }
 
 type User {
-  id: ID!
-  email: String!
-  firstName: String
-  lastName: String
-  roles: [String]
-  subscription(associationId: ID!): Membership
-  subscriptions: [Subscription]
-  associations: [Association] @auth
-  federatedIdentities: [Identity]
+    id: ID!
+    email: String!
+    firstName: String
+    lastName: String
+    birthday: DateTime
+    address: String
+    organization: String
+    job_position: String
+    is_organization: Boolean!
+    roles: [String]
+    subscription(associationId: ID!): Membership
+    subscriptions: [Subscription]
+    associations: [Association] @auth
+    federatedIdentities: [Identity]
 }
 
 ### QUERIES
 
 type Query {
-  about: AppInfo
-  me: User @auth
-  federation: Association @auth
-  membership(id: ID!): Membership @auth
-  association(id: ID!): Association @auth
-  associations: [Association] @ auth
+    about: AppInfo
+    me: User @auth
+    federation: Association @auth
+    membership(id: ID!): Membership @auth
+    association(id: ID!): Association @auth
+    associations: [Association] @ auth
 }
 
 ### MUTATIONS
 
 ### MUTATIONS DECLARATION
 input MembershipAddInput {
-  associationId: String!
-  code: String!
-  name: String!
+    associationId: String!
+    code: String!
+    fee: Int!
+    name: String!
+    description: String!
+}
+
+input MembershipEditInput {
+    name: String!
+    description: String!
 }
 
 input AssociationAddInput {
- code: String!
- name: String!
- description: String!
- email: String!
+    code: String!
+    name: String!
+    description: String!
+    email: String!
+    website: String
 }
 
 input AssociationEditInput {
-  description: String!
-  email: String!
+    name: String!
+    description: String!
+    email: String!
+    website: String
 }
 
-input UserProfileInput {
-  firstName: String!
-  lastName: String!
+input UserEditInput {
+    firstName: String!
+    lastName: String!
+    birthday: DateTime
+    address: String
+    organization: String
+    job_position: String
+    is_organization: Boolean
 }
 
 input UserLoginInput {
-  email: String!
-  password: String!
+    email: String!
+    password: String!
 }
 
 type Mutation {
-  updateProfile(input: UserProfileInput): User @auth
-  membershipAdd(input: MembershipAddInput): Membership @auth
-  membershipRemove(id: ID!): Association @auth
-  associationAdd(input: AssociationAddInput): Association @auth
-  associationUpdate(input: AssociationEditInput): Association @auth
+    updateProfile(input: UserEditInput!): User @auth
+    membershipAdd(input: MembershipAddInput!): Membership @auth
+    membershipUpdate(id: ID!, input: MembershipEditInput!): Membership @auth
+    membershipRemove(id: ID!): Association @auth
+    associationAdd(input: AssociationAddInput!): Association @auth
+    associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth
+    associationDelete(id: ID!): ID! @auth
 }
