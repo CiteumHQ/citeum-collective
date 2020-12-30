@@ -58,7 +58,7 @@ export const removeMembership = async (ctx, id) => {
 };
 
 export const createMembership = async (ctx, input) => {
-  const { associationId, name, code } = input;
+  const { associationId, name, code, fee } = input;
   if (code === ADMIN_ROLE_CODE) throw Error('admin is a reserved membership keyword');
   const association = await getAssociationById(ctx, associationId);
   if (!association) {
@@ -67,8 +67,8 @@ export const createMembership = async (ctx, input) => {
   const id = uuidv4();
   // Create the association
   await ctx.db.execute(
-    sql`insert INTO memberships (id, name, code, association_id) 
-                values (${id}, ${name}, ${code}, ${association.id})`
+    sql`insert INTO memberships (id, name, code, association_id, fee) 
+                values (${id}, ${name}, ${code}, ${association.id}, ${fee})`
   );
   // Create the keycloak admin role for this association
   await createRoleForAssociation(association, code, `${name} role for ${association.name}`);
