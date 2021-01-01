@@ -4,10 +4,10 @@ export const UserContext = React.createContext({
   me: null,
   federation: null,
   isGranted: () => {},
-  update: () => {},
+  refetch: () => {},
 });
 
 export const OrganizationContext = React.createContext({
   organization: null,
-  update: () => {},
+  refetch: () => {},
 });

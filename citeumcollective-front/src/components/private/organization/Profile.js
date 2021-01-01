@@ -36,10 +36,10 @@ const userValidation = () => Yup.object().shape({
 });
 
 const Profile = () => {
-  const { me, federation, update } = useContext(UserContext);
+  const { me, refetch } = useContext(UserContext);
   const [updateProfile] = useMutation(MUTATION_UPDATE_PROFILE, {
-    onCompleted(data) {
-      update({ federation, me: { ...me, ...data.updateProfile } });
+    onCompleted() {
+      refetch();
     },
   });
   const formSubmit = (values, { setSubmitting }) => {

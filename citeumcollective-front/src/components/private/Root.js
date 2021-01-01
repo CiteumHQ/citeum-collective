@@ -49,11 +49,8 @@ const QUERY_ME = gql`
 
 const Root = () => {
   const classes = useStyles();
-  const { data, loading } = useBasicQuery(QUERY_ME, null, {
-    pollInterval: 5000,
-  });
+  const { data, loading, refetch } = useBasicQuery(QUERY_ME);
   const [contextData, setContextData] = useState();
-  const update = (updated) => setContextData(updated);
   useEffect(() => {
     if (loading === false && data) {
       setContextData(data);
@@ -63,7 +60,7 @@ const Root = () => {
     me: contextData?.me,
     federation: contextData?.federation,
     isGranted: (assoName, role) => contextData.me.roles.includes(`asso_${assoName}_${role}`),
-    update,
+    refetch,
   };
   return (
     <UserContext.Provider value={userData}>

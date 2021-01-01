@@ -52,7 +52,7 @@ type User {
     address: String
     organization: String
     job_position: String
-    is_organization: Boolean!
+    is_organization: Boolean
     roles: [String]
     subscription(associationId: ID!): Membership
     subscriptions: [Subscription]

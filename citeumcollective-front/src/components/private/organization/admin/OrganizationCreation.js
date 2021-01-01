@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import { Add } from '@material-ui/icons';
 import * as Yup from 'yup';
+import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -24,6 +25,7 @@ const useStyles = makeStyles(() => ({
 const MUTATION_CREATE_ORGANIZATION = gql`
   mutation AssociationAdd($input: AssociationAddInput!) {
     associationAdd(input: $input) {
+      id
       code
       name
       description
@@ -39,11 +41,14 @@ const associationValidation = () => Yup.object().shape({
   description: Yup.string().required('This field is required'),
 });
 
-const OrganizationCreation = () => {
+const OrganizationCreation = ({ refetchOrganizations }) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const { refetch: refetchUserContext } = useContext(UserContext);
   const [createOrganization] = useMutation(MUTATION_CREATE_ORGANIZATION, {
     onCompleted() {
+      refetchUserContext();
+      refetchOrganizations();
       setOpen(false);
     },
   });

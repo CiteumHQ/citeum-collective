@@ -41,11 +41,10 @@ const QUERY_ASSOCIATION = gql`
 const Root = () => {
   const classes = useStyles();
   const { organizationId } = useParams();
-  const { data, loading } = useBasicQuery(QUERY_ASSOCIATION, {
+  const { data, loading, refetch } = useBasicQuery(QUERY_ASSOCIATION, {
     id: organizationId,
   });
   const [contextData, setContextData] = useState();
-  const update = (updated) => setContextData(updated);
   const { federation } = useContext(UserContext);
   useEffect(() => {
     if (loading === false && data) {
@@ -54,7 +53,7 @@ const Root = () => {
   }, [loading, data]);
   const organizationData = {
     organization: contextData?.organization,
-    update,
+    refetch,
   };
   return (
     <OrganizationContext.Provider value={organizationData}>

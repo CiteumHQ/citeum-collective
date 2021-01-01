@@ -4,11 +4,6 @@ import { useCallback } from 'react';
 export const client = new ApolloClient({
   cache: new InMemoryCache(),
   uri: '/graphql',
-  defaultOptions: {
-    query: { fetchPolicy: 'no-cache' },
-    watchQuery: { fetchPolicy: 'no-cache' },
-    mutate: { fetchPolicy: 'no-cache' },
-  },
 });
 
 const errorCodes = {

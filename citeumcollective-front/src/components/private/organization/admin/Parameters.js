@@ -44,15 +44,13 @@ const associationValidation = () => Yup.object().shape({
 
 const Parameters = () => {
   const { organizationId } = useParams();
-  const { organization, update } = useContext(OrganizationContext);
+  const { refetch } = useContext(OrganizationContext);
   const { data } = useBasicQuery(QUERY_ASSOCIATION, {
     id: organizationId,
   });
   const [updateOrganization] = useMutation(MUTATION_UPDATE_ORGANIZATION, {
-    onCompleted(updatedData) {
-      update({
-        organization: { ...organization, ...updatedData.associationUpdate },
-      });
+    onCompleted() {
+      refetch();
     },
   });
   const formSubmit = (values, { setSubmitting }) => {

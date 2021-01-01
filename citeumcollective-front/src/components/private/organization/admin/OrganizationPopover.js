@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Slide from '@material-ui/core/Slide';
 import { makeStyles } from '@material-ui/core/styles';
 import { MoreVert } from '@material-ui/icons';
+import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -29,7 +30,7 @@ const MUTATION_DELETE_ORGANIZATION = gql`
   }
 `;
 
-const OrganizationPopover = ({ id }) => {
+const OrganizationPopover = ({ id, refetchOrganizations }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleClick = (event) => {
@@ -40,8 +41,11 @@ const OrganizationPopover = ({ id }) => {
   };
   const [openDelete, setOpenDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { refetch: refetchUserContext } = useContext(UserContext);
   const [deleteOrganization] = useMutation(MUTATION_DELETE_ORGANIZATION, {
     onCompleted() {
+      refetchUserContext();
+      refetchOrganizations();
       setDeleting(false);
       setOpenDelete(false);
     },
