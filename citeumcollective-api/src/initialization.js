@@ -3,6 +3,13 @@ import { logger } from './config/conf';
 import migrate from './migrate';
 import { initProvider } from './config/authentication';
 import { connectKeycloak, initPlatformAdmin } from './database/keycloak';
+import { isStorageAlive } from './database/minio';
+
+export const checkSystemDependencies = async () => {
+  // Check if minio is here
+  await isStorageAlive();
+  logger.info(`[CHECK] Minio is alive`);
+};
 
 const migrateDatabase = async (db) => {
   try {
@@ -19,6 +26,7 @@ const migrateDatabase = async (db) => {
 };
 
 const platformInit = async (db) => {
+  await checkSystemDependencies();
   try {
     await initProvider(db);
     await connectKeycloak();

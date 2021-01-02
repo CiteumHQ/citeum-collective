@@ -16,6 +16,7 @@ import {
   getMembershipById,
   removeMembership,
 } from '../domain/memberships';
+import { createDocument } from '../domain/documents';
 
 const usersResolvers = {
   Query: {
@@ -35,6 +36,7 @@ const usersResolvers = {
     association: (membership, _, ctx) => getMembershipAssociation(ctx, membership),
   },
   Mutation: {
+    documentAdd: (_, { associationId, input }, ctx) => createDocument(ctx, associationId, input),
     associationAdd: (_, { input }, ctx) => createAssociation(ctx, input),
     associationUpdate: (_, { id, input }, ctx) => updateAssociation(ctx, id, input),
     associationDelete: (_, { id }, ctx) => deleteAssociation(ctx, id),

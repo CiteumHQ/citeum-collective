@@ -32,6 +32,13 @@
     "username": "change_me",
     "password": "change_me"
   },
+  "minio": {
+    "endpoint": "localhost",
+    "port": 9000,
+    "use_ssl": false,
+    "access_key": "ChangeMe",
+    "secret_key": "ChangeMe"
+  },
   "database": {
     "host": "127.0.0.1",
     "port": "5432",

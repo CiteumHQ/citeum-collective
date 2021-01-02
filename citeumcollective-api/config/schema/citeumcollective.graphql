@@ -7,6 +7,11 @@ directive @auth on OBJECT | FIELD_DEFINITION
 scalar DateTime
 scalar Upload
 
+enum DocumentType {
+    MINUTES
+    INFORMATION
+}
+
 type AppInfo {
     app: String
     postgre: String
@@ -58,6 +63,14 @@ type User {
     subscriptions: [Subscription]
     associations: [Association] @auth
     federatedIdentities: [Identity]
+}
+
+type Document {
+    id: ID!
+    name: String!
+    description: String!
+    size: Int
+    memberships: [Membership]
 }
 
 ### QUERIES
@@ -117,11 +130,20 @@ input UserLoginInput {
     password: String!
 }
 
+input DocumentAddInput {
+    name: String!
+    description: String!
+    memberships: [ID]!
+    type: DocumentType!
+    file: Upload!
+}
+
 type Mutation {
     updateProfile(input: UserEditInput!): User @auth
     membershipAdd(input: MembershipAddInput!): Membership @auth
     membershipUpdate(id: ID!, input: MembershipEditInput!): Membership @auth
     membershipRemove(id: ID!): Association @auth
+    documentAdd(associationId: ID!, input: DocumentAddInput!): Document @auth
     associationAdd(input: AssociationAddInput!): Association @auth
     associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth
     associationDelete(id: ID!): ID! @auth
