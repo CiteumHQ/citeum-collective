@@ -1,6 +1,6 @@
 import { bridgeSql } from '../database/postgre';
 import { sql } from '../utils/sql';
-import { createDocumentType } from '../domain/associations';
+import { createDocumentType } from '../domain/documents';
 
 export const up = async (knex, db = bridgeSql(knex)) => {
   // Create documents structure
