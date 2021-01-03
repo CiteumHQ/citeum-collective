@@ -4,7 +4,7 @@ import passport from 'passport';
 import jwt_decode from 'jwt-decode';
 import * as jwt from 'jsonwebtoken';
 import conf, { COOKIE_NAME, logger } from './conf';
-import { createUser, getUserByEmail } from '../domain/users';
+import { createUser, getUser, getUserByEmail } from '../domain/users';
 
 const generateJwtAccessToken = (user) => {
   const jwtBody = { id: user.sub };
@@ -25,7 +25,7 @@ export const setAuthenticationCookie = (user, res) => {
   });
 };
 
-export const extractUserTokenFromRequest = (req) => {
+const extractUserTokenFromRequest = (req) => {
   const { cookies } = req; // get cookies
   if (cookies) {
     const authCookie = cookies[COOKIE_NAME];
@@ -36,6 +36,14 @@ export const extractUserTokenFromRequest = (req) => {
         logger.error('Unable to verify JWT token', { token: authCookie, error: e });
       }
     }
+  }
+  return undefined;
+};
+
+export const extractUserFromRequest = (ctx, req) => {
+  const extractedUser = extractUserTokenFromRequest(req);
+  if (extractedUser) {
+    return getUser(ctx, extractedUser.id);
   }
   return undefined;
 };

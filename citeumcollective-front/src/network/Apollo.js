@@ -1,8 +1,10 @@
 import { ApolloClient, InMemoryCache, useQuery } from '@apollo/client';
 import { useCallback } from 'react';
+import { createUploadLink } from 'apollo-upload-client';
 
 export const client = new ApolloClient({
   cache: new InMemoryCache(),
+  link: createUploadLink(),
   uri: '/graphql',
 });
 

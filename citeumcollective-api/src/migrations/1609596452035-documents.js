@@ -13,14 +13,19 @@ export const up = async (knex, db = bridgeSql(knex)) => {
         );
         CREATE TABLE "documents"
         (
-          id              VARCHAR(255) PRIMARY KEY,
-          name            VARCHAR(255),
-          description     text,
-          type            VARCHAR(255),
-          created_at      timestamp DEFAULT CURRENT_TIMESTAMP,
-          CONSTRAINT fk_document_type
-            FOREIGN KEY (type)
-              REFERENCES document_type (id)
+            id              VARCHAR(255) PRIMARY KEY,
+            name            VARCHAR(255),
+            mimetype        VARCHAR(255),
+            description     text,
+            type            VARCHAR(255),
+            association_id  VARCHAR(255) NOT NULL,
+            created_at      timestamp DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT fk_document_type
+              FOREIGN KEY (type)
+                REFERENCES document_type (id),
+            CONSTRAINT fk_association_id
+              FOREIGN KEY (association_id)
+                REFERENCES associations (id)
         );
         CREATE TABLE "documents_memberships"
         (

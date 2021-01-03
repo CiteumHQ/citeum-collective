@@ -14,8 +14,13 @@ import nconf from 'nconf';
 import RateLimit from 'express-rate-limit';
 import sanitize from 'sanitize-filename';
 import conf, { COOKIE_NAME, DEV_MODE, logger } from './config/conf';
-import passport, { setAuthenticationCookie } from './config/authentication';
+import passport, { extractUserFromRequest, setAuthenticationCookie } from './config/authentication';
+import { downloadFile } from './database/minio';
+import { loadDocument } from './domain/documents';
+import { db as dbInstance } from './database/postgre';
+import { isDocumentAccessibleFromUser } from './domain/associations';
 
+const ctx = { db: dbInstance };
 const createApp = async (apolloServer) => {
   // Init the http server
   const app = express();
@@ -32,6 +37,7 @@ const createApp = async (apolloServer) => {
   app.use(session({ secret: sessionSecret, saveUninitialized: true, resave: true }));
   app.use(cookieParser());
   app.use(compression());
+  // region helmet
   app.use(helmet());
   app.use(helmet.frameguard());
   app.use(helmet.expectCt({ enforce: true, maxAge: 30 }));
@@ -54,6 +60,7 @@ const createApp = async (apolloServer) => {
       },
     })
   );
+  // endregion
   app.use(bodyParser.json({ limit: '100mb' }));
   app.use(limiter);
 
@@ -73,45 +80,48 @@ const createApp = async (apolloServer) => {
   });
   app.use(`${basePath}/static`, express.static(path.join(__dirname, '../public/static')));
 
-  // -- File download
-  // app.get(`${basePath}/storage/get/:file(*)`, async (req, res) => {
-  //   let token = req.cookies ? req.cookies[COOKIE_NAME] : null;
-  //   token = token || extractTokenFromBearer(req.headers.authorization);
-  //   const auth = await authentication(token);
-  //   if (!auth) res.sendStatus(403);
-  //   const { file } = req.params;
-  //   const stream = await downloadFile(file);
-  //   res.attachment(file);
-  //   stream.pipe(res);
-  // });
+  // -- File download / view
+  app.get(`${basePath}/storage/get/:file(*)`, async (req, res) => {
+    // Load user
+    const user = await extractUserFromRequest(ctx, req);
+    if (!user) res.sendStatus(403);
+    // Load document
+    const { file } = req.params;
+    const document = await loadDocument(ctx, file);
+    // Check if the user have access to this doc
+    const userHaveAccess = await isDocumentAccessibleFromUser(ctx, user, document);
+    if (!userHaveAccess) res.sendStatus(403);
+    // Download and stream the file
+    const stream = await downloadFile(file);
+    res.attachment(file);
+    stream.pipe(res);
+  });
+  app.get(`${basePath}/storage/view/:file(*)`, async (req, res) => {
+    // Load user
+    const user = await extractUserFromRequest(ctx, req);
+    if (!user) res.sendStatus(403);
+    // Load document
+    const { file } = req.params;
+    const document = await loadDocument(ctx, file);
+    // Check if the user have access to this doc
+    const userHaveAccess = await isDocumentAccessibleFromUser(ctx, user, document);
+    if (!userHaveAccess) res.sendStatus(403);
+    res.setHeader('Content-disposition', `inline; filename="${document.name}"`);
+    res.setHeader('Content-type', document.mimetype);
+    const stream = await downloadFile(file);
+    stream.pipe(res);
+  });
 
-  // -- File view
-  // app.get(`${basePath}/storage/view/:file(*)`, async (req, res) => {
-  //   let token = req.cookies ? req.cookies[COOKIE_NAME] : null;
-  //   token = token || extractTokenFromBearer(req.headers.authorization);
-  //   const auth = await authentication(token);
-  //   if (!auth) res.sendStatus(403);
-  //   const { file } = req.params;
-  //   const data = await loadFile(file);
-  //   res.setHeader('Content-disposition', `inline; filename="${data.name}"`);
-  //   res.setHeader('Content-type', data.metaData.mimetype);
-  //   const stream = await downloadFile(file);
-  //   stream.pipe(res);
-  // });
-
+  // -- Passport login / logout
   app.get(`${basePath}/logout`, (req, res) => {
     req.logout();
     res.clearCookie(COOKIE_NAME);
     res.redirect(conf.get('app:auth_provider:logout_uri'));
   });
-
-  // -- Passport login
   app.get(`${basePath}/login`, (req, res, next) => {
     req.session.redirect_override = req.get('Referrer');
     passport.authenticate('oic')(req, res, next);
   });
-
-  // -- Passport callback
   app.get(`${basePath}/login/callback`, urlencodedParser, passport.initialize(), (req, res, next) => {
     passport.authenticate('oic', (err, user) => {
       if (err || !user) res.redirect(`/`);

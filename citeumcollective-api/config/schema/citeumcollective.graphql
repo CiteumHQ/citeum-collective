@@ -49,6 +49,7 @@ type Association {
     members: [User]!
     memberships: [Membership]!
     notifications: [Notification]
+    documents: [Document]!
 }
 
 type Subscription {
@@ -146,7 +147,6 @@ input DocumentAddInput {
     description: String!
     memberships: [ID]!
     type: DocumentType!
-    file: Upload!
 }
 
 type Mutation {
@@ -154,7 +154,8 @@ type Mutation {
     membershipAdd(input: MembershipAddInput!): Membership @auth
     membershipUpdate(id: ID!, input: MembershipEditInput!): Membership @auth
     membershipDelete(id: ID!): ID! @auth
-    documentAdd(associationId: ID!, input: DocumentAddInput!): Document @auth
+    documentAdd(organizationId: ID!, input: DocumentAddInput!, file: Upload!): Document @auth
+    documentDelete(id: ID!): ID! @auth
     associationAdd(input: AssociationAddInput!): Association @auth
     associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth
     associationDelete(id: ID!): ID! @auth

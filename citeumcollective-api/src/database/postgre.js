@@ -100,3 +100,5 @@ export const connectDatabase = () => {
   });
   return database;
 };
+
+export const db = connectDatabase();

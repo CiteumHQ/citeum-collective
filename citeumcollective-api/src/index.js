@@ -1,10 +1,9 @@
 import { DEV_MODE, logger } from './config/conf';
 import platformInit from './initialization';
 import { listenServer, restartServer } from './httpServer';
-import { connectDatabase } from './database/postgre';
+import { db } from './database/postgre';
 
 let server;
-const db = connectDatabase();
 
 if (DEV_MODE && module.hot) {
   /* eslint-disable no-console, global-require, import/no-extraneous-dependencies */

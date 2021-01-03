@@ -16,6 +16,7 @@ import { UserContext, OrganizationContext } from '../Context';
 import { useBasicQuery } from '../../../network/Apollo';
 import ErrorNotFound from '../../ErrorNotFound';
 import TopBar from './TopBar';
+import Documents from './Documents';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -85,6 +86,11 @@ const Root = () => {
                 exact
                 path="/dashboard/organizations/:organizationId/overview"
                 component={Overview}
+              />
+              <Route
+                  exact
+                  path="/dashboard/organizations/:organizationId/documents"
+                  component={Documents}
               />
               <Route
                 exact
