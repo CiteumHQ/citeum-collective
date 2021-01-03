@@ -10,8 +10,6 @@ import SerialMetaPlugin from './plugins/SerialMetaPlugin';
 import TransactionPlugin from './plugins/TransactionPlugin';
 import UserContextPlugin from './plugins/UserContextPlugin';
 
-export const extractTokenFromBearer = (bearer) =>
-  bearer && bearer.length > 10 ? bearer.substring('Bearer '.length) : null;
 const createApolloServer = (db) => {
   return new ApolloServer({
     schema: createSchema(),

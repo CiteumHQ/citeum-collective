@@ -32,8 +32,7 @@ export const isStorageAlive = () => {
   });
 };
 
-export const deleteFile = async (user, id) => {
-  logger.debug(`[MINIO] delete file ${id} by ${user.user_email}`);
+export const deleteFile = async (id) => {
   await minioClient.removeObject(bucketName, id);
   return true;
 };
@@ -50,7 +49,7 @@ export const upload = async (path, file, metadata = {}) => {
   return new Promise((resolve, reject) => {
     return minioClient.putObject(bucketName, fileDirName, createReadStream(), null, fileMeta, (err) => {
       if (err) return reject(err);
-      return resolve(fileDirName);
+      return resolve({ id: fileDirName, mimetype });
     });
   });
 };

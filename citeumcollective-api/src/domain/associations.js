@@ -52,6 +52,13 @@ export const userSubscriptions = async (ctx) => {
   return associationsTuple;
 };
 
+export const isDocumentAccessibleFromUser = async (ctx, user, document) => {
+  const userOrganisationMemberships = await userSubscriptions({ ...ctx, user });
+  const userMemberships = userOrganisationMemberships.map((o) => `${o.association.id}-${o.membershipCode}`);
+  const fileMemberships = document.memberships.map((o) => `${o.association_id}-${o.code}`);
+  return fileMemberships.some((o) => userMemberships.includes(o));
+};
+
 export const userSubscription = async (ctx, associationId) => {
   const associations = await userSubscriptions(ctx);
   const collective = R.find((a) => a.association.id === associationId, associations);
