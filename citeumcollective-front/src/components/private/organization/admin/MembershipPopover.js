@@ -188,7 +188,6 @@ const MembershipPopover = ({ id, refetchMemberships }) => {
                     Cancel
                   </Button>
                   <Button
-                    size="small"
                     disabled={isSubmitting}
                     onClick={submitForm}
                     color="secondary"
