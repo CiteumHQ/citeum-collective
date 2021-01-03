@@ -8,12 +8,19 @@ import { makeStyles } from '@material-ui/core/styles';
 import gravatar from 'gravatar';
 import Avatar from '@material-ui/core/Avatar';
 import { useParams } from 'react-router-dom';
+import Chip from '@material-ui/core/Chip';
 import { useBasicQuery } from '../../../../network/Apollo';
 
 const useStyles = makeStyles((theme) => ({
   small: {
     width: theme.spacing(5),
     height: theme.spacing(5),
+  },
+  subscription: {
+    borderRadius: 5,
+    position: 'absolute',
+    right: 100,
+    width: 150,
   },
 }));
 
@@ -60,6 +67,12 @@ const Members = () => {
                 <ListItemText
                   primary={`${member.firstName} ${member.lastName}`}
                   secondary={member.email}
+                />
+                <Chip
+                  label={`${member.subscription.name}`}
+                  variant="outlined"
+                  className={classes.subscription}
+                  color="secondary"
                 />
               </ListItem>
             );

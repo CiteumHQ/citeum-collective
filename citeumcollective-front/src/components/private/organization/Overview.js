@@ -4,10 +4,16 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   pink,
+  green,
+  cyan,
   deepOrange,
   deepPurple,
   yellow,
@@ -22,15 +28,13 @@ import {
   DeleteOutlined,
   HelpOutlined,
 } from '@material-ui/icons';
+import { HeartPlusOutline, HeartRemoveOutline } from 'mdi-material-ui';
 import { Link } from 'react-router-dom';
 import { gql } from '@apollo/client';
 import { OrganizationContext, UserContext } from '../Context';
 import { useBasicQuery } from '../../../network/Apollo';
 
 const useStyles = makeStyles(() => ({
-  container: {
-    marginTop: 20,
-  },
   notification: {
     marginBottom: 20,
   },
@@ -63,6 +67,9 @@ const useStyles = makeStyles(() => ({
   },
   noLink: {
     cursor: 'default',
+  },
+  table: {
+    backgroundColor: 'transparent',
   },
 }));
 
@@ -153,6 +160,32 @@ const Overview = () => {
         </Avatar>
       );
     }
+    if (type === 'add_membership') {
+      return (
+        <Avatar
+          style={{
+            marginTop: 5,
+            backgroundColor: green[500],
+            color: '#ffffff',
+          }}
+        >
+          <HeartPlusOutline />
+        </Avatar>
+      );
+    }
+    if (type === 'delete_membership') {
+      return (
+        <Avatar
+          style={{
+            marginTop: 5,
+            backgroundColor: cyan[500],
+            color: '#ffffff',
+          }}
+        >
+          <HeartRemoveOutline />
+        </Avatar>
+      );
+    }
     if (type === 'update') {
       return (
         <Avatar
@@ -182,39 +215,66 @@ const Overview = () => {
     return (
       <Grid container spacing={3}>
         <Grid item xs={6}>
-          <Typography variant="h3">Information</Typography>
-          <div className={classes.container}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="subtitle1">
-                  {organization.description}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h4">Type of organization</Typography>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  className={classes.noLink}
-                >
-                  {organization.id === federation.id
-                    ? 'Federation'
-                    : 'Association'}
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h4">Subscription</Typography>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  component={Link}
-                  to={`/dashboard/organizations/${organization.id}/membership`}
-                >
-                  {subscription ? subscription.name : 'None'}
-                </Button>
-              </Grid>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="h3">Information</Typography>
+              <Typography variant="subtitle1">
+                {organization.description}
+              </Typography>
             </Grid>
-          </div>
+            <Grid item xs={6}>
+              <Typography variant="h3">Type of organization</Typography>
+              <Button
+                variant="outlined"
+                color="inherit"
+                className={classes.noLink}
+              >
+                {organization.id === federation.id
+                  ? 'Federation'
+                  : 'Association'}
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h3">Subscription</Typography>
+              <Button
+                variant="outlined"
+                color="secondary"
+                component={Link}
+                to={`/dashboard/organizations/${organization.id}/membership`}
+              >
+                {subscription ? subscription.name : 'None'}
+              </Button>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h3">Number of members</Typography>
+              <Table className={classes.table}>
+                <TableBody>
+                  <TableRow>
+                    <TableCell align="left" style={{ fontSize: 15 }}>
+                      Supporter
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      style={{ fontSize: 20, fontWeight: 700 }}
+                    >
+                      5
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="left" style={{ fontSize: 15 }}>
+                      Active
+                    </TableCell>
+                    <TableCell
+                      align="right"
+                      style={{ fontSize: 20, fontWeight: 700 }}
+                    >
+                      10
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h3">Latest notifications</Typography>

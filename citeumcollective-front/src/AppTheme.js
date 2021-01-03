@@ -19,6 +19,13 @@ export default {
     body1: {
       fontSize: '0.9rem',
     },
+    h1: {
+      margin: 0,
+      padding: 0,
+      color: '#ffffff',
+      fontWeight: 300,
+      fontSize: 25,
+    },
     h2: {
       margin: 0,
       padding: 0,
@@ -34,6 +41,7 @@ export default {
       color: '#90a4ae',
       fontWeight: 300,
       fontSize: 18,
+      marginBottom: 15,
     },
     h4: {
       color: '#ffffff',
