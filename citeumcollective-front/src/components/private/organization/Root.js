@@ -8,8 +8,9 @@ import {
 } from 'react-router-dom';
 import { gql } from '@apollo/client';
 import { makeStyles } from '@material-ui/core/styles';
-import Profile from './Profile';
+import Overview from './Overview';
 import Applications from './Applications';
+import Profile from './Profile';
 import AdminRoot from './admin/Root';
 import { UserContext, OrganizationContext } from '../Context';
 import { useBasicQuery } from '../../../network/Apollo';
@@ -22,7 +23,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     height: '100%',
     flexGrow: 1,
-    padding: 40,
+    padding: '20px 40px 40px 40px',
     minWidth: 0,
   },
 }));
@@ -35,6 +36,15 @@ const QUERY_ASSOCIATION = gql`
       description
       email
       code
+    }
+    me {
+      subscription(associationId: $id) {
+        id
+        name
+        code
+        fee
+        description
+      }
     }
   }
 `;
@@ -49,11 +59,15 @@ const Root = () => {
   const { federation } = useContext(UserContext);
   useEffect(() => {
     if (loading === false && data) {
-      setContextData({ organization: data.association });
+      setContextData({
+        organization: data.association,
+        subscription: data.me.subscription,
+      });
     }
   }, [loading, data]);
   const organizationData = {
     organization: contextData?.organization,
+    subscription: contextData?.subscription,
     refetch,
   };
   return (
@@ -64,23 +78,15 @@ const Root = () => {
           <div className={classes.container}>
             <Switch>
               <Route exact path="/dashboard/organizations/:organizationId">
-                {organizationId === federation.id ? (
-                  <Redirect
-                    to={`/dashboard/organizations/${organizationId}/profile`}
-                  />
-                ) : (
-                  <Redirect
-                    to={`/dashboard/organizations/${organizationId}/applications`}
-                  />
-                )}
-              </Route>
-              {organizationId === federation.id && (
-                <Route
-                  exact
-                  path="/dashboard/organizations/:organizationId/profile"
-                  component={Profile}
+                <Redirect
+                  to={`/dashboard/organizations/${organizationId}/overview`}
                 />
-              )}
+              </Route>
+              <Route
+                exact
+                path="/dashboard/organizations/:organizationId/overview"
+                component={Overview}
+              />
               <Route
                   exact
                   path="/dashboard/organizations/:organizationId/documents"
@@ -91,6 +97,13 @@ const Root = () => {
                 path="/dashboard/organizations/:organizationId/applications"
                 component={Applications}
               />
+              {organizationId === federation.id && (
+                <Route
+                  exact
+                  path="/dashboard/organizations/:organizationId/profile"
+                  component={Profile}
+                />
+              )}
               <Route
                 path="/dashboard/organizations/:organizationId/admin"
                 component={AdminRoot}

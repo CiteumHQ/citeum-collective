@@ -9,5 +9,6 @@ export const UserContext = React.createContext({
 
 export const OrganizationContext = React.createContext({
   organization: null,
+  subscription: null,
   refetch: () => {},
 });

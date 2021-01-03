@@ -15,8 +15,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import {
   PersonOutlined,
-  WidgetsOutlined,
+  DnsOutlined,
   SettingsOutlined,
+  DashboardOutlined,
 } from '@material-ui/icons';
 import { FileDocumentMultipleOutline, WalletTravel } from 'mdi-material-ui';
 import { OrganizationContext, UserContext } from '../Context';
@@ -126,18 +127,16 @@ const TopBar = ({ location }) => {
           variant="fullWidth"
           value={page}
         >
-          {organization.id === federation.id && (
-            <Tab
-              icon={<PersonOutlined />}
-              value="profile"
-              label="Profile"
-              component={Link}
-              to={`/dashboard/organizations/${organization.id}/profile`}
-              className={classes.tab}
-            />
-          )}
           <Tab
-            icon={<WidgetsOutlined />}
+            icon={<DashboardOutlined />}
+            value="overview"
+            label="Overview"
+            component={Link}
+            to={`/dashboard/organizations/${organization.id}/overview`}
+            className={classes.tab}
+          />
+          <Tab
+            icon={<DnsOutlined />}
             value="applications"
             label="Applications"
             component={Link}
@@ -160,6 +159,16 @@ const TopBar = ({ location }) => {
             to={`/dashboard/organizations/${organization.id}/membership`}
             className={classes.tab}
           />
+          {organization.id === federation.id && (
+            <Tab
+              icon={<PersonOutlined />}
+              value="profile"
+              label="Profile"
+              component={Link}
+              to={`/dashboard/organizations/${organization.id}/profile`}
+              className={classes.tab}
+            />
+          )}
           {isAdmin && (
             <Tab
               icon={<SettingsOutlined />}

@@ -5,6 +5,7 @@ import { constraintDirective } from 'graphql-constraint-directive';
 import usersResolvers from '../resolvers/users';
 import settingsResolvers from '../resolvers/settings';
 import associationsResolvers from '../resolvers/associations';
+import notificationsResolvers from '../resolvers/notifications';
 import AuthDirectives, { AUTH_DIRECTIVE } from './authDirective';
 import typeDefs from '../../config/schema/citeumcollective.graphql';
 import documentsResolvers from '../resolvers/documents';
@@ -20,6 +21,7 @@ const createSchema = () => {
     documentsResolvers,
     settingsResolvers,
     associationsResolvers,
+    notificationsResolvers,
   ]);
 
   return makeExecutableSchema({

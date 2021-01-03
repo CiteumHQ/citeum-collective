@@ -8,6 +8,7 @@ import {
   roleGen,
 } from '../database/keycloak';
 import { completeUserWithData } from './users';
+import { createNotification } from './notifications';
 
 export const getAssociationById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from associations where id = ${id}`);
@@ -26,7 +27,7 @@ export const getMembershipAssociation = (ctx, membership) => {
 };
 
 export const getAssociationMemberships = (ctx, association) => {
-  return ctx.db.queryRows(sql`select * from memberships where association_id = ${association.id}`);
+  return ctx.db.queryRows(sql`select * from memberships where association_id = ${association.id} order by name asc`);
 };
 
 export const getAssociationMembers = async (ctx, association) => {
@@ -47,18 +48,36 @@ export const getAssociationMembers = async (ctx, association) => {
   return members;
 };
 
-export const removeMembership = async (ctx, id) => {
+export const updateMembership = async (ctx, id, input) => {
+  await ctx.db.execute(
+    sql`UPDATE memberships SET name = ${input.name}, description = ${input.description}, fee = ${input.fee} WHERE id = ${id}`
+  );
+  const membership = await getMembershipById(ctx, id);
+  await createNotification(ctx, {
+    association_id: membership.association_id,
+    type: 'update',
+    content: 'Membership information of the <code>organization</code> has been modified.',
+  });
+  return membership;
+};
+
+export const deleteMembership = async (ctx, id) => {
   // Remove the role in keycloak
   const membership = await getMembershipById(ctx, id);
   const association = await getMembershipAssociation(ctx, membership);
   await deleteAssociationRole(association, membership);
   // Remove in db
   await ctx.db.execute(sql`delete from memberships where id = ${id}`);
-  return association;
+  await createNotification(ctx, {
+    association_id: association.id,
+    type: 'delete_membership',
+    content: `The membership <code>${membership.name}</code> has been deleted.`,
+  });
+  return id;
 };
 
 export const createMembership = async (ctx, input) => {
-  const { associationId, name, code, fee } = input;
+  const { associationId, name, description, code, fee } = input;
   if (code === ADMIN_ROLE_CODE) throw Error('admin is a reserved membership keyword');
   const association = await getAssociationById(ctx, associationId);
   if (!association) {
@@ -67,11 +86,16 @@ export const createMembership = async (ctx, input) => {
   const id = uuidv4();
   // Create the association
   await ctx.db.execute(
-    sql`insert INTO memberships (id, name, code, association_id, fee) 
-                values (${id}, ${name}, ${code}, ${association.id}, ${fee})`
+    sql`insert INTO memberships (id, name, description, code, association_id, fee) 
+                values (${id}, ${name}, ${description}, ${code}, ${association.id}, ${fee})`
   );
   // Create the keycloak admin role for this association
   await createRoleForAssociation(association, code, `${name} role for ${association.name}`);
   // Return the created membership
+  await createNotification(ctx, {
+    association_id: associationId,
+    type: 'add_membership',
+    content: `The membership <code>${name}</code> has been created.`,
+  });
   return getMembershipById(ctx, id);
 };

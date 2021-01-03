@@ -32,6 +32,13 @@ type Membership {
     association: Association!
 }
 
+type Notification {
+    id: ID!
+    date: DateTime!
+    type: String!
+    content: String!
+}
+
 type Association {
     id: ID!
     name: String!
@@ -41,6 +48,7 @@ type Association {
     code: String!
     members: [User]!
     memberships: [Membership]!
+    notifications: [Notification]
     documents: [Document]!
 }
 
@@ -83,6 +91,8 @@ type Query {
     membership(id: ID!): Membership @auth
     association(id: ID!): Association @auth
     associations: [Association] @ auth
+    notification(id: ID!): Notification @auth
+    notifications: [Notification] @ auth
 }
 
 ### MUTATIONS
@@ -98,6 +108,7 @@ input MembershipAddInput {
 
 input MembershipEditInput {
     name: String!
+    fee: Int!
     description: String!
 }
 
@@ -142,7 +153,7 @@ type Mutation {
     updateProfile(input: UserEditInput!): User @auth
     membershipAdd(input: MembershipAddInput!): Membership @auth
     membershipUpdate(id: ID!, input: MembershipEditInput!): Membership @auth
-    membershipRemove(id: ID!): Association @auth
+    membershipDelete(id: ID!): ID! @auth
     documentAdd(organizationId: ID!, input: DocumentAddInput!, file: Upload!): Document @auth
     documentDelete(id: ID!): ID! @auth
     associationAdd(input: AssociationAddInput!): Association @auth
