@@ -1,5 +1,6 @@
 import { sql } from '../utils/sql';
 import { upload } from '../database/minio';
+import { createNotification } from './notifications';
 
 export const createDocumentType = async (ctx, type, icon, description) => {
   await ctx.db.execute(
@@ -23,4 +24,9 @@ export const createDocument = async (ctx, associationId, input) => {
     await ctx.db.execute(sql`insert INTO documents_memberships (document, membership) 
                                 values (${fileName}, ${membership});`);
   }
+  await createNotification(ctx, {
+    association_id: associationId,
+    type: 'add_file',
+    content: `The document <code>${name}</code> (${type}) has been uploaded.`,
+  });
 };

@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import { useBasicQuery } from '../../../../network/Apollo';
 import { OrganizationContext } from '../../Context';
 
-const QUERY_ASSOCIATION = gql`
+export const QUERY_ASSOCIATION = gql`
   query GetAssociation($id: ID!) {
     association(id: $id) {
       id

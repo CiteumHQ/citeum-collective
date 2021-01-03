@@ -10,6 +10,7 @@ import {
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
 import { getAssociationById, getMembershipByCode } from './memberships';
 import { FunctionalError } from '../config/errors';
+import { createNotification } from './notifications';
 
 export const getAssociations = (ctx) => {
   return ctx.db.queryRows(sql`select * from associations`);
@@ -73,6 +74,11 @@ export const createAssociation = async (ctx, input) => {
   const adminRoleName = await createAssociationAdminRole(input);
   await grantRoleToUser(adminRoleName, ctx.user);
   // Return the created association
+  await createNotification(ctx, {
+    association_id: id,
+    type: 'create',
+    content: 'The <code>organization</code> has been created.',
+  });
   return getAssociationById(ctx, id);
 };
 
@@ -82,6 +88,11 @@ export const updateAssociation = async (ctx, id, input) => {
       input.email
     }, website = ${input.website || null} WHERE id = ${id}`
   );
+  await createNotification(ctx, {
+    association_id: id,
+    type: 'update',
+    content: 'Basic information about this <code>organization</code> has been modified.',
+  });
   return getAssociationById(ctx, id);
 };
 

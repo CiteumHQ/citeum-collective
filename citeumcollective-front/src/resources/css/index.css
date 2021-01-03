@@ -29,3 +29,11 @@ a:visited,
 a:focus {
   text-decoration: none;
 }
+
+code {
+  font-family: Consolas, monaco, monospace;
+  padding: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  background: rgba(64, 193, 255, 0.2);
+}

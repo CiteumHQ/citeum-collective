@@ -117,7 +117,7 @@ const OrganizationCreation = ({ refetchOrganizations }) => {
                   Cancel
                 </Button>
                 <Button
-                  color="primary"
+                  color="secondary"
                   onClick={submitForm}
                   disabled={isSubmitting}
                 >

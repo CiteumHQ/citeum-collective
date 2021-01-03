@@ -3,7 +3,7 @@ export default {
   palette: {
     type: 'dark',
     text: { secondary: 'rgba(255, 255, 255, 0.5)' },
-    primary: { main: '#f44336' },
+    primary: { main: '#90a4ae' },
     secondary: { main: '#f44336' },
     background: {
       paper: '#22353e',
@@ -27,6 +27,20 @@ export default {
       fontSize: 30,
       textTransform: 'uppercase',
       letterSpacing: '0.3em',
+    },
+    h3: {
+      margin: 0,
+      padding: 0,
+      color: '#90a4ae',
+      fontWeight: 300,
+      fontSize: 18,
+    },
+    h4: {
+      color: '#ffffff',
+      fontWeight: 300,
+      fontSize: 16,
+      textTransform: 'none',
+      marginBottom: 5,
     },
     h5: {
       color: '#ffffff',

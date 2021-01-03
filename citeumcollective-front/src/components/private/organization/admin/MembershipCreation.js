@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
+import * as R from 'ramda';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import Fab from '@material-ui/core/Fab';
@@ -11,6 +12,8 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import { Add } from '@material-ui/icons';
 import * as Yup from 'yup';
+import { useParams } from 'react-router-dom';
+import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -22,32 +25,40 @@ const useStyles = makeStyles(() => ({
 }));
 
 const MUTATION_CREATE_MEMBERSHIP = gql`
-  mutation MembershipAdd($input: AssociationAddInput!) {
-    associationAdd(input: $input) {
-      code
+  mutation MembershipAdd($input: MembershipAddInput!) {
+    membershipAdd(input: $input) {
+      id
       name
+      code
+      fee
       description
-      email
     }
   }
 `;
 
-const associationValidation = () => Yup.object().shape({
+const membershipValidation = () => Yup.object().shape({
   code: Yup.string().required('This field is required'),
   name: Yup.string().required('This field is required'),
   description: Yup.string().required('This field is required'),
+  fee: Yup.number().required('This field is required'),
 });
 
-const OrganizationCreation = () => {
+const MembershipCreation = ({ refetchMemberships }) => {
   const classes = useStyles();
+  const { organizationId } = useParams();
   const [open, setOpen] = useState(false);
+  const { refetch: refetchUserContext } = useContext(UserContext);
   const [createOrganization] = useMutation(MUTATION_CREATE_MEMBERSHIP, {
     onCompleted() {
+      refetchUserContext();
+      refetchMemberships();
       setOpen(false);
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
-    createOrganization({ variables: { input: values } }).finally(() => setSubmitting(false));
+    createOrganization({
+      variables: { input: R.assoc('associationId', organizationId, values) },
+    }).finally(() => setSubmitting(false));
   };
   return (
     <div>
@@ -65,15 +76,16 @@ const OrganizationCreation = () => {
           code: '',
           name: '',
           description: '',
+          fee: 0,
         }}
-        validationSchema={associationValidation()}
+        validationSchema={membershipValidation()}
         onSubmit={formSubmit}
         onReset={() => setOpen(false)}
       >
         {({ submitForm, handleReset, isSubmitting }) => (
           <Form>
             <Dialog open={open} onClose={() => setOpen(false)} fullWidth={true}>
-              <DialogTitle>Create an organization</DialogTitle>
+              <DialogTitle>Create a membership</DialogTitle>
               <DialogContent>
                 <Field
                   component={TextField}
@@ -85,6 +97,14 @@ const OrganizationCreation = () => {
                   component={TextField}
                   name="name"
                   label="Name"
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                />
+                <Field
+                  component={TextField}
+                  name="fee"
+                  label="Fee (€ / year)"
+                  type="number"
                   fullWidth={true}
                   style={{ marginTop: 20 }}
                 />
@@ -103,7 +123,7 @@ const OrganizationCreation = () => {
                   Cancel
                 </Button>
                 <Button
-                  color="primary"
+                  color="secondary"
                   onClick={submitForm}
                   disabled={isSubmitting}
                 >
@@ -118,4 +138,4 @@ const OrganizationCreation = () => {
   );
 };
 
-export default OrganizationCreation;
+export default MembershipCreation;

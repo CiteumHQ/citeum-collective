@@ -66,111 +66,106 @@ const Profile = () => {
     updateProfile({ variables: { input } }).finally(() => setSubmitting(false));
   };
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        <Formik
-          enableReinitialize={true}
-          initialValues={me}
-          validationSchema={userValidation()}
-          onSubmit={formSubmit}
-        >
-          {({ submitForm, isSubmitting }) => (
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Form>
-                <Grid container spacing={3}>
-                  <Grid item xs={6}>
-                    <Field
-                      component={TextField}
-                      name="firstName"
-                      label="Firstname"
-                      fullWidth={true}
-                    />
-                    <Field
-                      component={TextField}
-                      name="email"
-                      label="Email"
-                      disabled={true}
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Field
-                      component={TextField}
-                      name="lastName"
-                      label="Lastname"
-                      fullWidth={true}
-                    />
-                    <Field
-                      component={KeyboardDatePicker}
-                      name="birthday"
-                      label="Birthday"
-                      fullWidth={true}
-                      autoOk={true}
-                      disableFuture={true}
-                      format="yyyy-MM-dd"
-                      style={{ marginTop: 20 }}
-                    />
-                  </Grid>
-                </Grid>
+    <Formik
+      enableReinitialize={true}
+      initialValues={me}
+      validationSchema={userValidation()}
+      onSubmit={formSubmit}
+    >
+      {({ submitForm, isSubmitting }) => (
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <Form>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
                 <Field
                   component={TextField}
-                  name="address"
-                  label="Address"
+                  name="firstName"
+                  label="Firstname"
                   fullWidth={true}
-                  multiline={true}
-                  rows={4}
+                />
+                <Field
+                  component={TextField}
+                  name="email"
+                  label="Email"
+                  disabled={true}
+                  fullWidth={true}
                   style={{ marginTop: 20 }}
                 />
-                <Grid container spacing={3}>
-                  <Grid item xs={6}>
-                    <Field
-                      component={TextField}
-                      name="organization"
-                      label="Organization"
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Field
-                      component={TextField}
-                      name="job_position"
-                      label="Job position"
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                    />
-                  </Grid>
-                </Grid>
-                <FormControlLabel
-                  control={
-                    <Field
-                      component={Switch}
-                      type="checkbox"
-                      name="is_organization"
-                    />
-                  }
-                  label="I'm representing an organization"
+              </Grid>
+              <Grid item xs={6}>
+                <Field
+                  component={TextField}
+                  name="lastName"
+                  label="Lastname"
+                  fullWidth={true}
+                />
+                <Field
+                  component={KeyboardDatePicker}
+                  name="birthday"
+                  label="Birthday"
+                  fullWidth={true}
+                  autoOk={true}
+                  disableFuture={true}
+                  format="yyyy-MM-dd"
                   style={{ marginTop: 20 }}
                 />
-                <div className="clearfix" />
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="secondary"
-                  disabled={isSubmitting}
-                  onClick={submitForm}
+              </Grid>
+            </Grid>
+            <Field
+              component={TextField}
+              name="address"
+              label="Address"
+              fullWidth={true}
+              multiline={true}
+              rows={4}
+              style={{ marginTop: 20 }}
+            />
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <Field
+                  component={TextField}
+                  name="organization"
+                  label="Organization"
+                  fullWidth={true}
                   style={{ marginTop: 20 }}
-                >
-                  Save
-                </Button>
-              </Form>
-            </MuiPickersUtilsProvider>
-          )}
-        </Formik>
-      </Grid>
-      <Grid item xs={6}></Grid>
-    </Grid>
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Field
+                  component={TextField}
+                  name="job_position"
+                  label="Job position"
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                />
+              </Grid>
+            </Grid>
+            <FormControlLabel
+              control={
+                <Field
+                  component={Switch}
+                  type="checkbox"
+                  name="is_organization"
+                />
+              }
+              label="I'm representing an organization"
+              style={{ marginTop: 20 }}
+            />
+            <div className="clearfix" />
+            <Button
+              size="small"
+              variant="contained"
+              color="secondary"
+              disabled={isSubmitting}
+              onClick={submitForm}
+              style={{ marginTop: 20 }}
+            >
+              Save
+            </Button>
+          </Form>
+        </MuiPickersUtilsProvider>
+      )}
+    </Formik>
   );
 };
 

@@ -8,17 +8,18 @@ import {
 import conf from '../config/conf';
 import {
   createMembership,
+  updateMembership,
   getAssociationById,
   getAssociationMembers,
   getAssociationMemberships,
   getMembershipAssociation,
   getMembershipByCode,
   getMembershipById,
-  removeMembership,
+  deleteMembership,
 } from '../domain/memberships';
 import { createDocument } from '../domain/documents';
 
-const usersResolvers = {
+const associationsResolvers = {
   Query: {
     membership: (_, { id }, ctx) => getMembershipById(ctx, id),
     association: (_, { id }, ctx) => getAssociationById(ctx, id),
@@ -41,8 +42,9 @@ const usersResolvers = {
     associationUpdate: (_, { id, input }, ctx) => updateAssociation(ctx, id, input),
     associationDelete: (_, { id }, ctx) => deleteAssociation(ctx, id),
     membershipAdd: (_, { input }, ctx) => createMembership(ctx, input),
-    membershipRemove: (_, { id }, ctx) => removeMembership(ctx, id),
+    membershipUpdate: (_, { id, input }, ctx) => updateMembership(ctx, id, input),
+    membershipDelete: (_, { id }, ctx) => deleteMembership(ctx, id),
   },
 };
 
-export default usersResolvers;
+export default associationsResolvers;
