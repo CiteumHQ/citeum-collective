@@ -11,14 +11,15 @@ export const up = async (knex, db = bridgeSql(knex)) => {
   await db.execute(sql`
         CREATE TABLE "users"
         (
-            id              VARCHAR(255) PRIMARY KEY,
-            email           VARCHAR(255) UNIQUE,
-            address         text,
-            organization    VARCHAR(255),
-            birthday        timestamp DEFAULT CURRENT_TIMESTAMP,
-            job_position    VARCHAR(255),
-            is_organization BOOLEAN NOT NULL,
-            register_at     timestamp DEFAULT CURRENT_TIMESTAMP
+            id                VARCHAR(255) PRIMARY KEY,
+            email             VARCHAR(255) UNIQUE,
+            address           text,
+            organization      VARCHAR(255),
+            birthday          timestamp DEFAULT CURRENT_TIMESTAMP,
+            job_position      VARCHAR(255),
+            is_organization   BOOLEAN NOT NULL,
+            organization_logo text,
+            register_at       timestamp DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE "associations"
         (
@@ -35,6 +36,7 @@ export const up = async (knex, db = bridgeSql(knex)) => {
             id              VARCHAR(255) PRIMARY KEY,
             code            VARCHAR(255),
             fee             INTEGER NOT NULL,
+            color           VARCHAR(7),
             name            VARCHAR(255),
             description     VARCHAR(255),
             association_id  VARCHAR(255) NOT NULL,

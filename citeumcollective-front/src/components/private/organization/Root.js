@@ -17,6 +17,7 @@ import { useBasicQuery } from '../../../network/Apollo';
 import ErrorNotFound from '../../ErrorNotFound';
 import TopBar from './TopBar';
 import Documents from './Documents';
+import Membership from './Membership';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -44,6 +45,13 @@ const QUERY_ASSOCIATION = gql`
         code
         fee
         description
+        color
+        subscriptionInfo {
+          role
+          subscription_date
+          subscription_last_update
+          subscription_next_update
+        }
       }
     }
   }
@@ -96,6 +104,11 @@ const Root = () => {
                 exact
                 path="/dashboard/organizations/:organizationId/applications"
                 component={Applications}
+              />
+              <Route
+                  exact
+                  path="/dashboard/organizations/:organizationId/membership"
+                  component={Membership}
               />
               {organizationId === federation.id && (
                 <Route

@@ -35,6 +35,7 @@ type Membership {
     name: String!
     code: String!
     fee: Int!
+    color: String
     description: String
     association: Association!
     subscriptionInfo: UserMembershipInfo
@@ -73,6 +74,7 @@ type User {
     birthday: DateTime
     address: String
     organization: String
+    organization_logo: String
     job_position: String
     is_organization: Boolean
     roles: [String]
@@ -118,6 +120,7 @@ input MembershipAddInput {
 input MembershipEditInput {
     name: String!
     fee: Int!
+    color: String
     description: String!
 }
 
@@ -144,6 +147,7 @@ input UserEditInput {
     organization: String
     job_position: String
     is_organization: Boolean
+    organization_logo: String
 }
 
 input UserLoginInput {

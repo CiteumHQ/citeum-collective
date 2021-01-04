@@ -37,3 +37,7 @@ code {
   font-weight: 400;
   background: rgba(64, 193, 255, 0.2);
 }
+
+.clearfix {
+  clear: both;
+}

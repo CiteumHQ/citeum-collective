@@ -32,6 +32,7 @@ const QUERY_ASSOCIATION_MEMBERSHIPS = gql`
         code
         fee
         description
+        color
       }
     }
   }
@@ -50,7 +51,11 @@ const Memberships = () => {
         <List>
           {association.memberships.map((membership) => (
             <ListItem key={membership.id} divider={true}>
-              <ListItemIcon>
+              <ListItemIcon
+                style={{
+                  color: membership.color ? membership.color : '#ffffff',
+                }}
+              >
                 <PuzzleHeartOutline />
               </ListItemIcon>
               <ListItemText
@@ -61,7 +66,10 @@ const Memberships = () => {
                 label={`${membership.fee}€`}
                 variant="outlined"
                 className={classes.fee}
-                color="secondary"
+                style={{
+                  border: `1px solid ${membership.color}`,
+                  color: membership.color,
+                }}
               />
               <ListItemSecondaryAction>
                 <MembershipPopover

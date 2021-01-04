@@ -4,10 +4,12 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
+import BarChart from 'recharts/lib/chart/BarChart';
+import XAxis from 'recharts/lib/cartesian/XAxis';
+import YAxis from 'recharts/lib/cartesian/YAxis';
+import Cell from 'recharts/lib/component/Cell';
+import Bar from 'recharts/lib/cartesian/Bar';
+import ResponsiveContainer from 'recharts/lib/component/ResponsiveContainer';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import {
@@ -28,10 +30,12 @@ import {
   DeleteOutlined,
   HelpOutlined,
   PersonAddOutlined,
+  VisibilityOutlined,
 } from '@material-ui/icons';
 import { HeartPlusOutline, HeartRemoveOutline } from 'mdi-material-ui';
 import { Link } from 'react-router-dom';
 import { gql } from '@apollo/client';
+import * as R from 'ramda';
 import { OrganizationContext, UserContext } from '../Context';
 import { useBasicQuery } from '../../../network/Apollo';
 
@@ -74,8 +78,8 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const QUERY_ASSOCIATION_NOTIFICATIONS = gql`
-  query GetAssociationNotifications($id: ID!) {
+const QUERY_ASSOCIATION = gql`
+  query GetAssociation($id: ID!) {
     association(id: $id) {
       id
       notifications {
@@ -83,6 +87,25 @@ const QUERY_ASSOCIATION_NOTIFICATIONS = gql`
         date
         type
         content
+      }
+      members {
+        id
+        firstName
+        lastName
+        email
+        subscription(associationId: $id) {
+          id
+          name
+          code
+          description
+          color
+          subscriptionInfo {
+            role
+            subscription_date
+            subscription_last_update
+            subscription_next_update
+          }
+        }
       }
     }
   }
@@ -92,7 +115,7 @@ const Overview = () => {
   const classes = useStyles();
   const { organization, subscription } = useContext(OrganizationContext);
   const { federation } = useContext(UserContext);
-  const { data } = useBasicQuery(QUERY_ASSOCIATION_NOTIFICATIONS, {
+  const { data } = useBasicQuery(QUERY_ASSOCIATION, {
     id: organization.id,
   });
   const renderIcon = (type) => {
@@ -213,6 +236,29 @@ const Overview = () => {
     );
   };
   if (data && data.association) {
+    const members = R.pipe(
+      R.map((n) => ({
+        name: n.is_organization
+          ? n.organization
+          : `${n.firstName} ${n.lastName}`,
+        email: n.email,
+        subscription_date: n.subscription.subscriptionInfo.subscription_date,
+        subscription_name: n.subscription.name,
+        subscription_color: n.subscription.color,
+      })),
+      R.uniqBy(R.prop('name')),
+      R.sortWith([R.ascend(R.prop('subscription_date'))]),
+    )(data.association.members);
+    const colors = {};
+    for (const member of members) {
+      colors[member.subscription_name] = member.subscription_color;
+    }
+    const membersDistribution = R.pipe(
+      R.countBy(R.prop('subscription_name')),
+      R.toPairs,
+      R.map((n) => ({ label: n[0], value: n[1], color: colors[n[0]] })),
+      R.sortWith([R.descend(R.prop('value'))]),
+    )(members);
     return (
       <Grid container spacing={3}>
         <Grid item xs={6}>
@@ -239,41 +285,61 @@ const Overview = () => {
               <Typography variant="h3">Subscription</Typography>
               <Button
                 variant="outlined"
-                color="secondary"
                 component={Link}
                 to={`/dashboard/organizations/${organization.id}/membership`}
+                style={{
+                  border: `1px solid ${subscription.color}`,
+                  color: subscription.color,
+                }}
               >
                 {subscription ? subscription.name : 'None'}
               </Button>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h3">Number of members</Typography>
-              <Table className={classes.table}>
-                <TableBody>
-                  <TableRow>
-                    <TableCell align="left" style={{ fontSize: 15 }}>
-                      Supporter
-                    </TableCell>
-                    <TableCell
-                      align="right"
-                      style={{ fontSize: 20, fontWeight: 700 }}
-                    >
-                      5
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell align="left" style={{ fontSize: 15 }}>
-                      Active
-                    </TableCell>
-                    <TableCell
-                      align="right"
-                      style={{ fontSize: 20, fontWeight: 700 }}
-                    >
-                      10
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <Typography variant="h3" style={{ float: 'left' }}>
+                Number of members
+              </Typography>
+              <Button
+                style={{ float: 'left', margin: '-5px 0 0 10px' }}
+                color="secondary"
+                endIcon={<VisibilityOutlined />}
+                component={Link}
+                to={`/dashboard/organizations/${organization.id}/membership`}
+              >
+                View all
+              </Button>
+              <div className="clearfix" />
+              <ResponsiveContainer height={280} width="100%">
+                <BarChart
+                  layout="vertical"
+                  data={membersDistribution}
+                  margin={{
+                    top: 20,
+                    right: 20,
+                    bottom: 0,
+                    left: 0,
+                  }}
+                >
+                  <XAxis
+                    type="number"
+                    dataKey="value"
+                    stroke="#ffffff"
+                    allowDecimals={false}
+                  />
+                  <YAxis
+                    stroke="#ffffff"
+                    dataKey="label"
+                    type="category"
+                    angle={-30}
+                    textAnchor="end"
+                  />
+                  <Bar dataKey="value" barSize={20}>
+                    {membersDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </Grid>
           </Grid>
         </Grid>

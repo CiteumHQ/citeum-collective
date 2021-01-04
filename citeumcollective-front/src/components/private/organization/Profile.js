@@ -21,6 +21,7 @@ const MUTATION_UPDATE_PROFILE = gql`
       organization
       job_position
       is_organization
+      organization_logo
     }
   }
 `;
@@ -33,6 +34,7 @@ const userValidation = () => Yup.object().shape({
   organization: Yup.string(),
   job_position: Yup.string(),
   is_organization: Yup.boolean(),
+  organization_logo: Yup.string(),
 });
 
 const Profile = () => {
@@ -53,6 +55,8 @@ const Profile = () => {
       job_position,
       // eslint-disable-next-line camelcase
       is_organization,
+      // eslint-disable-next-line camelcase
+      organization_logo,
     } = values;
     const input = {
       firstName,
@@ -62,6 +66,7 @@ const Profile = () => {
       organization,
       job_position,
       is_organization,
+      organization_logo,
     };
     updateProfile({ variables: { input } }).finally(() => setSubmitting(false));
   };
@@ -72,7 +77,7 @@ const Profile = () => {
       validationSchema={userValidation()}
       onSubmit={formSubmit}
     >
-      {({ submitForm, isSubmitting }) => (
+      {({ submitForm, isSubmitting, values }) => (
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <Form>
             <Grid container spacing={3}>
@@ -140,17 +145,32 @@ const Profile = () => {
                 />
               </Grid>
             </Grid>
-            <FormControlLabel
-              control={
-                <Field
-                  component={Switch}
-                  type="checkbox"
-                  name="is_organization"
+            <Grid container spacing={3} style={{ paddingTop: 0 }}>
+              <Grid item xs={6}>
+                <FormControlLabel
+                  style={{ marginTop: 20 }}
+                  control={
+                    <Field
+                      component={Switch}
+                      type="checkbox"
+                      name="is_organization"
+                    />
+                  }
+                  label="I'm representing an organization"
                 />
-              }
-              label="I'm representing an organization"
-              style={{ marginTop: 20 }}
-            />
+              </Grid>
+              <Grid item xs={6}>
+                {values.is_organization && (
+                  <Field
+                    component={TextField}
+                    name="organization_lodo"
+                    label="Organization logo"
+                    fullWidth={true}
+                    style={{ marginTop: 20 }}
+                  />
+                )}
+              </Grid>
+            </Grid>
             <div className="clearfix" />
             <Button
               size="small"

@@ -50,7 +50,9 @@ export const getAssociationMembers = async (ctx, association) => {
 
 export const updateMembership = async (ctx, id, input) => {
   await ctx.db.execute(
-    sql`UPDATE memberships SET name = ${input.name}, description = ${input.description}, fee = ${input.fee} WHERE id = ${id}`
+    sql`UPDATE memberships SET name = ${input.name}, description = ${input.description}, fee = ${input.fee}, color = ${
+      input.color ? input.color : ''
+    } WHERE id = ${id}`
   );
   const membership = await getMembershipById(ctx, id);
   await createNotification(ctx, {

@@ -11,7 +11,7 @@ export const getNotifications = (ctx) => {
 
 export const getAssociationNotifications = (ctx, association) => {
   return ctx.db.queryRows(
-    sql`select * from notifications where association_id = ${association.id} order by date desc limit 5 offset 0`
+    sql`select * from notifications where association_id = ${association.id} order by date desc limit 10 offset 0`
   );
 };
 

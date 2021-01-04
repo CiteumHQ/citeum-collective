@@ -57,7 +57,7 @@ export const userSubscriptions = async (ctx, user) => {
 };
 
 export const isDocumentAccessibleFromUser = async (ctx, user, document) => {
-  const userOrganisationMemberships = await userSubscriptions({ ...ctx, user });
+  const userOrganisationMemberships = await userSubscriptions({ ...ctx, user }, user);
   const userMemberships = userOrganisationMemberships.map((o) => `${o.association.id}-${o.membershipCode}`);
   const fileMemberships = document.memberships.map((o) => `${o.association_id}-${o.code}`);
   return fileMemberships.some((o) => userMemberships.includes(o));

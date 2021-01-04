@@ -41,7 +41,7 @@ export default {
       color: '#90a4ae',
       fontWeight: 300,
       fontSize: 18,
-      marginBottom: 15,
+      marginBottom: 10,
     },
     h4: {
       color: '#ffffff',

@@ -76,7 +76,7 @@ const Root = () => {
             <Redirect
               exact
               from="/dashboard/profile"
-              to={`/dashboard/organizations/${userData.federation.id}`}
+              to={`/dashboard/organizations/${userData.federation.id}/profile`}
             />
             <Route
               path="/dashboard/organizations/:organizationId"

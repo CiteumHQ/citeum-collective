@@ -36,6 +36,7 @@ export const QUERY_MEMBERSHIP = gql`
       name
       description
       fee
+      color
     }
   }
 `;
@@ -46,6 +47,7 @@ const MUTATION_UPDATE_MEMBERSHIP = gql`
       name
       description
       fee
+      color
     }
   }
 `;
@@ -60,6 +62,7 @@ const membershipValidation = () => Yup.object().shape({
   name: Yup.string().required('This field is required'),
   description: Yup.string().required('This field is required'),
   fee: Yup.number().required('This field is required'),
+  color: Yup.string(),
 });
 
 const MembershipPopover = ({ id, refetchMemberships }) => {
@@ -91,11 +94,14 @@ const MembershipPopover = ({ id, refetchMemberships }) => {
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
-    const { name, description, fee } = values;
+    const {
+      name, description, fee, color,
+    } = values;
     const input = {
       name,
       description,
       fee,
+      color,
     };
     updateMembership({
       variables: { id, input },
@@ -177,6 +183,13 @@ const MembershipPopover = ({ id, refetchMemberships }) => {
                       label="Fee (€ / year)"
                       style={{ marginTop: 20 }}
                       fullWidth={true}
+                    />
+                    <Field
+                      component={TextField}
+                      name="color"
+                      label="Color"
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
                     />
                   </Form>
                 </DialogContent>
