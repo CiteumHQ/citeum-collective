@@ -17,7 +17,6 @@ import * as Yup from 'yup';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import { format, parseISO } from 'date-fns';
 import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
