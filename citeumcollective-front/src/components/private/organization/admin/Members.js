@@ -41,6 +41,12 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
           name
           code
           description
+          subscriptionInfo {
+            role
+            subscription_date
+            subscription_last_update
+            subscription_next_update
+          }
         }
       }
     }

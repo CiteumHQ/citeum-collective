@@ -71,7 +71,7 @@ export const userSubscription = async (ctx, user, associationId) => {
   const userMembership = ctx.db.queryOne(
     sql`select * from users_memberships where association = ${associationId} and account = ${user.id} and membership = ${membership.id}`
   );
-  return R.assoc('subscriptionInfo', userMembership, membership);
+  return R.assoc('subscriptionInfo', userMembership, R.assoc('id', `${user.id}_${membership.id}`, membership));
 };
 
 export const createAssociation = async (ctx, input) => {
@@ -115,7 +115,7 @@ export const addMember = async (ctx, input) => {
     sql`insert INTO users_memberships (account, membership, association, role, subscription_date, subscription_last_update, subscription_next_update) 
                 values (${user.id}, ${membership.id}, ${
       association.id
-    }, ${`${ROLE_ASSO_PREFIX}${association.code}_${membership.code}`}, current_timestamp, current_timestamp, current_timestamp)`
+    }, ${`${ROLE_ASSO_PREFIX}${association.code}_${membership.code}`}, current_timestamp, current_timestamp, now() + INTERVAL '1 YEAR')`
   );
   // Return the created association
   const content = `<code>${

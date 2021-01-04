@@ -17,6 +17,7 @@ import * as Yup from 'yup';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
+import { format, parseISO } from 'date-fns';
 import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
@@ -108,7 +109,7 @@ const MemberPopover = ({
     const input = {
       associationId,
       userId,
-      membershipId: subscription.id,
+      membershipId: subscription.id.split('_')[1],
       ...values,
     };
     updateMember({
@@ -118,9 +119,28 @@ const MemberPopover = ({
   const submitDelete = () => {
     setDeleting(true);
     deleteMember({
-      variables: { associationId, userId, membershipId: subscription.id },
+      variables: {
+        associationId,
+        userId,
+        membershipId: subscription.id.split('_')[1],
+      },
     });
   };
+  let initialValues = R.pipe(
+    R.propOr({}, 'subscriptionInfo'),
+    R.pick([
+      'subscription_date',
+      'subscription_last_update',
+      'subscription_next_update',
+    ]),
+  )(subscription);
+  if (!initialValues.subscription_date) {
+    initialValues = {
+      subscription_date: null,
+      subscription_last_update: null,
+      subscription_next_update: null,
+    };
+  }
   return (
     <div className={classes.container}>
       <IconButton
@@ -155,22 +175,13 @@ const MemberPopover = ({
       </Menu>
       <Dialog
         open={openUpdate}
-        keepMounted={true}
+        keepMounted={false}
         TransitionComponent={Transition}
         onClose={() => setOpenUpdate(false)}
       >
         <Formik
           enableReinitialize={true}
-          initialValues={R.pick(
-            [
-              'subscription_date',
-              'subscription_last_update',
-              'subscription_next_update',
-            ],
-            subscription && subscription.subscriptionInfo
-              ? subscription.subscriptionInfo
-              : {},
-          )}
+          initialValues={initialValues}
           validationSchema={memberValidation()}
           onSubmit={formSubmit}
         >

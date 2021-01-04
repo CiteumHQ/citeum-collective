@@ -17,6 +17,9 @@ const generateJwtAccessToken = (user) => {
 };
 
 export const setAuthenticationCookie = (user, res) => {
+  if (!user) {
+    return;
+  }
   const jwtAccessToken = generateJwtAccessToken(user);
   res.cookie(COOKIE_NAME, jwtAccessToken.content, {
     httpOnly: true,

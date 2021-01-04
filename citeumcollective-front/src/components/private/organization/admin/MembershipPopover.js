@@ -141,7 +141,7 @@ const MembershipPopover = ({ id, refetchMemberships }) => {
         </Menu>
         <Dialog
           open={openUpdate}
-          keepMounted={false}
+          keepMounted={true}
           TransitionComponent={Transition}
           onClose={() => setOpenUpdate(false)}
         >
