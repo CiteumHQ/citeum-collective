@@ -57,5 +57,11 @@ export default {
       fontSize: 20,
       textTransform: 'none',
     },
+    h6: {
+      color: '#ffffff',
+      fontWeight: 600,
+      fontSize: 18,
+      textTransform: 'none',
+    },
   },
 };

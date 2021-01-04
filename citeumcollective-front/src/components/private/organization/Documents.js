@@ -1,110 +1,153 @@
-import React, { useState } from 'react';
-import Grid from '@material-ui/core/Grid';
-import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import React, { useContext } from 'react';
 import Button from '@material-ui/core/Button';
-import * as Yup from 'yup';
-import { gql, useMutation } from '@apollo/client';
-import { useParams } from 'react-router-dom';
-import FileUploader from './FileUploader';
+import * as R from 'ramda';
+import { gql } from '@apollo/client';
+import Grid from '@material-ui/core/Grid';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import Tooltip from '@material-ui/core/Tooltip';
+import {
+  EventOutlined,
+  SettingsRemoteOutlined,
+  DescriptionOutlined,
+} from '@material-ui/icons';
+import { ScaleBalance } from 'mdi-material-ui';
+import { format, parseISO } from 'date-fns';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import List from '@material-ui/core/List';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import DocumentCreation from './DocumentCreation';
 import { useBasicQuery } from '../../../network/Apollo';
+import DocumentPopover from './DocumentPopover';
+import { OrganizationContext, UserContext } from '../Context';
 
-// region queries
+const useStyles = makeStyles(() => ({
+  paper: {
+    padding: 15,
+  },
+  date: {
+    position: 'absolute',
+    right: 70,
+    cursor: 'default',
+  },
+  noLink: {
+    cursor: 'default',
+  },
+  noDocument: {
+    marginTop: 20,
+    fontSize: 15,
+    color: '#b4b4b4',
+  },
+}));
+
 const OrganizationDocuments = gql`
   query Documents($organizationId: ID!) {
     association(id: $organizationId) {
       documents {
         id
+        type
         name
         description
+        mimetype
+        created_at
       }
     }
   }
 `;
-const DocumentAddMutation = gql`
-  mutation DocumentAdd($organizationId: ID!, $input: DocumentAddInput!, $file: Upload!) {
-    documentAdd(organizationId: $organizationId, input: $input, file: $file) {
-      id
-    }
-  }
-`;
-const DocumentDeleteMutation = gql`
-  mutation DocumentDelete($documentId: ID!) {
-    documentDelete(id: $documentId)
-  }
-`;
-// endregion
-
-const userValidation = () => Yup.object().shape({
-  name: Yup.string().required('This field is required'),
-  description: Yup.string().required('This field is required'),
-  memberships: Yup.string().required('This field is required'),
-});
 
 const Documents = () => {
-  const { organizationId } = useParams();
-  // Hooks
-  const [doc, setDoc] = useState(null);
-  const { data, refetch } = useBasicQuery(OrganizationDocuments, { organizationId });
-  const [addDoc] = useMutation(DocumentAddMutation, {
-    onCompleted() {
-      return refetch();
-    },
+  const classes = useStyles();
+  const { organization } = useContext(OrganizationContext);
+  const { me } = useContext(UserContext);
+  const { data, refetch } = useBasicQuery(OrganizationDocuments, {
+    organizationId: organization.id,
   });
-  const [deleteDoc] = useMutation(DocumentDeleteMutation, {
-    onCompleted() {
-      return refetch();
-    },
-  });
-  // Utils
-  const deleteDocument = (documentId) => deleteDoc({ variables: { documentId } });
-  const formSubmit = (values, { setSubmitting }) => {
-    // memberships: ['ea2d8e48-da04-4a2c-be54-b27fa96336f0', '4f9a4a31-987d-4996-80bc-e1128f51e5eb']
-    const { name, description, memberships } = values;
-    const input = {
-      name, description, memberships: [memberships], type: 'INFORMATION',
-    };
-    const variables = { organizationId, input, file: doc };
-    addDoc({ variables }).finally(() => setSubmitting(false));
+  const isAdmin = R.includes(`asso_${organization.code}_admin`, me.roles);
+  const renderIcon = (type) => {
+    switch (type) {
+      case 'INFORMATION':
+        return <ScaleBalance />;
+      case 'MINUTES':
+        return <SettingsRemoteOutlined />;
+      case 'DOCUM%ENT':
+        return <DescriptionOutlined />;
+      default:
+        return <DescriptionOutlined />;
+    }
   };
-  const defaultValues = { name: '', description: '', memberships: '' };
-  return <div>
-    <div>APP Documents</div>
-    <Grid container spacing={3}>
-      <Grid item xs={6}>
-        {/* eslint-disable-next-line max-len */}
-        <Formik enableReinitialize={true} initialValues={defaultValues} validationSchema={userValidation()} onSubmit={formSubmit}>
-          {({ submitForm, isSubmitting }) => (
-            <Form>
-              <Field component={TextField} name="name" label="Name" fullWidth={true} multiline={false}/>
-              <Field component={TextField} name="description" label="Description" fullWidth={true} multiline={false}/>
-              <Field component={TextField} name="memberships" label="Memberships" fullWidth={true} multiline={false}/>
-              <FileUploader onFileSelection={(file) => setDoc(file)} />
-              <div className="clearfix" />
-              <Button size="small" variant="contained"
-                  color="secondary"
-                  disabled={isSubmitting}
-                  onClick={submitForm}
-                  style={{ marginTop: 20 }}>
-                Save
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </Grid>
-    </Grid>
-    <br/>
-    <hr/>
-    <br/>
-    <div>Documents</div>
-    <ul>
-      {(data?.association?.documents || [])
-        .map((document) => <li key={document.id}>
-          {document.name} - <a href={`/storage/get/${document.id}`}>{document.id}</a>
-          <Button size="small" variant="contained" color="secondary" onClick={() => deleteDocument(document.id)}>X</Button>
-        </li>)}
-    </ul>
-  </div>;
+  const renderList = (documents) => (
+    <div style={{ marginTop: 20 }}>
+      {documents.length > 0 ? (
+        <List style={{ marginTop: -15 }}>
+          {documents.map((document) => (
+            <ListItem
+              key={document.id}
+              divider={true}
+              button={true}
+              component="a"
+              href={`/storage/get/${document.id}`}
+            >
+              <ListItemIcon>{renderIcon(document.type)}</ListItemIcon>
+              <ListItemText
+                primary={document.name}
+                secondary={document.description}
+              />
+              <Tooltip title="Document date" aria-label="date">
+                <Button
+                  color="primary"
+                  className={classes.date}
+                  startIcon={<EventOutlined />}
+                >
+                  {format(parseISO(document.created_at), 'yyyy-LL-dd')}
+                </Button>
+              </Tooltip>
+              {isAdmin && (
+                <ListItemSecondaryAction>
+                  <DocumentPopover
+                    id={document.id}
+                    refetchDocuments={refetch}
+                  />
+                </ListItemSecondaryAction>
+              )}
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <div className={classes.noDocument}>No document here yet.</div>
+      )}
+    </div>
+  );
+  if (data && data.association) {
+    return (
+      <div>
+        <Grid container spacing={3}>
+          <Grid item xs={6}>
+            <Typography variant="h3">Information</Typography>
+            <Typography variant="h6">
+              Official documents of the organization
+            </Typography>
+            {renderList(
+              R.filter(
+                (n) => n.type === 'INFORMATION',
+                data.association.documents,
+              ),
+            )}
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="h3">Minutes</Typography>
+            <Typography variant="h6">Official meetings minutes</Typography>
+            {renderList(
+              R.filter((n) => n.type === 'MINUTES', data.association.documents),
+            )}
+          </Grid>
+        </Grid>
+        {isAdmin && <DocumentCreation refetchDocuments={refetch} />}
+      </div>
+    );
+  }
+  return <div />;
 };
 
 export default Documents;

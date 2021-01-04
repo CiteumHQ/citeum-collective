@@ -41,7 +41,7 @@ export const up = async (knex, db = bridgeSql(knex)) => {
         );
     `);
   // Create basic types
-  await createDocumentType({ db }, 'MINUTES', 'SettingsRemote', 'Communications');
+  await createDocumentType({ db }, 'MINUTES', 'SettingsRemote', 'Official meetings minutes');
   await createDocumentType({ db }, 'INFORMATION', 'Description', 'Documents');
 };
 

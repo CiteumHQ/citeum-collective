@@ -90,6 +90,9 @@ type Document {
     description: String!
     size: Int
     memberships: [Membership]
+    type: String!
+    mimetype: String!
+    created_at: DateTime
 }
 
 ### QUERIES
