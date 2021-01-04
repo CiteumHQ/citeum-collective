@@ -87,7 +87,7 @@ const Members = () => {
     )(association.members);
     return (
       <div>
-        <List>
+        <List style={{ marginTop: -15 }}>
           {members.map((member) => {
             const memberGravatarUrl = gravatar.url(member.email, {
               protocol: 'https',

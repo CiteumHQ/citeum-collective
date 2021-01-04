@@ -38,7 +38,7 @@ const Organizations = () => {
     const { associations } = data;
     return (
       <div>
-        <List>
+        <List style={{ marginTop: -15 }}>
           {associations.map((association) => {
             const organizationGravatarUrl = gravatar.url(association.email, {
               protocol: 'https',

@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { EventOutlined } from '@material-ui/icons';
 import { gql } from '@apollo/client';
 import List from '@material-ui/core/List';
+import Paper from '@material-ui/core/Paper';
 import gravatar from 'gravatar';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
@@ -18,7 +19,10 @@ import * as R from 'ramda';
 import { useBasicQuery } from '../../../network/Apollo';
 import { OrganizationContext } from '../Context';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    padding: 15,
+  },
   subscription: {
     borderRadius: 5,
     position: 'absolute',
@@ -90,54 +94,56 @@ const Membership = () => {
     return (
       <Grid container spacing={3}>
         <Grid item xs={6}>
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
-              <Typography variant="h3">Subscription</Typography>
-              <Button
-                className={classes.noLink}
-                style={{
-                  border: `1px solid ${subscription.color}`,
-                  color: subscription.color,
-                }}
-              >
-                {subscription ? subscription.name : 'None'}
-              </Button>
+          <Paper variant="outlined" elevation={2} classes={{ root: classes.paper }}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <Typography variant="h3">Subscription</Typography>
+                <Button
+                  className={classes.noLink}
+                  style={{
+                    border: `1px solid ${subscription.color}`,
+                    color: subscription.color,
+                  }}
+                >
+                  {subscription ? subscription.name : 'None'}
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h3">Date of subscription</Typography>
+                <Button color="inherit" className={classes.noLink}>
+                  {format(
+                    parseISO(subscription.subscriptionInfo.subscription_date),
+                    'yyyy-LL-dd',
+                  )}
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h3">Last renewal</Typography>
+                <Button color="inherit" className={classes.noLink}>
+                  {format(
+                    parseISO(
+                      subscription.subscriptionInfo.subscription_last_update,
+                    ),
+                    'yyyy-LL-dd',
+                  )}
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h3">Next renewal</Typography>
+                <Button color="secondary" className={classes.noLink}>
+                  {format(
+                    parseISO(
+                      subscription.subscriptionInfo.subscription_next_update,
+                    ),
+                    'yyyy-LL-dd',
+                  )}
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h3">Date of subscription</Typography>
-              <Button color="inherit" className={classes.noLink}>
-                {format(
-                  parseISO(subscription.subscriptionInfo.subscription_date),
-                  'yyyy-LL-dd',
-                )}
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h3">Last renewal</Typography>
-              <Button color="inherit" className={classes.noLink}>
-                {format(
-                  parseISO(
-                    subscription.subscriptionInfo.subscription_last_update,
-                  ),
-                  'yyyy-LL-dd',
-                )}
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h3">Next renewal</Typography>
-              <Button color="secondary" className={classes.noLink}>
-                {format(
-                  parseISO(
-                    subscription.subscriptionInfo.subscription_next_update,
-                  ),
-                  'yyyy-LL-dd',
-                )}
-              </Button>
-            </Grid>
-          </Grid>
+          </Paper>
         </Grid>
         <Grid item xs={6}>
-          <List>
+          <List style={{ marginTop: -15 }}>
             {members.map((member) => {
               const memberGravatarUrl = gravatar.url(member.email, {
                 protocol: 'https',

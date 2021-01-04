@@ -48,7 +48,7 @@ const Memberships = () => {
     const { association } = data;
     return (
       <div>
-        <List>
+        <List style={{ marginTop: -15 }}>
           {association.memberships.map((membership) => (
             <ListItem key={membership.id} divider={true}>
               <ListItemIcon

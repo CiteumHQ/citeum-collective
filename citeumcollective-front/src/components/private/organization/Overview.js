@@ -59,6 +59,9 @@ const useStyles = makeStyles(() => ({
     height: '100%',
     padding: '17px 15px 15px 15px',
   },
+  paperContainer: {
+    padding: 15,
+  },
   date: {
     float: 'right',
     textAlign: 'right',
@@ -262,39 +265,47 @@ const Overview = () => {
     return (
       <Grid container spacing={3}>
         <Grid item xs={6}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h3">Information</Typography>
-              <Typography variant="subtitle1">
-                {organization.description}
-              </Typography>
+          <Paper
+            variant="outlined"
+            elevation={2}
+            classes={{ root: classes.paperContainer }}
+          >
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography variant="h3">Information</Typography>
+                <Typography variant="subtitle1">
+                  {organization.description}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h3">Type of organization</Typography>
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  className={classes.noLink}
+                >
+                  {organization.id === federation.id
+                    ? 'Federation'
+                    : 'Association'}
+                </Button>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="h3">Subscription</Typography>
+                <Button
+                  variant="outlined"
+                  component={Link}
+                  to={`/dashboard/organizations/${organization.id}/membership`}
+                  style={{
+                    border: `1px solid ${subscription.color}`,
+                    color: subscription.color,
+                  }}
+                >
+                  {subscription ? subscription.name : 'None'}
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h3">Type of organization</Typography>
-              <Button
-                variant="outlined"
-                color="inherit"
-                className={classes.noLink}
-              >
-                {organization.id === federation.id
-                  ? 'Federation'
-                  : 'Association'}
-              </Button>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h3">Subscription</Typography>
-              <Button
-                variant="outlined"
-                component={Link}
-                to={`/dashboard/organizations/${organization.id}/membership`}
-                style={{
-                  border: `1px solid ${subscription.color}`,
-                  color: subscription.color,
-                }}
-              >
-                {subscription ? subscription.name : 'None'}
-              </Button>
-            </Grid>
+          </Paper>
+          <Grid container spacing={3} style={{ marginTop: 20 }}>
             <Grid item xs={12}>
               <Typography variant="h3" style={{ float: 'left' }}>
                 Number of members
