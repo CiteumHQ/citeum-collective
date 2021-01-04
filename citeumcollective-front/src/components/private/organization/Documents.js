@@ -29,7 +29,6 @@ const useStyles = makeStyles(() => ({
   },
   date: {
     position: 'absolute',
-    right: 70,
     cursor: 'default',
   },
   noLink: {
@@ -87,7 +86,7 @@ const Documents = () => {
               divider={true}
               button={true}
               component="a"
-              href={`/storage/get/${document.id}`}
+              href={`/storage/view/${document.id}`}
             >
               <ListItemIcon>{renderIcon(document.type)}</ListItemIcon>
               <ListItemText
@@ -98,6 +97,7 @@ const Documents = () => {
                 <Button
                   color="primary"
                   className={classes.date}
+                  style={{ right: isAdmin ? 70 : 10 }}
                   startIcon={<EventOutlined />}
                 >
                   {format(parseISO(document.created_at), 'yyyy-LL-dd')}

@@ -66,6 +66,9 @@ const DocumentPopover = ({ id, refetchDocuments }) => {
         onClose={handleClose}
         style={{ marginTop: 50 }}
       >
+        <MenuItem component="a" href={`/storage/get/${id}`}>
+          Download
+        </MenuItem>
         <MenuItem
           onClick={() => {
             handleClose();
