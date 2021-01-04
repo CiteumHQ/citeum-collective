@@ -20,6 +20,7 @@ import {
   getMembershipById,
   deleteMembership,
 } from '../domain/memberships';
+import { createApplication, createProduct, getAssociationProducts, getProductApplications } from '../domain/products';
 
 const associationsResolvers = {
   Query: {
@@ -34,6 +35,10 @@ const associationsResolvers = {
   Association: {
     members: (association, _, ctx) => getAssociationMembers(ctx, association),
     memberships: (association, _, ctx) => getAssociationMemberships(ctx, association),
+    products: (association, _, ctx) => getAssociationProducts(ctx, association),
+  },
+  Product: {
+    applications: (product, _, ctx) => getProductApplications(ctx, product),
   },
   Membership: {
     association: (membership, _, ctx) => getMembershipAssociation(ctx, membership),
@@ -47,8 +52,10 @@ const associationsResolvers = {
     membershipDelete: (_, { id }, ctx) => deleteMembership(ctx, id),
     memberAdd: (_, { input }, ctx) => addMember(ctx, input),
     memberUpdate: (_, { input }, ctx) => updateMember(ctx, input),
-    memberDelete: (_, { associationId, userId, membershipId }, ctx) =>
-      removeMember(ctx, associationId, userId, membershipId),
+    // eslint-disable-next-line prettier/prettier
+    memberDelete: (_, { associationId, userId, membershipId }, ctx) => removeMember(ctx, associationId, userId, membershipId),
+    productAdd: (_, { associationId, input }, ctx) => createProduct(ctx, associationId, input),
+    applicationAdd: (_, { productId, input }, ctx) => createApplication(ctx, productId, input),
   },
 };
 
