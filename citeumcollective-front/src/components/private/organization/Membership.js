@@ -19,7 +19,7 @@ import * as R from 'ramda';
 import { useBasicQuery } from '../../../network/Apollo';
 import { OrganizationContext } from '../Context';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   paper: {
     padding: 15,
   },
