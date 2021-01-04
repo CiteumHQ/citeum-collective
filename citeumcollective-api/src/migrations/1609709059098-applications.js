@@ -31,12 +31,12 @@ export const up = async (knex, db = bridgeSql(knex)) => {
         );
         CREATE TABLE "applications_memberships"
         (
-            document        VARCHAR(255),
+            membership      VARCHAR(255),
             application     VARCHAR(255),
-            UNIQUE (document, application),
-            CONSTRAINT fk_document
-              FOREIGN KEY (document)
-                REFERENCES documents (id),
+            UNIQUE (membership, application),
+            CONSTRAINT fk_membership
+              FOREIGN KEY (membership)
+                REFERENCES memberships (id),
             CONSTRAINT fk_application
               FOREIGN KEY (application)
                 REFERENCES applications (id)
