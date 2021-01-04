@@ -6,11 +6,13 @@ import {
   createAssociationAdminRole,
   deleteAssociationRoles,
   grantRoleToUser,
+  removeRoleFromUser,
 } from '../database/keycloak';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
-import { getAssociationById, getMembershipByCode } from './memberships';
+import { getAssociationById, getMembershipByCode, getMembershipById } from './memberships';
 import { FunctionalError } from '../config/errors';
-import { createNotification } from './notifications';
+import { createNotification, getNotificationByContent } from './notifications';
+import { getUser } from './users';
 
 export const getAssociations = (ctx) => {
   return ctx.db.queryRows(sql`select * from associations`);
@@ -20,8 +22,8 @@ export const getAssociationByCode = (ctx, code) => {
   return ctx.db.queryOne(sql`select * from associations where code = ${code}`);
 };
 
-const associationsRelatedToUser = async (ctx) => {
-  const userRoles = ctx.user.roles;
+const associationsRelatedToUser = async (ctx, user) => {
+  const userRoles = user.roles || [];
   const assoCodes = R.uniq(
     userRoles
       .filter((f) => f.startsWith(ROLE_ASSO_PREFIX))
@@ -37,13 +39,14 @@ const associationsRelatedToUser = async (ctx) => {
         order by name`);
 };
 
-export const userAssociations = async (ctx) => associationsRelatedToUser(ctx);
+export const userAssociations = async (ctx, user) => associationsRelatedToUser(ctx, user);
 
-export const userSubscriptions = async (ctx) => {
+export const userSubscriptions = async (ctx, user) => {
   const associationsTuple = [];
-  const associations = await associationsRelatedToUser(ctx);
-  for (let index = 0; index < ctx.user.roles.length; index += 1) {
-    const role = ctx.user.roles[index];
+  const associations = await associationsRelatedToUser(ctx, user);
+  const roles = user.roles || [];
+  for (let index = 0; index < roles.length; index += 1) {
+    const role = roles[index];
     const [, associationCode, membershipCode] = role.split(ROLE_ASSO_SEPARATOR);
     const association = R.find((a) => a.code === associationCode, associations);
     if (membershipCode !== ADMIN_ROLE_CODE && association) {
@@ -60,11 +63,15 @@ export const isDocumentAccessibleFromUser = async (ctx, user, document) => {
   return fileMemberships.some((o) => userMemberships.includes(o));
 };
 
-export const userSubscription = async (ctx, associationId) => {
-  const associations = await userSubscriptions(ctx);
+export const userSubscription = async (ctx, user, associationId) => {
+  const associations = await userSubscriptions(ctx, user);
   const collective = R.find((a) => a.association.id === associationId, associations);
   if (!collective) return null;
-  return getMembershipByCode(ctx, associationId, collective.membershipCode);
+  const membership = await getMembershipByCode(ctx, associationId, collective.membershipCode);
+  const userMembership = ctx.db.queryOne(
+    sql`select * from users_memberships where association = ${associationId} and account = ${user.id} and membership = ${membership.id}`
+  );
+  return R.assoc('subscriptionInfo', userMembership, membership);
 };
 
 export const createAssociation = async (ctx, input) => {
@@ -87,6 +94,97 @@ export const createAssociation = async (ctx, input) => {
     content: 'The <code>organization</code> has been created.',
   });
   return getAssociationById(ctx, id);
+};
+
+export const addMember = async (ctx, input) => {
+  const { associationId, userId, membershipId } = input;
+  const association = await getAssociationById(ctx, associationId);
+  if (!association) {
+    throw FunctionalError('Association not found', { associationId });
+  }
+  const user = await getUser(ctx, userId);
+  if (!user) {
+    throw FunctionalError('User not found', { userId });
+  }
+  const membership = await getMembershipById(ctx, membershipId);
+  if (!membership) {
+    throw FunctionalError('Membership not found', { membershipId });
+  }
+  await grantRoleToUser(`${ROLE_ASSO_PREFIX}${association.code}_${membership.code}`, user);
+  await ctx.db.execute(
+    sql`insert INTO users_memberships (account, membership, association, role, subscription_date, subscription_last_update, subscription_next_update) 
+                values (${user.id}, ${membership.id}, ${
+      association.id
+    }, ${`${ROLE_ASSO_PREFIX}${association.code}_${membership.code}`}, current_timestamp, current_timestamp, current_timestamp)`
+  );
+  // Return the created association
+  const content = `<code>${
+    user.is_organization ? user.organization : `${user.firstName} ${user.lastName}`
+  }</code> is now a <code>${membership.name}</code> member.`;
+  const existingNotification = await getNotificationByContent(ctx, association, content);
+  if (!existingNotification) {
+    await createNotification(ctx, {
+      association_id: associationId,
+      type: 'add_member',
+      content,
+    });
+  }
+  return user;
+};
+
+export const updateMember = async (ctx, input) => {
+  const {
+    associationId,
+    userId,
+    membershipId,
+    subscription_date: subscriptionDate,
+    subscription_last_update: subscriptionLastUpdate,
+    subscription_next_update: subscriptionNextUpdate,
+  } = input;
+  const association = await getAssociationById(ctx, associationId);
+  if (!association) {
+    throw FunctionalError('Association not found', { associationId });
+  }
+  const user = await getUser(ctx, userId);
+  if (!user) {
+    throw FunctionalError('User not found', { userId });
+  }
+  const membership = await getMembershipById(ctx, membershipId);
+  if (!membership) {
+    throw FunctionalError('Membership not found', { membershipId });
+  }
+  await ctx.db.execute(
+    sql`UPDATE users_memberships SET subscription_date = ${subscriptionDate}, subscription_last_update = ${subscriptionLastUpdate}, subscription_next_update= ${subscriptionNextUpdate} where association = ${associationId} and account = ${user.id} and membership = ${membership.id}`
+  );
+  return user;
+};
+
+export const removeMember = async (ctx, associationId, userId, membershipId) => {
+  const association = await getAssociationById(ctx, associationId);
+  if (!association) {
+    throw FunctionalError('Association not found', { associationId });
+  }
+  const user = await getUser(ctx, userId);
+  if (!user) {
+    throw FunctionalError('User not found', { userId });
+  }
+  const membership = await getMembershipById(ctx, membershipId);
+  if (!membership) {
+    throw FunctionalError('Membership not found', { membershipId });
+  }
+  await removeRoleFromUser(`${ROLE_ASSO_PREFIX}${association.code}_${membership.code}`, user);
+  await ctx.db.execute(
+    sql`DELETE from users_memberships where association = ${associationId} and account = ${user.id} and membership = ${membership.id}`
+  );
+  // Return the created association
+  await createNotification(ctx, {
+    association_id: associationId,
+    type: 'remove_member',
+    content: `<code>${
+      user.isOrganization ? user.organization : `${user.firstName} ${user.lastName}`
+    }</code> is no longer a <code>${membership.name}</code> member.`,
+  });
+  return user;
 };
 
 export const updateAssociation = async (ctx, id, input) => {

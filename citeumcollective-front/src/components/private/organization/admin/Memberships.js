@@ -6,14 +6,14 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Chip from '@material-ui/core/Chip';
-import { PuzzleHeartOutline, CashMultiple } from 'mdi-material-ui';
+import { PuzzleHeartOutline } from 'mdi-material-ui';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { useBasicQuery } from '../../../../network/Apollo';
 import MembershipCreation from './MembershipCreation';
 import MembershipPopover from './MembershipPopover';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   fee: {
     borderRadius: 5,
     position: 'absolute',

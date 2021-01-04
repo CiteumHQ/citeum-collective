@@ -63,6 +63,19 @@ export const connectKeycloak = async () => {
   kc.refreshToken = tokenSet.refresh_token;
 };
 
+export const getAllUsers = async () => {
+  const api = await kc.get();
+  const users = await api.users.find();
+  return Promise.all(
+    users.map(async (user) => {
+      const input = { id: user.id };
+      const realmRoles = await api.users.listRealmRoleMappings(input);
+      const roles = realmRoles.map((r) => r.name);
+      return Object.assign(user, { roles });
+    })
+  );
+};
+
 export const getUserInfo = async (userId) => {
   const api = await kc.get();
   const input = { id: userId };
@@ -97,6 +110,15 @@ export const grantRoleToUser = async (roleName, user) => {
   const api = await kc.get();
   const role = await api.roles.findOneByName({ name: roleName });
   return api.users.addRealmRoleMappings({
+    id: user.id,
+    roles: [{ id: role.id, name: role.name }],
+  });
+};
+
+export const removeRoleFromUser = async (roleName, user) => {
+  const api = await kc.get();
+  const role = await api.roles.findOneByName({ name: roleName });
+  return api.users.delRealmRoleMappings({
     id: user.id,
     roles: [{ id: role.id, name: role.name }],
   });

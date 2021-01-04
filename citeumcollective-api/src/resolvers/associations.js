@@ -4,6 +4,9 @@ import {
   deleteAssociation,
   getAssociationByCode,
   getAssociations,
+  addMember,
+  removeMember,
+  updateMember,
 } from '../domain/associations';
 import conf from '../config/conf';
 import {
@@ -42,6 +45,10 @@ const associationsResolvers = {
     membershipAdd: (_, { input }, ctx) => createMembership(ctx, input),
     membershipUpdate: (_, { id, input }, ctx) => updateMembership(ctx, id, input),
     membershipDelete: (_, { id }, ctx) => deleteMembership(ctx, id),
+    memberAdd: (_, { input }, ctx) => addMember(ctx, input),
+    memberUpdate: (_, { input }, ctx) => updateMember(ctx, input),
+    memberDelete: (_, { associationId, userId, membershipId }, ctx) =>
+      removeMember(ctx, associationId, userId, membershipId),
   },
 };
 

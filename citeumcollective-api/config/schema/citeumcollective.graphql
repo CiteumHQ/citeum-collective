@@ -23,6 +23,13 @@ type Identity {
     userName: String
 }
 
+type UserMembershipInfo {
+    role: String
+    subscription_date: DateTime
+    subscription_last_update: DateTime
+    subscription_next_update: DateTime
+}
+
 type Membership {
     id: ID!
     name: String!
@@ -30,6 +37,7 @@ type Membership {
     fee: Int!
     description: String
     association: Association!
+    subscriptionInfo: UserMembershipInfo
 }
 
 type Notification {
@@ -87,6 +95,7 @@ type Document {
 type Query {
     about: AppInfo
     me: User @auth
+    users: [User] @auth
     federation: Association @auth
     membership(id: ID!): Membership @auth
     association(id: ID!): Association @auth
@@ -142,6 +151,21 @@ input UserLoginInput {
     password: String!
 }
 
+input MemberAddInput {
+    associationId: ID!
+    userId: ID!,
+    membershipId: ID!
+}
+
+input MemberEditInput {
+    associationId: ID!
+    userId: ID!,
+    membershipId: ID!
+    subscription_date: DateTime
+    subscription_last_update: DateTime
+    subscription_next_update: DateTime
+}
+
 input DocumentAddInput {
     name: String!
     description: String!
@@ -159,4 +183,7 @@ type Mutation {
     associationAdd(input: AssociationAddInput!): Association @auth
     associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth
     associationDelete(id: ID!): ID! @auth
+    memberAdd(input: MemberAddInput!): User @auth
+    memberUpdate(input: MemberEditInput!): User @auth
+    memberDelete(associationId: ID!, userId: ID!, membershipId: ID!): User @auth
 }

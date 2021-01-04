@@ -1,5 +1,5 @@
 import { sql } from '../utils/sql';
-import { getUserInfo, updateUserInfo } from '../database/keycloak';
+import { getAllUsers, getUserInfo, updateUserInfo } from '../database/keycloak';
 import { FunctionalError } from '../config/errors';
 
 export const completeUserWithData = async (ctx, user) => {
@@ -10,6 +10,10 @@ export const completeUserWithData = async (ctx, user) => {
 export const getUser = async (ctx, userId) => {
   const user = await getUserInfo(userId);
   return completeUserWithData(ctx, user);
+};
+
+export const getUsers = async () => {
+  return getAllUsers();
 };
 
 export const updateUser = async (ctx, id, input) => {

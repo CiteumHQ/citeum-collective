@@ -1,36 +1,48 @@
-import React, { useContext, useState } from "react";
-import { gql, useMutation } from "@apollo/client";
-import * as R from "ramda";
-import { Field, Form, Formik } from "formik";
-import { TextField, Select } from "formik-material-ui";
-import {
-  Autocomplete,
-  AutocompleteRenderInputParams,
-} from "formik-material-ui-lab";
-import Fab from "@material-ui/core/Fab";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/core/styles";
-import { Add } from "@material-ui/icons";
-import * as Yup from "yup";
-import { useParams } from "react-router-dom";
-import { UserContext } from "../../Context";
-import { useBasicQuery } from "../../../../network/Apollo";
+import React, { useContext, useState } from 'react';
+import { gql, useMutation } from '@apollo/client';
+import { Field, Form, Formik } from 'formik';
+import { Select } from 'formik-material-ui';
+import { Autocomplete } from 'formik-material-ui-lab';
+import Fab from '@material-ui/core/Fab';
+import MuiTextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
+import { Add } from '@material-ui/icons';
+import * as Yup from 'yup';
+import { useParams } from 'react-router-dom';
+import { UserContext } from '../../Context';
+import { useBasicQuery } from '../../../../network/Apollo';
 
 const useStyles = makeStyles(() => ({
   createButton: {
-    position: "fixed",
+    position: 'fixed',
     bottom: 30,
     right: 200,
     zIndex: 2000,
   },
 }));
+
+const QUERY_USERS = gql`
+  query GetUsers($associationId: ID!) {
+    users {
+      id
+      firstName
+      lastName
+      email
+      subscription(associationId: $associationId) {
+        id
+        name
+      }
+    }
+  }
+`;
 
 const QUERY_ASSOCIATION_MEMBERSHIPS = gql`
   query GetAssociationMemberships($id: ID!) {
@@ -44,35 +56,36 @@ const QUERY_ASSOCIATION_MEMBERSHIPS = gql`
   }
 `;
 
-const MUTATION_CREATE_MEMBERSHIP = gql`
-  mutation MembershipAdd($input: MembershipAddInput!) {
-    membershipAdd(input: $input) {
+const MUTATION_ADD_MEMBER = gql`
+  mutation MemberAdd($input: MemberAddInput!) {
+    memberAdd(input: $input) {
       id
-      name
-      code
-      fee
-      description 
+      firstName
+      lastName
     }
   }
 `;
 
-const memberValidation = () =>
-  Yup.object().shape({
-    code: Yup.string().required("This field is required"),
-    name: Yup.string().required("This field is required"),
-    description: Yup.string().required("This field is required"),
-    fee: Yup.number().required("This field is required"),
-  });
+const memberValidation = () => Yup.object().shape({
+  userId: Yup.object().required('This field is required'),
+  membershipId: Yup.string().required('This field is required'),
+});
 
 const AddMember = ({ refetchMembers }) => {
   const classes = useStyles();
   const { organizationId } = useParams();
   const [open, setOpen] = useState(false);
   const { refetch: refetchUserContext } = useContext(UserContext);
-  const { data } = useBasicQuery(QUERY_ASSOCIATION_MEMBERSHIPS, {
-    id: organizationId,
+  const { data: dataUsers } = useBasicQuery(QUERY_USERS, {
+    associationId: organizationId,
   });
-  const [createOrganization] = useMutation(MUTATION_CREATE_MEMBERSHIP, {
+  const { data: dataMemberships } = useBasicQuery(
+    QUERY_ASSOCIATION_MEMBERSHIPS,
+    {
+      id: organizationId,
+    },
+  );
+  const [addMember] = useMutation(MUTATION_ADD_MEMBER, {
     onCompleted() {
       refetchUserContext();
       refetchMembers();
@@ -80,11 +93,21 @@ const AddMember = ({ refetchMembers }) => {
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
-    createOrganization({
-      variables: { input: R.assoc("associationId", organizationId, values) },
-    }).finally(() => setSubmitting(false));
+    const variables = {
+      input: {
+        associationId: organizationId,
+        userId: values.userId.id,
+        membershipId: values.membershipId,
+      },
+    };
+    addMember({ variables }).finally(() => setSubmitting(false));
   };
-  if (data && data.association) {
+  if (
+    dataUsers
+    && dataUsers.users
+    && dataMemberships
+    && dataMemberships.association
+  ) {
     return (
       <div>
         <Fab
@@ -98,87 +121,60 @@ const AddMember = ({ refetchMembers }) => {
         <Formik
           enableReinitialize={true}
           initialValues={{
-            code: "",
-            name: "",
-            description: "",
-            fee: 0,
+            userId: null,
+            membershipId: null,
           }}
-          validationSchema={membershipValidation()}
+          validationSchema={memberValidation()}
           onSubmit={formSubmit}
           onReset={() => setOpen(false)}
         >
-          {({ submitForm, handleReset, isSubmitting }) => (
+          {({
+            submitForm, handleReset, isSubmitting, touched, errors,
+          }) => (
             <Form>
               <Dialog
                 open={open}
                 onClose={() => setOpen(false)}
                 fullWidth={true}
               >
-                <DialogTitle>Create a membership</DialogTitle>
+                <DialogTitle>Add a membership</DialogTitle>
                 <DialogContent>
                   <Field
-                    name="autocomplete"
-                    multiple
+                    name="userId"
                     component={Autocomplete}
-                    options={users}
-                    getOptionLabel={(option: any) => option.title}
-                    style={{ width: 300 }}
-                    renderInput={(params: AutocompleteRenderInputParams) => (
+                    fullWidth={true}
+                    options={dataUsers.users}
+                    getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`
+                    }
+                    getOptionSelected={(option, value) => option === value
+                      || option.id === value
+                      || option.id === value.id
+                    }
+                    renderInput={(params) => (
                       <MuiTextField
                         {...params}
-                        error={
-                          touched["autocomplete"] && !!errors["autocomplete"]
-                        }
-                        helperText={
-                          touched["autocomplete"] && errors["autocomplete"]
-                        }
-                        label="Autocomplete"
-                        variant="outlined"
+                        error={touched.autocomplete && !!errors.autocomplete}
+                        helperText={touched.autocomplete && errors.autocomplete}
+                        label="User"
                       />
                     )}
                   />
-                  <FormControl>
-                    <InputLabel shrink={true} htmlFor="tags">
-                      Membership
-                    </InputLabel>
+                  <FormControl fullWidth={true} style={{ marginTop: 20 }}>
+                    <InputLabel>Membership</InputLabel>
                     <Field
                       component={Select}
-                      type="text"
-                      name="tags"
-                      multiple={true}
-                      inputProps={{ name: "tags", id: "tags" }}
+                      name="membershipId"
+                      inputProps={{ name: 'membershipId', id: 'membershipId' }}
                     >
-                      {data.association.memberships.map((membership) => (
-                        <MenuItem key={membership.id} value={membership.id}>
-                          {membership.name}
-                        </MenuItem>
-                      ))}
+                      {dataMemberships.association.memberships.map(
+                        (membership) => (
+                          <MenuItem key={membership.id} value={membership.id}>
+                            {membership.name}
+                          </MenuItem>
+                        ),
+                      )}
                     </Field>
                   </FormControl>
-                  <Field
-                    component={TextField}
-                    name="name"
-                    label="Name"
-                    fullWidth={true}
-                    style={{ marginTop: 20 }}
-                  />
-                  <Field
-                    component={TextField}
-                    name="fee"
-                    label="Fee (€ / year)"
-                    type="number"
-                    fullWidth={true}
-                    style={{ marginTop: 20 }}
-                  />
-                  <Field
-                    component={TextField}
-                    name="description"
-                    label="Description"
-                    fullWidth={true}
-                    multiline={true}
-                    rows={4}
-                    style={{ marginTop: 20 }}
-                  />
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleReset} disabled={isSubmitting}>

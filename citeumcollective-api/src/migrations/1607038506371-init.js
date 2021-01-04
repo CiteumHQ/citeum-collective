@@ -54,6 +54,27 @@ export const up = async (knex, db = bridgeSql(knex)) => {
               FOREIGN KEY (association_id)
                 REFERENCES associations (id)
         );
+        CREATE TABLE "users_memberships"
+        (
+            account            VARCHAR(255) NOT NULL,
+            membership         VARCHAR(255) NOT NULL,
+            association        VARCHAR(255) NOT NULL,
+            role               VARCHAR(255) NOT NULL,
+            subscription_date timestamp,
+            subscription_last_update timestamp,
+            subscription_next_update timestamp,          
+            CONSTRAINT users_memberships_account_membership_association_key
+              UNIQUE (account, membership, association),
+            CONSTRAINT users_memberships_association_fkey
+              FOREIGN KEY (association)
+                REFERENCES associations (id),
+            CONSTRAINT users_memberships_membership_fkey
+              FOREIGN KEY (membership)
+                REFERENCES memberships (id),
+            CONSTRAINT users_memberships_user_fkey
+              FOREIGN KEY (account)
+                REFERENCES users (id)                           
+        );
     `);
   // Provide data
   // 01- Create default association

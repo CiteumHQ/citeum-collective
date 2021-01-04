@@ -15,6 +15,12 @@ export const getAssociationNotifications = (ctx, association) => {
   );
 };
 
+export const getNotificationByContent = (ctx, association, content) => {
+  return ctx.db.queryOne(
+    sql`select * from notifications where association_id = ${association.id} and content = ${content}`
+  );
+};
+
 export const createNotification = async (ctx, input) => {
   const { type, content, association_id: associationId } = input;
   const id = uuidv4();

@@ -9,7 +9,10 @@ import gravatar from 'gravatar';
 import Avatar from '@material-ui/core/Avatar';
 import { useParams } from 'react-router-dom';
 import Chip from '@material-ui/core/Chip';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { useBasicQuery } from '../../../../network/Apollo';
+import AddMember from './AddMember';
+import MemberPopover from './MemberPopover';
 
 const useStyles = makeStyles((theme) => ({
   small: {
@@ -29,6 +32,7 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
     association(id: $id) {
       id
       members {
+        id
         firstName
         lastName
         email
@@ -46,7 +50,7 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
 const Members = () => {
   const classes = useStyles();
   const { organizationId } = useParams();
-  const { data } = useBasicQuery(QUERY_ASSOCIATION_MEMBERS, {
+  const { data, refetch } = useBasicQuery(QUERY_ASSOCIATION_MEMBERS, {
     id: organizationId,
   });
   if (data && data.association) {
@@ -69,15 +73,24 @@ const Members = () => {
                   secondary={member.email}
                 />
                 <Chip
-                  label={`${member.subscription.name}`}
+                  label={member.subscription.name}
                   variant="outlined"
                   className={classes.subscription}
                   color="secondary"
                 />
+                <ListItemSecondaryAction>
+                  <MemberPopover
+                    associationId={organizationId}
+                    userId={member.id}
+                    subscription={member.subscription}
+                    refetchMembers={refetch}
+                  />
+                </ListItemSecondaryAction>
               </ListItem>
             );
           })}
         </List>
+        <AddMember refetchMembers={refetch} />
       </div>
     );
   }

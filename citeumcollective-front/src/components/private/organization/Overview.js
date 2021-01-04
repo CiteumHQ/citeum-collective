@@ -27,6 +27,7 @@ import {
   CloudUploadOutlined,
   DeleteOutlined,
   HelpOutlined,
+  PersonAddOutlined,
 } from '@material-ui/icons';
 import { HeartPlusOutline, HeartRemoveOutline } from 'mdi-material-ui';
 import { Link } from 'react-router-dom';
@@ -143,7 +144,7 @@ const Overview = () => {
             color: '#ffffff',
           }}
         >
-          <CloudUploadOutlined />
+          <PersonAddOutlined />
         </Avatar>
       );
     }
@@ -287,7 +288,7 @@ const Overview = () => {
                 <div className={classes.content}>
                   <Paper classes={{ root: classes.paper }}>
                     <div className={classes.date}>
-                      {format(parseISO(notification.date), 'yyyy-LL-dd kk:mm')}
+                      {format(parseISO(notification.date), 'yyyy-LL-dd HH:mm')}
                     </div>
                     <div className={classes.description}>
                       <div
