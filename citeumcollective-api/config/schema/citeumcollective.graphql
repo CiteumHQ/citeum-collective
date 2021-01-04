@@ -48,6 +48,20 @@ type Notification {
     content: String!
 }
 
+type Application {
+    id: ID!
+    name: String!
+    description: String!
+    memberships: [Membership]!
+}
+
+type Product {
+    id: ID!
+    name: String!
+    description: String!
+    applications: [Application]!
+}
+
 type Association {
     id: ID!
     name: String!
@@ -59,6 +73,7 @@ type Association {
     memberships: [Membership]!
     notifications: [Notification]
     documents: [Document]!
+    products: [Product]!
 }
 
 type Subscription {
@@ -180,17 +195,36 @@ input DocumentAddInput {
     type: DocumentType!
 }
 
+input ProductAddInput {
+    name: String!
+    description: String!
+}
+
+input ApplicationAddInput {
+    name: String!
+    description: String!
+    uri: String!
+    memberships: [ID]!
+}
+
 type Mutation {
     updateProfile(input: UserEditInput!): User @auth
+    # Memberships
     membershipAdd(input: MembershipAddInput!): Membership @auth
     membershipUpdate(id: ID!, input: MembershipEditInput!): Membership @auth
     membershipDelete(id: ID!): ID! @auth
+    # Documents
     documentAdd(organizationId: ID!, input: DocumentAddInput!, file: Upload!): Document @auth
     documentDelete(id: ID!): ID! @auth
+    # Associations
     associationAdd(input: AssociationAddInput!): Association @auth
     associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth
     associationDelete(id: ID!): ID! @auth
+    # Members
     memberAdd(input: MemberAddInput!): User @auth
     memberUpdate(input: MemberEditInput!): User @auth
     memberDelete(associationId: ID!, userId: ID!, membershipId: ID!): User @auth
+    # Products
+    productAdd(associationId: ID!, input: ProductAddInput!): Document @auth
+    applicationAdd(productId: ID!, input: ApplicationAddInput!): Document @auth
 }
