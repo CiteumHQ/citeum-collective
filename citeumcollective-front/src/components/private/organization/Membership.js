@@ -62,7 +62,7 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
       }
       members {
         id
-        email
+        gravatar
         is_organization
         organization
         organization_logo

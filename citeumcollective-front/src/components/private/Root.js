@@ -32,6 +32,7 @@ const QUERY_ME = gql`
       is_organization
       roles
       organization_logo
+      gravatar
       providerInfo {
         firstName
         lastName

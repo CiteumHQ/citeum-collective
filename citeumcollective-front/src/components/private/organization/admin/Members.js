@@ -48,7 +48,7 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
       id
       members {
         id
-        email
+        gravatar
         providerInfo {
           firstName
           lastName
