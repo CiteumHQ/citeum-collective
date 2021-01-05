@@ -22,6 +22,8 @@ export const QUERY_ASSOCIATION = gql`
       description
       email
       website
+      logo_url
+      subscription_url
       code
       default_membership
     }
@@ -47,6 +49,8 @@ const MUTATION_UPDATE_ORGANIZATION = gql`
       description
       email
       website
+      logo_url
+      subscription_url
       default_membership
     }
   }
@@ -57,6 +61,8 @@ const associationValidation = () => Yup.object().shape({
   email: Yup.string().required('This field is required'),
   description: Yup.string().required('This field is required'),
   website: Yup.string().nullable(),
+  logo_url: Yup.string().nullable(),
+  subscription_url: Yup.string().nullable(),
   default_membership: Yup.string(),
 });
 
@@ -84,6 +90,10 @@ const Parameters = () => {
       description,
       website,
       // eslint-disable-next-line camelcase
+      logo_url,
+      // eslint-disable-next-line camelcase
+      subscription_url,
+      // eslint-disable-next-line camelcase
       default_membership,
     } = values;
     const input = {
@@ -91,6 +101,8 @@ const Parameters = () => {
       email,
       description,
       website,
+      logo_url,
+      subscription_url,
       default_membership,
     };
     updateOrganization({
@@ -134,6 +146,13 @@ const Parameters = () => {
                       component={TextField}
                       name="logo_url"
                       label="Logo URL"
+                      fullWidth={true}
+                      style={{ marginTop: 20 }}
+                    />
+                    <Field
+                      component={TextField}
+                      name="subscription_url"
+                      label="Subscription URL"
                       fullWidth={true}
                       style={{ marginTop: 20 }}
                     />

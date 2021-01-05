@@ -64,6 +64,8 @@ type Association {
     description: String!
     email: String!
     website: String
+    logo_url: String
+    subscription_url: String
     code: String!
     members: [User]!
     memberships: [Membership]!
@@ -178,6 +180,8 @@ input AssociationEditInput {
     description: String!
     email: String!
     website: String
+    logo_url: String
+    subscription_url: String
     default_membership: String!
 }
 

@@ -116,7 +116,9 @@ export const updateAssociation = async (ctx, id, input) => {
   const association = await getAssociationById(ctx, id);
   await ctx.db.execute(
     sql`UPDATE associations SET name = ${input.name}, description = ${input.description}, email = ${input.email},
-                        website = ${input.website || ''} WHERE id = ${id}`
+                        website = ${input.website || ''}, logo_url = ${input.logo_url || ''}, subscription_url = ${
+      input.subscription_url || ''
+    } WHERE id = ${id}`
   );
   const currentDefault = await getAssociationDefaultMembership(ctx, association);
   if (input.default_membership && currentDefault !== input.default_membership) {
