@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import Button from '@material-ui/core/Button';
 import * as R from 'ramda';
 import { gql } from '@apollo/client';
-import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -19,6 +18,7 @@ import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
+import Divider from '@material-ui/core/Divider';
 import DocumentCreation from './DocumentCreation';
 import { useBasicQuery } from '../../../network/Apollo';
 import DocumentPopover from './DocumentPopover';
@@ -146,27 +146,19 @@ const Documents = () => {
   if (data && data.association) {
     return (
       <div>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Typography variant="h3">Information</Typography>
-            <Typography variant="h6">
-              Official documents of the organization
-            </Typography>
-            {renderList(
-              R.filter(
-                (n) => n.type === 'INFORMATION',
-                data.association.documents,
-              ),
-            )}
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h3">Minutes</Typography>
-            <Typography variant="h6">Official meetings minutes</Typography>
-            {renderList(
-              R.filter((n) => n.type === 'MINUTES', data.association.documents),
-            )}
-          </Grid>
-        </Grid>
+        <Typography variant="h3">Information</Typography>
+        <Typography variant="h6">
+          Official documents of the organization
+        </Typography>
+        {renderList(
+          R.filter((n) => n.type === 'INFORMATION', data.association.documents),
+        )}
+        <Divider style={{ width: '100%', margin: '15px 0 15px 0' }} />
+        <Typography variant="h3">Minutes</Typography>
+        <Typography variant="h6">Official meetings minutes</Typography>
+        {renderList(
+          R.filter((n) => n.type === 'MINUTES', data.association.documents),
+        )}
         {isAdmin && <DocumentCreation refetchDocuments={refetch} />}
       </div>
     );
