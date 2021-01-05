@@ -52,16 +52,14 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
         organization
         organization_logo
         subscription(associationId: $id) {
-          id
-          name
-          code
-          description
-          color
-          subscriptionInfo {
-            role
-            subscription_date
-            subscription_last_update
-            subscription_next_update
+          subscription_date
+          subscription_last_update
+          subscription_next_update
+          membership {
+            name
+            code
+            description
+            color
           }
         }
       }
@@ -84,9 +82,9 @@ const Membership = () => {
           : `${n.firstName} ${n.lastName}`,
         email: n.email,
         organization_logo: n.organization_logo,
-        subscription_date: n.subscription.subscriptionInfo.subscription_date,
-        subscription_name: n.subscription.name,
-        subscription_color: n.subscription.color,
+        subscription_date: n.subscription.subscription_date,
+        subscription_name: n.subscription.membership.name,
+        subscription_color: n.subscription.membership.color,
       })),
       R.uniqBy(R.prop('name')),
       R.sortWith([R.ascend(R.prop('subscription_date'))]),
@@ -94,7 +92,11 @@ const Membership = () => {
     return (
       <Grid container spacing={3}>
         <Grid item xs={6}>
-          <Paper variant="outlined" elevation={2} classes={{ root: classes.paper }}>
+          <Paper
+            variant="outlined"
+            elevation={2}
+            classes={{ root: classes.paper }}
+          >
             <Grid container spacing={3}>
               <Grid item xs={6}>
                 <Typography variant="h3">Subscription</Typography>
@@ -112,7 +114,7 @@ const Membership = () => {
                 <Typography variant="h3">Date of subscription</Typography>
                 <Button color="inherit" className={classes.noLink}>
                   {format(
-                    parseISO(subscription.subscriptionInfo.subscription_date),
+                    parseISO(subscription.subscription_date),
                     'yyyy-LL-dd',
                   )}
                 </Button>
@@ -122,7 +124,7 @@ const Membership = () => {
                 <Button color="inherit" className={classes.noLink}>
                   {format(
                     parseISO(
-                      subscription.subscriptionInfo.subscription_last_update,
+                      subscription.subscription_last_update,
                     ),
                     'yyyy-LL-dd',
                   )}
@@ -133,7 +135,7 @@ const Membership = () => {
                 <Button color="secondary" className={classes.noLink}>
                   {format(
                     parseISO(
-                      subscription.subscriptionInfo.subscription_next_update,
+                      subscription.subscription_next_update,
                     ),
                     'yyyy-LL-dd',
                   )}

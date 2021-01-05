@@ -52,16 +52,14 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
         lastName
         email
         subscription(associationId: $id) {
-          id
-          name
-          code
-          description
-          color
-          subscriptionInfo {
-            role
-            subscription_date
-            subscription_last_update
-            subscription_next_update
+          subscription_date
+          subscription_last_update
+          subscription_next_update
+          membership {
+            name
+            code
+            description
+            color
           }
         }
       }
@@ -78,11 +76,7 @@ const Members = () => {
   if (data && data.association) {
     const { association } = data;
     const members = R.pipe(
-      R.map((n) => R.assoc(
-        'subscriptionDate',
-        n.subscription.subscriptionInfo.subscription_date,
-        n,
-      )),
+      R.map((n) => R.assoc('subscriptionDate', n.subscription.subscription_date, n)),
       R.sortWith([R.ascend(R.prop('subscriptionDate'))]),
     )(association.members);
     return (
@@ -112,9 +106,7 @@ const Members = () => {
                     startIcon={<EventOutlined />}
                   >
                     {format(
-                      parseISO(
-                        member.subscription.subscriptionInfo.subscription_date,
-                      ),
+                      parseISO(member.subscription.subscription_date),
                       'yyyy-LL-dd',
                     )}
                   </Button>
@@ -126,21 +118,18 @@ const Members = () => {
                     startIcon={<ScheduleOutlined />}
                   >
                     {format(
-                      parseISO(
-                        member.subscription.subscriptionInfo
-                          .subscription_next_update,
-                      ),
+                      parseISO(member.subscription.subscription_next_update),
                       'yyyy-LL-dd',
                     )}
                   </Button>
                 </Tooltip>
                 <Chip
-                  label={member.subscription.name}
+                  label={member.subscription.membership.name}
                   variant="outlined"
                   className={classes.subscription}
                   style={{
-                    border: `1px solid ${member.subscription.color}`,
-                    color: member.subscription.color,
+                    border: `1px solid ${member.subscription.membership.color}`,
+                    color: member.subscription.membership.color,
                   }}
                 />
                 <ListItemSecondaryAction>

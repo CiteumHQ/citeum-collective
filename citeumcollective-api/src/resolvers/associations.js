@@ -12,7 +12,6 @@ import {
   getAssociationById,
   getAssociationMemberships,
   getMembershipAssociation,
-  getMembershipByCode,
   getMembershipById,
   deleteMembership,
 } from '../domain/memberships';
@@ -35,7 +34,8 @@ const associationsResolvers = {
     federation: (_, __, ctx) => getAssociationByCode(ctx, conf.get('association:identifier')),
   },
   Subscription: {
-    membership: (associationMembership, _, ctx) => getMembershipByCode(ctx, associationMembership.membershipCode),
+    association: (subscription, _, ctx) => getAssociationById(ctx, subscription.association_id),
+    membership: (subscription, _, ctx) => getMembershipById(ctx, subscription.membership_id),
   },
   Association: {
     members: (association, _, ctx) => getAssociationMembers(ctx, association),

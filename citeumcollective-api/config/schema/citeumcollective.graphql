@@ -23,13 +23,6 @@ type Identity {
     userName: String
 }
 
-type UserMembershipInfo {
-    role: String
-    subscription_date: DateTime
-    subscription_last_update: DateTime
-    subscription_next_update: DateTime
-}
-
 type Membership {
     id: ID!
     name: String!
@@ -38,7 +31,6 @@ type Membership {
     color: String
     description: String
     association: Association!
-    subscriptionInfo: UserMembershipInfo
 }
 
 type Notification {
@@ -80,8 +72,15 @@ type Association {
 }
 
 type Subscription {
+    id: String!
+    association_id: String
+    membership_id: String
+    user_id: String
     association: Association!
     membership: Membership!
+    subscription_date: DateTime
+    subscription_last_update: DateTime
+    subscription_next_update: DateTime
 }
 
 type User {
@@ -96,7 +95,7 @@ type User {
     job_position: String
     is_organization: Boolean
     roles: [String]
-    subscription(associationId: ID!): Membership
+    subscription(associationId: ID!): Subscription
     subscriptions: [Subscription]
     associations: [Association] @auth
     federatedIdentities: [Identity]

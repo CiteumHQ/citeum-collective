@@ -31,7 +31,6 @@ const associationsRelatedToUser = async (ctx, user) => {
       })
   );
   if (assoCodes.length === 0) return [];
-  // TODO Add the way to user to organize the associations.
   return ctx.db.queryRows(sql`SELECT id, code, name, description, email from associations 
         where code in (${sql.bindings(assoCodes.map((a) => a.associationCode))})
         order by name`);
@@ -40,36 +39,30 @@ const associationsRelatedToUser = async (ctx, user) => {
 export const userAssociations = async (ctx, user) => associationsRelatedToUser(ctx, user);
 
 export const userSubscriptions = async (ctx, user) => {
-  const associationsTuple = [];
-  const associations = await associationsRelatedToUser(ctx, user);
-  const roles = user.roles || [];
-  for (let index = 0; index < roles.length; index += 1) {
-    const role = roles[index];
-    const [, associationCode, membershipCode] = role.split(ROLE_ASSO_SEPARATOR);
-    const association = R.find((a) => a.code === associationCode, associations);
-    if (membershipCode !== ADMIN_ROLE_CODE && association) {
-      associationsTuple.push({ association, membershipCode });
-    }
+  const subscriptions = await ctx.db.queryRows(
+    sql`select role, subscription_date, subscription_last_update, subscription_next_update, account as user_id, membership as membership_id, association as association_id from users_memberships where account = ${user.id}`
+  );
+  const result = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const subscription of subscriptions) {
+    result.push({ id: `${subscription.user_id}_${subscription.membership_id}`, ...subscription });
   }
-  return associationsTuple;
+  return result;
 };
 
 export const isDocumentAccessibleFromUser = async (ctx, user, document) => {
   const userOrganisationMemberships = await userSubscriptions({ ...ctx, user }, user);
-  const userMemberships = userOrganisationMemberships.map((o) => `${o.association.id}-${o.membershipCode}`);
+  const userMemberships = userOrganisationMemberships.map((o) => {
+    const [, , membershipCode] = o.role.split(ROLE_ASSO_SEPARATOR);
+    return `${o.association.id}-${membershipCode}`;
+  });
   const fileMemberships = document.memberships.map((o) => `${o.association_id}-${o.code}`);
   return fileMemberships.some((o) => userMemberships.includes(o));
 };
 
 export const userSubscription = async (ctx, user, associationId) => {
-  const associations = await userSubscriptions(ctx, user);
-  const collective = R.find((a) => a.association.id === associationId, associations);
-  if (!collective) return null;
-  const membership = await getMembershipByCode(ctx, associationId, collective.membershipCode);
-  const userMembership = ctx.db.queryOne(
-    sql`select * from users_memberships where association = ${associationId} and account = ${user.id} and membership = ${membership.id}`
-  );
-  return R.assoc('subscriptionInfo', userMembership, R.assoc('id', `${user.id}_${membership.id}`, membership));
+  const subscriptions = await userSubscriptions(ctx, user);
+  return R.head(R.filter((n) => n.association_id === associationId, subscriptions));
 };
 
 export const createAssociation = async (ctx, input) => {

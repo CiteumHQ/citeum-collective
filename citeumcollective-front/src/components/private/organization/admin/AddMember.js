@@ -38,7 +38,9 @@ const QUERY_USERS = gql`
       email
       subscription(associationId: $associationId) {
         id
-        name
+        membership {
+          name
+        }
       }
     }
   }

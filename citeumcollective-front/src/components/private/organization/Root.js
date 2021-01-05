@@ -40,17 +40,15 @@ const QUERY_ASSOCIATION = gql`
     }
     me {
       subscription(associationId: $id) {
-        id
-        name
-        code
-        fee
-        description
-        color
-        subscriptionInfo {
-          role
-          subscription_date
-          subscription_last_update
-          subscription_next_update
+        subscription_date
+        subscription_last_update
+        subscription_next_update
+        membership {
+          name
+          code
+          description
+          color
+          fee
         }
       }
     }
@@ -96,9 +94,9 @@ const Root = () => {
                 component={Overview}
               />
               <Route
-                  exact
-                  path="/dashboard/organizations/:organizationId/documents"
-                  component={Documents}
+                exact
+                path="/dashboard/organizations/:organizationId/documents"
+                component={Documents}
               />
               <Route
                 exact
@@ -106,9 +104,9 @@ const Root = () => {
                 component={Applications}
               />
               <Route
-                  exact
-                  path="/dashboard/organizations/:organizationId/membership"
-                  component={Membership}
+                exact
+                path="/dashboard/organizations/:organizationId/membership"
+                component={Membership}
               />
               {organizationId === federation.id && (
                 <Route

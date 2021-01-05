@@ -33,6 +33,7 @@ const QUERY_ME = gql`
       job_position
       is_organization
       roles
+      organization_logo
       associations {
         id
         name

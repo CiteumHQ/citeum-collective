@@ -38,15 +38,14 @@ const MUTATION_UPDATE_MEMBER = gql`
       lastName
       email
       subscription(associationId: $id) {
-        id
-        name
-        code
-        description
-        subscriptionInfo {
-          role
-          subscription_date
-          subscription_last_update
-          subscription_next_update
+        subscription_date
+        subscription_last_update
+        subscription_next_update
+        membership {
+          name
+          code
+          description
+          color
         }
       }
     }
@@ -126,7 +125,6 @@ const MemberPopover = ({
     });
   };
   let initialValues = R.pipe(
-    R.propOr({}, 'subscriptionInfo'),
     R.pick([
       'subscription_date',
       'subscription_last_update',

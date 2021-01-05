@@ -97,16 +97,14 @@ const QUERY_ASSOCIATION = gql`
         lastName
         email
         subscription(associationId: $id) {
-          id
-          name
-          code
-          description
-          color
-          subscriptionInfo {
-            role
-            subscription_date
-            subscription_last_update
-            subscription_next_update
+          subscription_date
+          subscription_last_update
+          subscription_next_update
+          membership {
+            name
+            code
+            description
+            color
           }
         }
       }
@@ -245,9 +243,9 @@ const Overview = () => {
           ? n.organization
           : `${n.firstName} ${n.lastName}`,
         email: n.email,
-        subscription_date: n.subscription.subscriptionInfo.subscription_date,
-        subscription_name: n.subscription.name,
-        subscription_color: n.subscription.color,
+        subscription_date: n.subscription.subscription_date,
+        subscription_name: n.subscription.membership.name,
+        subscription_color: n.subscription.membership.color,
       })),
       R.uniqBy(R.prop('name')),
       R.sortWith([R.ascend(R.prop('subscription_date'))]),
@@ -296,11 +294,11 @@ const Overview = () => {
                   component={Link}
                   to={`/dashboard/organizations/${organization.id}/membership`}
                   style={{
-                    border: `1px solid ${subscription.color}`,
-                    color: subscription.color,
+                    border: `1px solid ${subscription.membership.color}`,
+                    color: subscription.membership.color,
                   }}
                 >
-                  {subscription ? subscription.name : 'None'}
+                  {subscription ? subscription.membership.name : 'None'}
                 </Button>
               </Grid>
             </Grid>

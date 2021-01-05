@@ -163,7 +163,7 @@ const Profile = () => {
                 {values.is_organization && (
                   <Field
                     component={TextField}
-                    name="organization_lodo"
+                    name="organization_logo"
                     label="Organization logo"
                     fullWidth={true}
                     style={{ marginTop: 20 }}
