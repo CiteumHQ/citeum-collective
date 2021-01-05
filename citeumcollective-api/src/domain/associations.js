@@ -8,7 +8,7 @@ import { createNotification } from './notifications';
 import { grantRoleToUser } from './roles';
 import { ADMIN_ROLE_CODE, kcDeleteAssociationRoles } from '../database/keycloak';
 // eslint-disable-next-line import/no-cycle
-import { getAssociationMembers } from './users';
+import { getAssociationMembers, getUsers } from './users';
 
 export const getAssociations = (ctx) => {
   return ctx.db.queryRows(sql`select * from associations`);
@@ -96,6 +96,13 @@ export const createAssociation = async (ctx, input) => {
   );
   // Assign the admin role for this association
   await grantRoleToUser(ctx, ctx.user.id, id, ADMIN_ROLE_CODE);
+  // Assign the default role to every platform users
+  const users = await getUsers(ctx);
+  for (let index = 0; index < users.length; index += 1) {
+    const user = users[index];
+    // eslint-disable-next-line no-await-in-loop
+    await assignUserMembership(ctx, user, association, createdMembership);
+  }
   // Return the created association
   await createNotification(ctx, {
     association_id: id,
