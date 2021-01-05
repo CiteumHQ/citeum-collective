@@ -110,7 +110,7 @@ const extractMemberNeededInfo = async (ctx, userId, associationId, membershipId)
 
 export const addMember = async (ctx, input) => {
   const { associationId, userId, membershipId } = input;
-  const { association, membership, user } = extractMemberNeededInfo(ctx, userId, associationId, membershipId);
+  const { association, membership, user } = await extractMemberNeededInfo(ctx, userId, associationId, membershipId);
   await assignUserMembership(ctx, user, association, membership);
   // Return the created association
   const content = `<code>${
@@ -136,7 +136,7 @@ export const updateMember = async (ctx, input) => {
     subscription_last_update: subscriptionLastUpdate,
     subscription_next_update: subscriptionNextUpdate,
   } = input;
-  const { membership, user } = extractMemberNeededInfo(ctx, userId, associationId, membershipId);
+  const { membership, user } = await extractMemberNeededInfo(ctx, userId, associationId, membershipId);
   await ctx.db.execute(
     sql`UPDATE users_memberships SET subscription_date = ${subscriptionDate}, 
                              subscription_last_update = ${subscriptionLastUpdate}, 
@@ -147,7 +147,7 @@ export const updateMember = async (ctx, input) => {
 };
 
 export const removeMember = async (ctx, associationId, userId, membershipId) => {
-  const { association, membership, user } = extractMemberNeededInfo(ctx, userId, associationId, membershipId);
+  const { association, membership, user } = await extractMemberNeededInfo(ctx, userId, associationId, membershipId);
   await kcRemoveRoleFromUser(roleGen(association, membership.code), user);
   await ctx.db.execute(
     sql`DELETE from users_memberships where association = ${associationId} and account = ${user.id} and membership = ${membership.id}`
