@@ -56,6 +56,7 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
           subscription_last_update
           subscription_next_update
           membership {
+            id
             name
             code
             description

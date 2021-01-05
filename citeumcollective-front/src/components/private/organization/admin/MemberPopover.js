@@ -42,6 +42,7 @@ const MUTATION_UPDATE_MEMBER = gql`
         subscription_last_update
         subscription_next_update
         membership {
+          id
           name
           code
           description
@@ -107,7 +108,7 @@ const MemberPopover = ({
     const input = {
       associationId,
       userId,
-      membershipId: subscription.id.split('_')[1],
+      membershipId: subscription.membership.id,
       ...values,
     };
     updateMember({
@@ -120,7 +121,7 @@ const MemberPopover = ({
       variables: {
         associationId,
         userId,
-        membershipId: subscription.id.split('_')[1],
+        membershipId: subscription.membership.id,
       },
     });
   };
