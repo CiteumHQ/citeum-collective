@@ -101,7 +101,7 @@ export const createAssociation = async (ctx, input) => {
   for (let index = 0; index < users.length; index += 1) {
     const user = users[index];
     // eslint-disable-next-line no-await-in-loop
-    await assignUserMembership(ctx, user, association, createdMembership);
+    await assignUserMembership(ctx, user, { id, code }, createdMembership);
   }
   // Return the created association
   await createNotification(ctx, {
