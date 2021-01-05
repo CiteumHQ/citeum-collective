@@ -1,11 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as R from 'ramda';
 import { sql } from '../utils/sql';
-import { kcCreateAssociationAdminRole, kcDeleteAssociationRoles, kcGrantRoleToUser } from '../database/keycloak';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
-import { getAssociationById } from './memberships';
+import { assignUserMembership, createMembership, getAssociationById, getMembershipById } from './memberships';
 import { FunctionalError } from '../config/errors';
 import { createNotification } from './notifications';
+import { grantRoleToUser } from './roles';
+import { ADMIN_ROLE_CODE, kcDeleteAssociationRoles } from '../database/keycloak';
+// eslint-disable-next-line import/no-cycle
+import { getAssociationMembers } from './users';
 
 export const getAssociations = (ctx) => {
   return ctx.db.queryRows(sql`select * from associations`);
@@ -77,9 +80,22 @@ export const createAssociation = async (ctx, input) => {
     sql`insert INTO associations (id, name, description, email, code, register_at) 
                 values (${id}, ${name}, ${description}, ${email}, ${code}, current_timestamp)`
   );
-  // Create the keycloak admin role for this association
-  const adminRoleName = await kcCreateAssociationAdminRole(input);
-  await kcGrantRoleToUser(adminRoleName, ctx.user);
+  // Create default membership
+  const membership = {
+    associationId: id,
+    name: 'Supporter',
+    description: 'A natural or legal person following the non profit organization activity.',
+    code: 'supporter',
+    fee: 0,
+  };
+  const createdMembership = await createMembership(ctx, membership);
+  // Assign default to this membership
+  await ctx.db.execute(
+    sql`INSERT INTO associations_default_memberships (association, membership) 
+            VALUES (${id}, ${createdMembership.id})`
+  );
+  // Assign the admin role for this association
+  await grantRoleToUser(ctx, ctx.user.id, id, ADMIN_ROLE_CODE);
   // Return the created association
   await createNotification(ctx, {
     association_id: id,
@@ -90,15 +106,26 @@ export const createAssociation = async (ctx, input) => {
 };
 
 export const updateAssociation = async (ctx, id, input) => {
+  const association = await getAssociationById(ctx, id);
   await ctx.db.execute(
     sql`UPDATE associations SET name = ${input.name}, description = ${input.description}, email = ${
       input.email
     }, website = ${input.website || null} WHERE id = ${id}`
   );
-  if (input.default_membership) {
+  const currentDefault = await getAssociationDefaultMembership(ctx, association);
+  if (input.default_membership && currentDefault !== input.default_membership) {
+    // Assign new default
     await ctx.db.execute(
       sql`UPDATE associations_default_memberships SET membership = ${input.default_membership} WHERE association = ${id}`
     );
+    // Assign new default to every users
+    const membership = await getMembershipById(ctx, input.default_membership);
+    const allMembers = await getAssociationMembers(ctx, id);
+    for (let index = 0; index < allMembers.length; index += 1) {
+      const member = allMembers[index];
+      // eslint-disable-next-line no-await-in-loop
+      await assignUserMembership(ctx, member, association, membership);
+    }
   }
   await createNotification(ctx, {
     association_id: id,
@@ -113,7 +140,13 @@ export const deleteAssociation = async (ctx, id) => {
   if (!association) {
     throw FunctionalError('Association not found', { id });
   }
+  // Delete roles in keycloak
   await kcDeleteAssociationRoles(association);
+  // Delete association in db
+  await ctx.db.execute(sql`DELETE FROM notifications where association_id = ${id}`);
+  await ctx.db.execute(sql`DELETE FROM users_memberships where association = ${id}`);
+  await ctx.db.execute(sql`DELETE FROM memberships where association_id = ${id}`);
+  await ctx.db.execute(sql`DELETE FROM users_roles where association_id = ${id}`);
   await ctx.db.execute(sql`DELETE FROM associations where id = ${id}`);
   return id;
 };

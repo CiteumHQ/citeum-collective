@@ -103,9 +103,7 @@ export const up = async (knex, db = bridgeSql(knex)) => {
     email: associationEmail,
     code: associationCode,
   };
-  const association = await createAssociation({ db, user: admin }, asso);
-  // 02- Create default membership
-  await createMembership({ db }, { associationId: association.id, name: 'Supporter', code: 'supporter', fee: 0 });
+  await createAssociation({ db, user: admin }, asso);
 };
 
 // eslint-disable-next-line no-unused-vars

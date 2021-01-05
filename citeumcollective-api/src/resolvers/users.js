@@ -4,7 +4,7 @@ import { userSubscriptions, userAssociations, userSubscription } from '../domain
 const usersResolvers = {
   Query: {
     me: (_, __, ctx) => ctx.user,
-    users: () => getUsers(),
+    users: (_, __, ctx) => getUsers(ctx),
   },
   User: {
     associations: (user, __, ctx) => userAssociations(ctx, user),

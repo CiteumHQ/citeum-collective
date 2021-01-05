@@ -1,8 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sql } from '../utils/sql';
-import { ADMIN_ROLE_CODE, kcCreateRoleForAssociation, kcDeleteAssociationRole } from '../database/keycloak';
+import {
+  ADMIN_ROLE_CODE,
+  kcCreateRoleForAssociation,
+  kcDeleteAssociationRole,
+  kcGrantRoleToUser,
+  roleGen,
+} from '../database/keycloak';
 import { createNotification } from './notifications';
-import { ROLE_ASSO_PREFIX } from '../database/constants';
 
 export const getAssociationById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from associations where id = ${id}`);
@@ -73,10 +78,14 @@ export const createMembership = async (ctx, input) => {
 };
 
 export const assignUserMembership = async (ctx, user, association, membership) => {
+  const role = roleGen(association, membership.code);
+  // Assign in keycloak
+  await kcGrantRoleToUser(role, user);
+  // Assign in db
   return ctx.db.execute(
-    sql`insert INTO users_memberships (account, membership, association, role, subscription_date, subscription_last_update, subscription_next_update) 
-                values (${user.id}, ${membership.id}, ${association.id}, 
-                        ${`${ROLE_ASSO_PREFIX}${association.code}_${membership.code}`}, current_timestamp, 
+    sql`insert INTO users_memberships (account, membership, association, role, subscription_date, 
+                               subscription_last_update, subscription_next_update) 
+                values (${user.id}, ${membership.id}, ${association.id},  ${role}, current_timestamp, 
                         current_timestamp, now() + INTERVAL '1 YEAR')`
   );
 };

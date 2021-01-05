@@ -1,6 +1,7 @@
 import { bridgeSql } from '../database/postgre';
 import { sql } from '../utils/sql';
-import { createRole } from '../domain/users';
+import { createRole } from '../domain/roles';
+import { ADMIN_ROLE_CODE } from '../database/keycloak';
 
 export const up = async (knex, db = bridgeSql(knex)) => {
   // Create documents structure
@@ -27,7 +28,7 @@ export const up = async (knex, db = bridgeSql(knex)) => {
                 REFERENCES associations (id)
         );
     `);
-  await createRole({ db }, 'admin', 'Admin role');
+  await createRole({ db }, ADMIN_ROLE_CODE, 'Admin role');
 };
 
 // eslint-disable-next-line no-unused-vars
