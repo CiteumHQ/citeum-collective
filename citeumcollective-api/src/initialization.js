@@ -2,8 +2,9 @@
 import { logger } from './config/conf';
 import migrate from './migrate';
 import { initProvider } from './config/authentication';
-import { connectKeycloak, initPlatformAdmin } from './database/keycloak';
+import { connectKeycloak } from './database/keycloak';
 import { isStorageAlive } from './database/minio';
+import { initPlatformAdmin } from './domain/users';
 
 export const checkSystemDependencies = async () => {
   // Check if minio is here
@@ -30,7 +31,7 @@ const platformInit = async (db) => {
   try {
     await initProvider(db);
     await connectKeycloak();
-    await initPlatformAdmin();
+    await initPlatformAdmin({ db });
     await migrateDatabase(db);
   } catch (e) {
     logger.error(`[CITEUMCOLLECTIVE] Platform initialization fail`, { error: e });

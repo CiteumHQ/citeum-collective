@@ -1,14 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sql } from '../utils/sql';
-import {
-  ADMIN_ROLE_CODE,
-  createRoleForAssociation,
-  deleteAssociationRole,
-  getUsersWithRole,
-  roleGen,
-} from '../database/keycloak';
-import { completeUserWithData } from './users';
+import { ADMIN_ROLE_CODE, kcCreateRoleForAssociation, kcDeleteAssociationRole } from '../database/keycloak';
 import { createNotification } from './notifications';
+import { ROLE_ASSO_PREFIX } from '../database/constants';
 
 export const getAssociationById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from associations where id = ${id}`);
@@ -30,24 +24,6 @@ export const getAssociationMemberships = (ctx, association) => {
   return ctx.db.queryRows(sql`select * from memberships where association_id = ${association.id} order by name asc`);
 };
 
-export const getAssociationMembers = async (ctx, association) => {
-  const memberships = await getAssociationMemberships(ctx, association);
-  const roles = memberships.map((m) => roleGen(association, m.code));
-  const members = [];
-  for (let index = 0; index < roles.length; index += 1) {
-    const role = roles[index];
-    // eslint-disable-next-line no-await-in-loop
-    const users = await getUsersWithRole(role);
-    for (let index2 = 0; index2 < users.length; index2 += 1) {
-      const user = users[index2];
-      // eslint-disable-next-line no-await-in-loop
-      const userCompleted = await completeUserWithData(ctx, user);
-      members.push(Object.assign(userCompleted, { roles: [role] }));
-    }
-  }
-  return members;
-};
-
 export const updateMembership = async (ctx, id, input) => {
   await ctx.db.execute(
     sql`UPDATE memberships SET name = ${input.name}, description = ${input.description}, fee = ${input.fee}, color = ${
@@ -67,7 +43,7 @@ export const deleteMembership = async (ctx, id) => {
   // Remove the role in keycloak
   const membership = await getMembershipById(ctx, id);
   const association = await getMembershipAssociation(ctx, membership);
-  await deleteAssociationRole(association, membership);
+  await kcDeleteAssociationRole(association, membership);
   // Remove in db
   await ctx.db.execute(sql`delete from memberships where id = ${id}`);
   await createNotification(ctx, {
@@ -92,7 +68,7 @@ export const createMembership = async (ctx, input) => {
                 values (${id}, ${name}, ${description}, ${code}, ${association.id}, ${fee})`
   );
   // Create the keycloak admin role for this association
-  await createRoleForAssociation(association, code, `${name} role for ${association.name}`);
+  await kcCreateRoleForAssociation(association, code, `${name} role for ${association.name}`);
   // Return the created membership
   await createNotification(ctx, {
     association_id: associationId,
@@ -100,4 +76,13 @@ export const createMembership = async (ctx, input) => {
     content: `The membership <code>${name}</code> has been created.`,
   });
   return getMembershipById(ctx, id);
+};
+
+export const assignUserMembership = async (ctx, user, association, membership) => {
+  return ctx.db.execute(
+    sql`insert INTO users_memberships (account, membership, association, role, subscription_date, subscription_last_update, subscription_next_update) 
+                values (${user.id}, ${membership.id}, ${association.id}, 
+                        ${`${ROLE_ASSO_PREFIX}${association.code}_${membership.code}`}, current_timestamp, 
+                        current_timestamp, now() + INTERVAL '1 YEAR')`
+  );
 };
