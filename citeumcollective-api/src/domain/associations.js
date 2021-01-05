@@ -2,13 +2,13 @@ import { v4 as uuidv4 } from 'uuid';
 import * as R from 'ramda';
 import { sql } from '../utils/sql';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
-import { assignUserMembership, createMembership, getAssociationById, getMembershipById } from './memberships';
+import { assignUserMembership, createMembership, getAssociationById } from './memberships';
 import { FunctionalError } from '../config/errors';
 import { createNotification } from './notifications';
 import { grantRoleToUser } from './roles';
 import { ADMIN_ROLE_CODE, kcDeleteAssociationRoles } from '../database/keycloak';
 // eslint-disable-next-line import/no-cycle
-import { getAssociationMembers, getUsers } from './users';
+import { getUsers } from './users';
 
 export const getAssociations = (ctx) => {
   return ctx.db.queryRows(sql`select * from associations`);
@@ -115,9 +115,8 @@ export const createAssociation = async (ctx, input) => {
 export const updateAssociation = async (ctx, id, input) => {
   const association = await getAssociationById(ctx, id);
   await ctx.db.execute(
-    sql`UPDATE associations SET name = ${input.name}, description = ${input.description}, email = ${
-      input.email
-    }, website = ${input.website || null} WHERE id = ${id}`
+    sql`UPDATE associations SET name = ${input.name}, description = ${input.description}, email = ${input.email},
+                        website = ${input.website || ''} WHERE id = ${id}`
   );
   const currentDefault = await getAssociationDefaultMembership(ctx, association);
   if (input.default_membership && currentDefault !== input.default_membership) {
@@ -125,14 +124,6 @@ export const updateAssociation = async (ctx, id, input) => {
     await ctx.db.execute(
       sql`UPDATE associations_default_memberships SET membership = ${input.default_membership} WHERE association = ${id}`
     );
-    // Assign new default to every users
-    const membership = await getMembershipById(ctx, input.default_membership);
-    const allMembers = await getAssociationMembers(ctx, id);
-    for (let index = 0; index < allMembers.length; index += 1) {
-      const member = allMembers[index];
-      // eslint-disable-next-line no-await-in-loop
-      await assignUserMembership(ctx, member, association, membership);
-    }
   }
   await createNotification(ctx, {
     association_id: id,

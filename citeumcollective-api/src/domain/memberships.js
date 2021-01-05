@@ -85,7 +85,7 @@ export const assignUserMembership = async (ctx, user, association, membership) =
   return ctx.db.execute(
     sql`insert INTO users_memberships (account, membership, association, role, subscription_date, 
                                subscription_last_update, subscription_next_update) 
-                values (${user.id}, ${membership.id}, ${association.id},  ${role}, current_timestamp, 
+                values (${user.id}, ${membership.id}, ${association.id}, ${role}, current_timestamp, 
                         current_timestamp, now() + INTERVAL '1 YEAR')`
   );
 };
