@@ -9,7 +9,6 @@ import { EventOutlined } from '@material-ui/icons';
 import { gql } from '@apollo/client';
 import List from '@material-ui/core/List';
 import Paper from '@material-ui/core/Paper';
-import gravatar from 'gravatar';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
