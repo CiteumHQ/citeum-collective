@@ -10,6 +10,7 @@ import {
 } from '../database/keycloak';
 import { FunctionalError } from '../config/errors';
 import conf from '../config/conf';
+// eslint-disable-next-line import/no-cycle
 import { getAssociationByCode, getAssociationDefaultMembership, getAssociations } from './associations';
 import { assignUserMembership, getAssociationById, getMembershipById } from './memberships';
 import { createNotification, getNotificationByContent } from './notifications';
@@ -25,6 +26,7 @@ export const getUserMemberships = (ctx, user) => {
 
 export const getUser = async (ctx, userId) => {
   const user = await ctx.db.queryOne(sql`select * from users where id = ${userId}`);
+  if (!user) return user;
   const userMemberships = await getUserMemberships(ctx, user);
   const userRoles = await getUserRoles(ctx, user.id);
   const memberships = userMemberships.map((m) => m.membership);
@@ -73,7 +75,8 @@ export const createUser = async (ctx, user) => {
   for (let index = 0; index < associations.length; index += 1) {
     const association = associations[index];
     const defaultMembership = await getAssociationDefaultMembership(ctx, association);
-    await assignUserMembership(ctx, { id }, association, defaultMembership);
+    const membership = await getMembershipById(ctx, defaultMembership);
+    await assignUserMembership(ctx, { id }, association, membership);
   }
   return getUserByEmail(ctx, email);
 };

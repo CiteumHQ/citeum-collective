@@ -3,7 +3,6 @@ import { sql } from '../utils/sql';
 import conf from '../config/conf';
 import { createAssociation } from '../domain/associations';
 import { kcGetUserByName } from '../database/keycloak';
-import { createMembership } from '../domain/memberships';
 
 export const up = async (knex, db = bridgeSql(knex)) => {
   const admin = await kcGetUserByName(conf.get('association:admin'));
