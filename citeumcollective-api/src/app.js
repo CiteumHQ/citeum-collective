@@ -84,7 +84,10 @@ const createApp = async (apolloServer) => {
   app.get(`${basePath}/storage/get/:file(*)`, async (req, res) => {
     // Load user
     const user = await extractUserFromRequest(ctx, req);
-    if (!user) res.sendStatus(403);
+    if (!user) {
+      res.sendStatus(403);
+      return;
+    }
     // Load document
     const { file } = req.params;
     const document = await loadDocument(ctx, file);
@@ -99,7 +102,10 @@ const createApp = async (apolloServer) => {
   app.get(`${basePath}/storage/view/:file(*)`, async (req, res) => {
     // Load user
     const user = await extractUserFromRequest(ctx, req);
-    if (!user) res.sendStatus(403);
+    if (!user) {
+      res.sendStatus(403);
+      return;
+    }
     // Load document
     const { file } = req.params;
     const document = await loadDocument(ctx, file);

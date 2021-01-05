@@ -58,6 +58,9 @@ const completeUserWithData = async (ctx, user) => {
 
 export const getUser = async (ctx, userId) => {
   const user = await kcGetUserInfo(userId);
+  if (!user) {
+    return null;
+  }
   return completeUserWithData(ctx, user);
 };
 

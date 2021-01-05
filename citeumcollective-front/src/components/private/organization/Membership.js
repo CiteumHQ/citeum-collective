@@ -102,10 +102,14 @@ const Membership = () => {
                 <Typography variant="h3">Subscription</Typography>
                 <Button
                   className={classes.noLink}
-                  style={{
-                    border: `1px solid ${subscription.color}`,
-                    color: subscription.color,
-                  }}
+                  style={
+                    subscription
+                      ? {
+                        border: `1px solid ${subscription.membership.color}`,
+                        color: subscription.membership.color,
+                      }
+                      : { color: 'inherit' }
+                  }
                 >
                   {subscription ? subscription.name : 'None'}
                 </Button>
@@ -123,9 +127,7 @@ const Membership = () => {
                 <Typography variant="h3">Last renewal</Typography>
                 <Button color="inherit" className={classes.noLink}>
                   {format(
-                    parseISO(
-                      subscription.subscription_last_update,
-                    ),
+                    parseISO(subscription.subscription_last_update),
                     'yyyy-LL-dd',
                   )}
                 </Button>
@@ -134,9 +136,7 @@ const Membership = () => {
                 <Typography variant="h3">Next renewal</Typography>
                 <Button color="secondary" className={classes.noLink}>
                   {format(
-                    parseISO(
-                      subscription.subscription_next_update,
-                    ),
+                    parseISO(subscription.subscription_next_update),
                     'yyyy-LL-dd',
                   )}
                 </Button>

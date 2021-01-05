@@ -48,7 +48,7 @@ const queryRows = async (knexObj, sqlQuery) => {
 
 const queryOne = async (knexObj, sqlQuery) => {
   const rows = await queryRows(knexObj, sqlQuery);
-  if (rows.length > 1) {
+  if (rows && rows.length > 1) {
     throw new Error(`Query result expected to return a single row but ${rows.length} rows received`);
   }
   return rows && rows[0];

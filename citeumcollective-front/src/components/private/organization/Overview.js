@@ -293,10 +293,14 @@ const Overview = () => {
                   variant="outlined"
                   component={Link}
                   to={`/dashboard/organizations/${organization.id}/membership`}
-                  style={{
-                    border: `1px solid ${subscription.membership.color}`,
-                    color: subscription.membership.color,
-                  }}
+                  style={
+                    subscription
+                      ? {
+                        border: `1px solid ${subscription.membership.color}`,
+                        color: subscription.membership.color,
+                      }
+                      : { color: 'inherit' }
+                  }
                 >
                   {subscription ? subscription.membership.name : 'None'}
                 </Button>

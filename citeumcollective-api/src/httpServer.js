@@ -7,8 +7,8 @@ import { connectKeycloak } from './database/keycloak';
 
 const PORT = conf.get('app:port');
 // const broadcaster = initBroadcaster();
-const createHttpServer = async (db, kc) => {
-  const apolloServer = createApolloServer(db, kc);
+const createHttpServer = async (db) => {
+  const apolloServer = createApolloServer(db);
   const { app, seeMiddleware } = await createApp(apolloServer);
   const httpServer = http.createServer(app);
   apolloServer.installSubscriptionHandlers(httpServer);

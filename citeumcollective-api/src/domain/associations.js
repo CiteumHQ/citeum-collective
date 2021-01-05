@@ -1,14 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as R from 'ramda';
 import { sql } from '../utils/sql';
-import {
-  ADMIN_ROLE_CODE,
-  kcCreateAssociationAdminRole,
-  kcDeleteAssociationRoles,
-  kcGrantRoleToUser,
-} from '../database/keycloak';
+import { kcCreateAssociationAdminRole, kcDeleteAssociationRoles, kcGrantRoleToUser } from '../database/keycloak';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from '../database/constants';
-import { getAssociationById, getMembershipByCode } from './memberships';
+import { getAssociationById } from './memberships';
 import { FunctionalError } from '../config/errors';
 import { createNotification } from './notifications';
 
