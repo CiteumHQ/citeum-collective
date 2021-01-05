@@ -6,6 +6,11 @@ export const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: createUploadLink(),
   uri: '/graphql',
+  defaultOptions: {
+    query: { fetchPolicy: 'no-cache' },
+    watchQuery: { fetchPolicy: 'no-cache' },
+    mutate: { fetchPolicy: 'no-cache' },
+  },
 });
 
 const errorCodes = {
@@ -37,6 +42,5 @@ export const useBasicQuery = (query, variables, options) => {
     },
     [optionOnCompleted, queryResultRefetch],
   );
-
   return { ...queryResult, refetch };
 };

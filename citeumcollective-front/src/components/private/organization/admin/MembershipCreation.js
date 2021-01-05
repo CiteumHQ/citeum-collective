@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import * as R from 'ramda';
 import { Field, Form, Formik } from 'formik';
@@ -13,7 +13,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Add } from '@material-ui/icons';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
-import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -47,10 +46,8 @@ const MembershipCreation = ({ refetchMemberships }) => {
   const classes = useStyles();
   const { organizationId } = useParams();
   const [open, setOpen] = useState(false);
-  const { refetch: refetchUserContext } = useContext(UserContext);
   const [createOrganization] = useMutation(MUTATION_CREATE_MEMBERSHIP, {
     onCompleted() {
-      refetchUserContext();
       refetchMemberships();
       setOpen(false);
     },
@@ -58,7 +55,8 @@ const MembershipCreation = ({ refetchMemberships }) => {
   const formSubmit = (values, { setSubmitting }) => {
     createOrganization({
       variables: { input: R.assoc('associationId', organizationId, values) },
-    }).finally(() => setSubmitting(false));
+    });
+    setSubmitting(false);
   };
   return (
     <div>

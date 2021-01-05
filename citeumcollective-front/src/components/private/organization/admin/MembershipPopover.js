@@ -77,17 +77,14 @@ const MembershipPopover = ({ id, refetchMemberships }) => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const { refetch: refetchUserContext } = useContext(UserContext);
   const [updateMembership] = useMutation(MUTATION_UPDATE_MEMBERSHIP, {
     onCompleted() {
-      refetchUserContext();
       refetchMemberships();
       setOpenUpdate(false);
     },
   });
   const [deleteMembership] = useMutation(MUTATION_DELETE_MEMBERSHIP, {
     onCompleted() {
-      refetchUserContext();
       refetchMemberships();
       setDeleting(false);
       setOpenDelete(false);

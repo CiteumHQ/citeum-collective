@@ -52,6 +52,7 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
         lastName
         email
         subscription(associationId: $id) {
+          id
           subscription_date
           subscription_last_update
           subscription_next_update

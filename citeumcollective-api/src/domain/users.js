@@ -176,7 +176,7 @@ export const addMember = async (ctx, input) => {
       content,
     });
   }
-  return user;
+  return `${user.id}_${membership.id}`;
 };
 
 export const updateMember = async (ctx, input) => {
@@ -223,15 +223,7 @@ export const removeMember = async (ctx, associationId, userId, membershipId) => 
   await ctx.db.execute(
     sql`DELETE from users_memberships where association = ${associationId} and account = ${user.id} and membership = ${membership.id}`
   );
-  // Return the created association
-  await createNotification(ctx, {
-    association_id: associationId,
-    type: 'remove_member',
-    content: `<code>${
-      user.isOrganization ? user.organization : `${user.firstName} ${user.lastName}`
-    }</code> is no longer a <code>${membership.name}</code> member.`,
-  });
-  return user;
+  return `${userId}_${membershipId}`;
 };
 
 export const initPlatformAdmin = async (ctx) => {

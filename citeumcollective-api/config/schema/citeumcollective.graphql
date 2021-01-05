@@ -176,9 +176,9 @@ input UserLoginInput {
 }
 
 input MemberAddInput {
-    associationId: ID!
-    userId: ID!,
-    membershipId: ID!
+    associationId: String!
+    userId: String!
+    membershipId: String!
 }
 
 input MemberEditInput {
@@ -225,9 +225,9 @@ type Mutation {
     associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth
     associationDelete(id: ID!): ID! @auth
     # Members
-    memberAdd(input: MemberAddInput!): User @auth
+    memberAdd(input: MemberAddInput!): ID! @auth
     memberUpdate(input: MemberEditInput!): User @auth
-    memberDelete(associationId: ID!, userId: ID!, membershipId: ID!): User @auth
+    memberDelete(associationId: String!, userId: String!, membershipId: String!): ID! @auth
     # Products
     productAdd(associationId: ID!, input: ProductAddInput!): Product @auth
     productDelete(id: ID!): ID! @auth

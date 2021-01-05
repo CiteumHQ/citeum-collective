@@ -12,7 +12,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Add } from '@material-ui/icons';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
-import { UserContext } from '../Context';
 import { useBasicQuery } from '../../../network/Apollo';
 
 const useStyles = makeStyles(() => ({
@@ -56,7 +55,6 @@ const ProductCreation = ({ refretchProducts }) => {
   const classes = useStyles();
   const { organizationId } = useParams();
   const [open, setOpen] = useState(false);
-  const { refetch: refetchUserContext } = useContext(UserContext);
   const { data: dataMemberships } = useBasicQuery(
     QUERY_ASSOCIATION_MEMBERSHIPS,
     {
@@ -65,7 +63,6 @@ const ProductCreation = ({ refretchProducts }) => {
   );
   const [createProduct] = useMutation(MUTATION_CREATE_PRODUCT, {
     onCompleted() {
-      refetchUserContext();
       refretchProducts();
       setOpen(false);
     },

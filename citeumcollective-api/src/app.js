@@ -93,7 +93,10 @@ const createApp = async (apolloServer) => {
     const document = await loadDocument(ctx, file);
     // Check if the user have access to this doc
     const userHaveAccess = await isDocumentAccessibleFromUser(ctx, user, document);
-    if (!userHaveAccess) res.sendStatus(403);
+    if (!userHaveAccess) {
+      res.sendStatus(403);
+      return;
+    }
     // Download and stream the file
     const stream = await downloadFile(file);
     res.attachment(file);
@@ -111,7 +114,10 @@ const createApp = async (apolloServer) => {
     const document = await loadDocument(ctx, file);
     // Check if the user have access to this doc
     const userHaveAccess = await isDocumentAccessibleFromUser(ctx, user, document);
-    if (!userHaveAccess) res.sendStatus(403);
+    if (!userHaveAccess) {
+      res.sendStatus(403);
+      return;
+    }
     res.setHeader('Content-disposition', `inline; filename="${document.name}"`);
     res.setHeader('Content-type', document.mimetype);
     const stream = await downloadFile(file);

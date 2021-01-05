@@ -40,10 +40,12 @@ const QUERY_ASSOCIATION = gql`
     }
     me {
       subscription(associationId: $id) {
+        id
         subscription_date
         subscription_last_update
         subscription_next_update
         membership {
+          id
           name
           code
           description

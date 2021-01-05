@@ -53,7 +53,8 @@ const OrganizationCreation = ({ refetchOrganizations }) => {
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
-    createOrganization({ variables: { input: values } }).finally(() => setSubmitting(false));
+    createOrganization({ variables: { input: values } });
+    setSubmitting(false);
   };
   return (
     <div>

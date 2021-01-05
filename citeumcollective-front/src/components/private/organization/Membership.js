@@ -111,7 +111,7 @@ const Membership = () => {
                       : { color: 'inherit' }
                   }
                 >
-                  {subscription ? subscription.name : 'None'}
+                  {subscription ? subscription.membership.name : 'None'}
                 </Button>
               </Grid>
               <Grid item xs={6}>

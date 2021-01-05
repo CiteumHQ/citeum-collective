@@ -17,8 +17,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Add } from '@material-ui/icons';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
-import { UserContext } from '../../Context';
 import { useBasicQuery } from '../../../../network/Apollo';
+import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
   createButton: {
@@ -60,11 +60,7 @@ const QUERY_ASSOCIATION_MEMBERSHIPS = gql`
 
 const MUTATION_ADD_MEMBER = gql`
   mutation MemberAdd($input: MemberAddInput!) {
-    memberAdd(input: $input) {
-      id
-      firstName
-      lastName
-    }
+    memberAdd(input: $input)
   }
 `;
 
@@ -89,9 +85,9 @@ const AddMember = ({ refetchMembers }) => {
   );
   const [addMember] = useMutation(MUTATION_ADD_MEMBER, {
     onCompleted() {
-      refetchUserContext();
-      refetchMembers();
       setOpen(false);
+      refetchMembers();
+      refetchUserContext();
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
@@ -102,7 +98,8 @@ const AddMember = ({ refetchMembers }) => {
         membershipId: values.membershipId,
       },
     };
-    addMember({ variables }).finally(() => setSubmitting(false));
+    addMember({ variables });
+    setSubmitting(false);
   };
   if (
     dataUsers

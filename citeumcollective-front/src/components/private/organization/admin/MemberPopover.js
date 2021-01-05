@@ -17,7 +17,6 @@ import * as Yup from 'yup';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { KeyboardDatePicker } from 'formik-material-ui-pickers';
-import { UserContext } from '../../Context';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -38,6 +37,7 @@ const MUTATION_UPDATE_MEMBER = gql`
       lastName
       email
       subscription(associationId: $id) {
+        id
         subscription_date
         subscription_last_update
         subscription_next_update
@@ -54,14 +54,16 @@ const MUTATION_UPDATE_MEMBER = gql`
 `;
 
 const MUTATION_DELETE_MEMBER = gql`
-  mutation MemberDelete($associationId: ID!, $userId: ID!, $membershipId: ID!) {
+  mutation MemberDelete(
+    $associationId: String!
+    $userId: String!
+    $membershipId: String!
+  ) {
     memberDelete(
       associationId: $associationId
       userId: $userId
       membershipId: $membershipId
-    ) {
-      id
-    }
+    )
   }
 `;
 
@@ -88,20 +90,17 @@ const MemberPopover = ({
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const { refetch: refetchUserContext } = useContext(UserContext);
   const [updateMember] = useMutation(MUTATION_UPDATE_MEMBER, {
     onCompleted() {
-      refetchUserContext();
-      refetchMembers();
       setOpenUpdate(false);
+      refetchMembers();
     },
   });
   const [deleteMember] = useMutation(MUTATION_DELETE_MEMBER, {
     onCompleted() {
-      refetchUserContext();
-      refetchMembers();
       setDeleting(false);
       setOpenDelete(false);
+      refetchMembers();
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
@@ -111,9 +110,8 @@ const MemberPopover = ({
       membershipId: subscription.membership.id,
       ...values,
     };
-    updateMember({
-      variables: { id: associationId, input },
-    }).finally(() => setSubmitting(false));
+    updateMember({ variables: { id: associationId, input } });
+    setSubmitting(false);
   };
   const submitDelete = () => {
     setDeleting(true);
