@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import * as R from 'ramda';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
 import Menu from '@material-ui/core/Menu';
@@ -12,11 +11,6 @@ import Button from '@material-ui/core/Button';
 import Slide from '@material-ui/core/Slide';
 import { makeStyles } from '@material-ui/core/styles';
 import { MoreVert } from '@material-ui/icons';
-import { Field, Form, Formik } from 'formik';
-import * as Yup from 'yup';
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { KeyboardDatePicker } from 'formik-material-ui-pickers';
 
 const useStyles = makeStyles(() => ({
   container: {
