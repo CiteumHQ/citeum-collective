@@ -117,10 +117,12 @@ const Membership = () => {
               <Grid item xs={6}>
                 <Typography variant="h3">Date of subscription</Typography>
                 <Button color="inherit" className={classes.noLink}>
-                  {format(
-                    parseISO(subscription.subscription_date),
-                    'yyyy-LL-dd',
-                  )}
+                  {subscription
+                    ? format(
+                      parseISO(subscription.subscription_date),
+                      'yyyy-LL-dd',
+                    )
+                    : 'None'}
                 </Button>
               </Grid>
               <Grid item xs={6}>
