@@ -151,6 +151,7 @@ export const deleteAssociation = async (ctx, id) => {
   await kcDeleteAssociationRoles(association);
   // Delete association in db
   await ctx.db.execute(sql`DELETE FROM notifications where association_id = ${id}`);
+  await ctx.db.execute(sql`DELETE FROM associations_default_memberships where association = ${id}`);
   await ctx.db.execute(sql`DELETE FROM users_memberships where association = ${id}`);
   await ctx.db.execute(sql`DELETE FROM memberships where association_id = ${id}`);
   await ctx.db.execute(sql`DELETE FROM users_roles where association_id = ${id}`);
