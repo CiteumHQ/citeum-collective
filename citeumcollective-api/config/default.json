@@ -15,7 +15,7 @@
       "expiration": 86400
     },
     "auth_provider": {
-      "issuer": "https://.../openid-configuration",
+      "issuer": "https://auth.xxxx.org/auth/realms/citeum",
       "client_secret": "client_secret",
       "redirect_uris": ["http://localhost/login/callback"],
       "logout_uri": "https://.../openid-connect/logout?redirect_uri=http://localhost:3000"
