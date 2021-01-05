@@ -64,6 +64,18 @@ export const connectKeycloak = async () => {
   kc.refreshToken = tokenSet.refresh_token;
 };
 
+export const kcResetPassword = async (userId, password, temporary = false) => {
+  const api = await kc.get();
+  await api.users.resetPassword({
+    id: userId,
+    credential: {
+      temporary,
+      type: 'password',
+      value: password,
+    },
+  });
+};
+
 export const kcGetAllUsers = async () => {
   const api = await kc.get();
   return api.users.find();
