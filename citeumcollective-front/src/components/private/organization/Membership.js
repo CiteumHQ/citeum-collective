@@ -128,19 +128,23 @@ const Membership = () => {
               <Grid item xs={6}>
                 <Typography variant="h3">Last renewal</Typography>
                 <Button color="inherit" className={classes.noLink}>
-                  {format(
-                    parseISO(subscription.subscription_last_update),
-                    'yyyy-LL-dd',
-                  )}
+                  {subscription
+                    ? format(
+                      parseISO(subscription.subscription_last_update),
+                      'yyyy-LL-dd',
+                    )
+                    : 'None'}
                 </Button>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="h3">Next renewal</Typography>
                 <Button color="secondary" className={classes.noLink}>
-                  {format(
-                    parseISO(subscription.subscription_next_update),
-                    'yyyy-LL-dd',
-                  )}
+                  {subscription
+                    ? format(
+                      parseISO(subscription.subscription_next_update),
+                      'yyyy-LL-dd',
+                    )
+                    : 'None'}
                 </Button>
               </Grid>
             </Grid>
