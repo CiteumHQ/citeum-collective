@@ -46,6 +46,7 @@ type Application {
     description: String!
     url: String!
     logo_url: String!
+    clients: [Client]
     memberships: [Membership]!
 }
 
@@ -69,6 +70,7 @@ type Association {
     notifications: [Notification]
     documents: [Document]!
     products: [Product]!
+    clients: [Client]!
     default_membership: String!
 }
 
@@ -115,6 +117,20 @@ type Document {
     type: String!
     mimetype: String!
     created_at: DateTime
+}
+
+type ClientConfiguration {
+    protocol: String!
+    issuer: String!
+    client_id: String!
+    client_secret: String!
+}
+
+type Client {
+    id: ID!
+    association: Association!
+    application: Application!
+    configuration: ClientConfiguration
 }
 
 ### QUERIES
@@ -239,4 +255,6 @@ type Mutation {
     productDelete(id: ID!): ID! @auth
     applicationAdd(productId: ID!, input: ApplicationAddInput!): Product @auth
     applicationDelete(id: ID!): ID! @auth
+    clientAdd(applicationId: ID!): Client @auth
+    clientDelete(id: ID!): ID! @auth
 }

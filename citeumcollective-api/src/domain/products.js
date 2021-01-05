@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { sql } from '../utils/sql';
 import { createNotification } from './notifications';
+import { kcCreateApplicationClient, kcDeleteClient, kcGetClient } from '../database/keycloak';
+import { getAssociationById } from './memberships';
 
 export const getProductById = (ctx, id) => {
   return ctx.db.queryOne(sql`select * from products where id = ${id}`);
@@ -83,4 +85,32 @@ export const createApplication = async (ctx, productId, input) => {
 export const deleteApplication = async (ctx, applicationId) => {
   await ctx.db.execute(sql`DELETE FROM applications where id = ${applicationId};`);
   return applicationId;
+};
+
+export const getAssociationClients = (ctx, association) => {
+  return ctx.db.queryRows(sql`select keycloak_client_id as id, association as association_id, 
+       application as application_id from applications_clients where association = ${association.id}`);
+};
+
+export const getApplicationClients = (ctx, application) => {
+  return ctx.db.queryRows(sql`select keycloak_client_id as id, association as association_id, 
+       application as application_id from applications_clients where application = ${application.id}`);
+};
+
+export const createApplicationClient = async (ctx, applicationId) => {
+  const application = await getApplicationById(ctx, applicationId);
+  const product = await getProductById(ctx, application.product_id);
+  const association = await getAssociationById(ctx, product.association_id);
+  const clientId = await kcCreateApplicationClient(association, application);
+  await ctx.db.execute(
+    sql`insert INTO applications_clients (association, application, keycloak_client_id) 
+            values (${association.id}, ${application.id}, ${clientId});`
+  );
+  return kcGetClient({ id: clientId });
+};
+
+export const deleteClient = async (ctx, id) => {
+  await kcDeleteClient(id);
+  await ctx.db.execute(sql`DELETE FROM applications_clients where keycloak_client_id = ${id};`);
+  return id;
 };

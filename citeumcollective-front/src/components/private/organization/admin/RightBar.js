@@ -11,6 +11,7 @@ import {
   AssignmentOutlined,
   DomainOutlined,
   GroupOutlined,
+  Https,
 } from '@material-ui/icons';
 import { Charity } from 'mdi-material-ui';
 import { OrganizationContext, UserContext } from '../../Context';
@@ -89,6 +90,21 @@ const RightBar = ({ location }) => {
             <GroupOutlined />
           </ListItemIcon>
           <ListItemText primary="Members" />
+        </MenuItem>
+        <MenuItem
+            component={Link}
+            to={`/dashboard/organizations/${organization.id}/admin/authentications`}
+            selected={
+              location.pathname
+              === `/dashboard/organizations/${organization.id}/admin/authentications`
+            }
+            dense={false}
+            classes={{ root: classes.menuItem }}
+        >
+          <ListItemIcon style={{ minWidth: 50 }}>
+            <Https />
+          </ListItemIcon>
+          <ListItemText primary="Authentications" />
         </MenuItem>
         {organization.id === federation.id && (
           <MenuItem

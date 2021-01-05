@@ -2,6 +2,7 @@ import KcAdminClient from 'keycloak-admin';
 import AsyncLock from 'async-lock';
 import * as R from 'ramda';
 import { Issuer } from 'openid-client';
+import { v4 as uuidv4 } from 'uuid';
 import conf from '../config/conf';
 import { ROLE_ASSO_PREFIX, ROLE_ASSO_SEPARATOR } from './constants';
 
@@ -148,10 +149,27 @@ export const kcCreateAssociationAdminRole = async (association) => {
   return kcCreateRoleForAssociation(association, ADMIN_ROLE_CODE, `Admin role for ${association.name}`);
 };
 
-export const kcCreateApplicationClient = async (association) => {
+export const kcCreateApplicationClient = async (association, application) => {
+  const id = uuidv4();
   const api = await kc.get();
-  const input = { name: association.name, clientId: association.code };
-  await api.clients.create(input);
+  const name = `${association.name} ${application.name}`;
+  const url = application.url.endsWith('/') ? `${application.url}*` : `${application.url}/*`;
+  const input = { name, clientId: id, protocol: 'openid-connect', redirectUris: [url], webOrigins: [url] };
+  const createdClient = await api.clients.create(input);
+  return createdClient.id;
+};
+
+export const kcGetClient = async (client) => {
+  const api = await kc.get();
+  const cli = await api.clients.findOne({ id: client.id });
+  const credential = await api.clients.getClientSecret({ id: client.id });
+  const issuer = 'https://auth.citeum.org/auth/realms/citeum';
+  return { ...cli, client_id: client.id, client_secret: credential.value, issuer };
+};
+
+export const kcDeleteClient = async (clientId) => {
+  const api = await kc.get();
+  await api.clients.del({ id: clientId });
 };
 
 export const kcCreateUser = async (email) => {

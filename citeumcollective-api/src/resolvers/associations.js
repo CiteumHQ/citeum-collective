@@ -24,8 +24,14 @@ import {
   deleteProduct,
   deleteApplication,
   getApplicationMemberships,
+  getAssociationClients,
+  createApplicationClient,
+  getApplicationById,
+  deleteClient,
+  getApplicationClients,
 } from '../domain/products';
 import { addMember, getAssociationMembers, removeMember, updateMember } from '../domain/users';
+import { kcGetClient } from '../database/keycloak';
 
 const associationsResolvers = {
   Query: {
@@ -42,13 +48,20 @@ const associationsResolvers = {
     members: (association, _, ctx) => getAssociationMembers(ctx, association),
     memberships: (association, _, ctx) => getAssociationMemberships(ctx, association),
     products: (association, _, ctx) => getAssociationProducts(ctx, association),
+    clients: (association, _, ctx) => getAssociationClients(ctx, association),
     default_membership: (association, _, ctx) => getAssociationDefaultMembership(ctx, association),
+  },
+  Client: {
+    association: (client, _, ctx) => getAssociationById(ctx, client.association_id),
+    application: (client, _, ctx) => getApplicationById(ctx, client.application_id),
+    configuration: (client) => kcGetClient(client),
   },
   Product: {
     applications: (product, _, ctx) => getProductApplications(ctx, product),
   },
   Application: {
     memberships: (application, _, ctx) => getApplicationMemberships(ctx, application),
+    clients: (application, _, ctx) => getApplicationClients(ctx, application),
   },
   Membership: {
     association: (membership, _, ctx) => getMembershipAssociation(ctx, membership),
@@ -68,6 +81,8 @@ const associationsResolvers = {
     productDelete: (_, { id }, ctx) => deleteProduct(ctx, id),
     applicationAdd: (_, { productId, input }, ctx) => createApplication(ctx, productId, input),
     applicationDelete: (_, { id }, ctx) => deleteApplication(ctx, id),
+    clientAdd: (_, { applicationId }, ctx) => createApplicationClient(ctx, applicationId),
+    clientDelete: (_, { id }, ctx) => deleteClient(ctx, id),
   },
 };
 

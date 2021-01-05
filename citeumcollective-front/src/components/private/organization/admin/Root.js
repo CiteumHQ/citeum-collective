@@ -13,6 +13,7 @@ import Parameters from './Parameters';
 import Memberships from './Memberships';
 import Members from './Members';
 import Organizations from './Organizations';
+import Authentications from './Authentications';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -52,6 +53,11 @@ const Root = () => {
               exact
               path="/dashboard/organizations/:organizationId/admin/members"
               component={Members}
+          />
+          <Route
+              exact
+              path="/dashboard/organizations/:organizationId/admin/authentications"
+              component={Authentications}
           />
           {organizationId === federation.id && (
             <Route
