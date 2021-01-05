@@ -57,6 +57,7 @@ const associationValidation = () => Yup.object().shape({
   email: Yup.string().required('This field is required'),
   description: Yup.string().required('This field is required'),
   website: Yup.string().nullable(),
+  default_membership: Yup.string(),
 });
 
 const Parameters = () => {

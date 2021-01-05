@@ -30,13 +30,7 @@ export const updateMembership = async (ctx, id, input) => {
       input.color ? input.color : ''
     } WHERE id = ${id}`
   );
-  const membership = await getMembershipById(ctx, id);
-  await createNotification(ctx, {
-    association_id: membership.association_id,
-    type: 'update',
-    content: 'Membership information of the <code>organization</code> has been modified.',
-  });
-  return membership;
+  return getMembershipById(ctx, id);
 };
 
 export const deleteMembership = async (ctx, id) => {

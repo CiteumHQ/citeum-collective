@@ -8,7 +8,7 @@ export const createDocumentType = async (ctx, type, icon, description) => {
   );
 };
 
-const documentMemberships = async (ctx, id) => {
+export const documentMemberships = async (ctx, id) => {
   return ctx.db.queryRows(sql`
     select m.* from documents d
         left join documents_memberships dm ON d.id = dm.document
@@ -17,7 +17,7 @@ const documentMemberships = async (ctx, id) => {
   `);
 };
 export const loadDocument = async (ctx, id) => {
-  const doc = await ctx.db.queryOne(sql`select * from documents  where id = ${id}`);
+  const doc = await ctx.db.queryOne(sql`select * from documents where id = ${id}`);
   const memberships = await documentMemberships(ctx, id);
   return { ...doc, memberships };
 };

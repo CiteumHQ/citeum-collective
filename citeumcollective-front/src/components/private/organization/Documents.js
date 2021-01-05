@@ -18,6 +18,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
 import DocumentCreation from './DocumentCreation';
 import { useBasicQuery } from '../../../network/Apollo';
 import DocumentPopover from './DocumentPopover';
@@ -39,6 +40,10 @@ const useStyles = makeStyles(() => ({
     fontSize: 15,
     color: '#b4b4b4',
   },
+  chips: {
+    position: 'absolute',
+    right: 200,
+  },
 }));
 
 const QUERY_ASSOCIATION_DOCUMENTS = gql`
@@ -51,6 +56,11 @@ const QUERY_ASSOCIATION_DOCUMENTS = gql`
         description
         mimetype
         created_at
+        memberships {
+          id
+          name
+          color
+        }
       }
     }
   }
@@ -93,6 +103,20 @@ const Documents = () => {
                 primary={document.name}
                 secondary={document.description}
               />
+              <div className={classes.chips}>
+                {document.memberships.map((membership) => (
+                  <Chip
+                    key={membership.id}
+                    label={membership.name.substring(0, 3).toUpperCase()}
+                    variant="outlined"
+                    style={{
+                      borderColor: membership.color,
+                      color: membership.color,
+                      marginRight: 10,
+                    }}
+                  />
+                ))}
+              </div>
               <Tooltip title="Document date" aria-label="date">
                 <Button
                   color="primary"
@@ -123,7 +147,7 @@ const Documents = () => {
     return (
       <div>
         <Grid container spacing={3}>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Typography variant="h3">Information</Typography>
             <Typography variant="h6">
               Official documents of the organization
@@ -135,7 +159,7 @@ const Documents = () => {
               ),
             )}
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Typography variant="h3">Minutes</Typography>
             <Typography variant="h6">Official meetings minutes</Typography>
             {renderList(

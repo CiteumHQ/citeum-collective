@@ -22,6 +22,8 @@ import {
   indigo,
   teal,
   amber,
+  lightBlue,
+  lime,
 } from '@material-ui/core/colors';
 import {
   AddOutlined,
@@ -31,6 +33,8 @@ import {
   HelpOutlined,
   PersonAddOutlined,
   VisibilityOutlined,
+  RemoveFromQueueOutlined,
+  QueueOutlined,
 } from '@material-ui/icons';
 import { HeartPlusOutline, HeartRemoveOutline } from 'mdi-material-ui';
 import { Link } from 'react-router-dom';
@@ -182,6 +186,58 @@ const Overview = () => {
           }}
         >
           <CloudUploadOutlined />
+        </Avatar>
+      );
+    }
+    if (type === 'add_member') {
+      return (
+        <Avatar
+          style={{
+            marginTop: 5,
+            backgroundColor: teal[500],
+            color: '#ffffff',
+          }}
+        >
+          <PersonAddOutlined />
+        </Avatar>
+      );
+    }
+    if (type === 'delete_member') {
+      return (
+        <Avatar
+          style={{
+            marginTop: 5,
+            backgroundColor: amber[500],
+            color: '#ffffff',
+          }}
+        >
+          <CloudUploadOutlined />
+        </Avatar>
+      );
+    }
+    if (type === 'add_product' || type === 'add_application') {
+      return (
+        <Avatar
+          style={{
+            marginTop: 5,
+            backgroundColor: lightBlue[500],
+            color: '#ffffff',
+          }}
+        >
+          <QueueOutlined />
+        </Avatar>
+      );
+    }
+    if (type === 'delete_product' || type === 'delete_application') {
+      return (
+        <Avatar
+          style={{
+            marginTop: 5,
+            backgroundColor: lime[500],
+            color: '#ffffff',
+          }}
+        >
+          <RemoveFromQueueOutlined />
         </Avatar>
       );
     }

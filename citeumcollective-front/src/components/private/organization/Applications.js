@@ -72,7 +72,7 @@ const QUERY_ASSOCIATION_PRODUCTS = gql`
 
 const Applications = () => {
   const classes = useStyles();
-  const { organization } = useContext(OrganizationContext);
+  const { organization, subscription } = useContext(OrganizationContext);
   const { me } = useContext(UserContext);
   const { data, refetch } = useBasicQuery(QUERY_ASSOCIATION_PRODUCTS, {
     organizationId: organization.id,
@@ -115,35 +115,53 @@ const Applications = () => {
                 </div>
                 <div className={classes.content}>
                   <List>
-                    {product.applications.map((application) => (
-                      <ListItem key={application.id}>
-                        <ListItemAvatar>
-                          <Avatar
-                            src={application.logo_url}
-                            component="a"
-                            href={application.url}
+                    {product.applications.map((application) => {
+                      const membershipIds = R.map(
+                        (n) => n.id,
+                        application.memberships,
+                      );
+                      const disabled = !membershipIds.includes(
+                        subscription.membership.id,
+                      );
+                      return (
+                        <ListItem key={application.id} disabled={disabled}>
+                          <ListItemAvatar>
+                            {disabled ? (
+                              <Avatar
+                                src={application.logo_url}
+                                imgProps={{
+                                  style: { filter: 'grayscale(100%)' },
+                                }}
+                              />
+                            ) : (
+                              <Avatar
+                                src={application.logo_url}
+                                component="a"
+                                href={application.url}
+                              />
+                            )}
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={application.name}
+                            secondary={application.description}
                           />
-                        </ListItemAvatar>
-                        <ListItemText
-                          primary={application.name}
-                          secondary={application.description}
-                        />
-                        <div>
-                          {application.memberships.map((membership) => (
-                            <Chip
-                              key={membership.id}
-                              label={membership.name}
-                              variant="outlined"
-                              style={{
-                                borderColor: membership.color,
-                                color: membership.color,
-                                marginRight: 10,
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </ListItem>
-                    ))}
+                          <div>
+                            {application.memberships.map((membership) => (
+                              <Chip
+                                key={membership.id}
+                                label={membership.name.substring(0, 3).toUpperCase()}
+                                variant="outlined"
+                                style={{
+                                  borderColor: membership.color,
+                                  color: membership.color,
+                                  marginRight: 10,
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </ListItem>
+                      );
+                    })}
                   </List>
                 </div>
               </Paper>

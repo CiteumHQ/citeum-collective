@@ -6,9 +6,9 @@ export default {
     primary: { main: '#90a4ae' },
     secondary: { main: '#f44336' },
     background: {
-      paper: '#1f353e',
-      default: '#162026',
+      paper: '#182a31',
       paperDark: '#0f242b',
+      default: '#162026',
     },
     divider: 'rgba(255, 255, 255, 0.2)',
   },
