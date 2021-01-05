@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
@@ -14,7 +14,6 @@ import { MoreVert } from '@material-ui/icons';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import * as Yup from 'yup';
-import { UserContext } from '../../Context';
 import { useBasicQuery } from '../../../../network/Apollo';
 
 const useStyles = makeStyles(() => ({
