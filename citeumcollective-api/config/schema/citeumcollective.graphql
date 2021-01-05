@@ -186,14 +186,15 @@ input AssociationEditInput {
 }
 
 input UserEditInput {
-    firstName: String!
-    lastName: String!
+    firstName: String
+    lastName: String
     birthday: DateTime
     address: String
     organization: String
     job_position: String
     is_organization: Boolean
     organization_logo: String
+    password: String
 }
 
 input UserLoginInput {
