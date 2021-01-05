@@ -63,50 +63,38 @@ export const connectKeycloak = async () => {
   kc.refreshToken = tokenSet.refresh_token;
 };
 
-export const getAllUsers = async () => {
+export const kcGetAllUsers = async () => {
   const api = await kc.get();
-  const users = await api.users.find();
-  return Promise.all(
-    users.map(async (user) => {
-      const input = { id: user.id };
-      const realmRoles = await api.users.listRealmRoleMappings(input);
-      const roles = realmRoles.map((r) => r.name);
-      return Object.assign(user, { roles });
-    })
-  );
+  return api.users.find();
 };
 
-export const getUserInfo = async (userId) => {
+export const kcGetUserInfo = async (userId) => {
   const api = await kc.get();
   const input = { id: userId };
-  const userPromise = api.users.findOne(input);
-  const realmRolesPromise = api.users.listRealmRoleMappings(input);
-  const [user, realmRoles] = await Promise.all([userPromise, realmRolesPromise]);
-  const roles = realmRoles.map((r) => r.name);
-  return Object.assign(user, { roles });
+  return api.users.findOne(input);
 };
 
-export const getUsersWithRole = async (name) => {
+export const kcGetUsersWithRole = async (name) => {
   const api = await kc.get();
   return api.roles.findUsersWithRole({ name });
 };
 
-export const getUserByName = async (username) => {
+export const kcGetUserByName = async (username) => {
   const api = await kc.get();
   const findUser = await api.users.find({ username });
   if (findUser.length === 1) {
-    return getUserInfo(R.head(findUser).id);
+    return kcGetUserInfo(R.head(findUser).id);
   }
   return null;
 };
 
-export const updateUserInfo = async (userId, input) => {
+export const kcUpdateUserInfo = async (userId, input) => {
   const api = await kc.get();
   await api.users.update({ id: userId }, input);
-  return getUserInfo(userId);
+  return kcGetUserInfo(userId);
 };
 
-export const grantRoleToUser = async (roleName, user) => {
+export const kcGrantRoleToUser = async (roleName, user) => {
   const api = await kc.get();
   const role = await api.roles.findOneByName({ name: roleName });
   return api.users.addRealmRoleMappings({
@@ -115,7 +103,7 @@ export const grantRoleToUser = async (roleName, user) => {
   });
 };
 
-export const removeRoleFromUser = async (roleName, user) => {
+export const kcRemoveRoleFromUser = async (roleName, user) => {
   const api = await kc.get();
   const role = await api.roles.findOneByName({ name: roleName });
   return api.users.delRealmRoleMappings({
@@ -124,13 +112,13 @@ export const removeRoleFromUser = async (roleName, user) => {
   });
 };
 
-export const getRolesForAssociation = async (association) => {
+export const kcGetRolesForAssociation = async (association) => {
   const api = await kc.get();
   const roles = await api.roles.find();
   return R.filter((n) => n.name.startsWith(`${ROLE_ASSO_PREFIX}${association.name}`), roles);
 };
 
-export const createRoleForAssociation = async (association, roleName, description) => {
+export const kcCreateRoleForAssociation = async (association, roleName, description) => {
   const api = await kc.get();
   const roleNameToCreate = roleGen(association, roleName);
   const role = await api.roles.findOneByName({ name: roleNameToCreate });
@@ -140,15 +128,15 @@ export const createRoleForAssociation = async (association, roleName, descriptio
   return roleNameToCreate;
 };
 
-export const deleteAssociationRole = async (association, membership) => {
+export const kcDeleteAssociationRole = async (association, membership) => {
   const api = await kc.get();
   const roleNameToDelete = roleGen(association, membership.code);
   await api.roles.delByName({ name: roleNameToDelete });
 };
 
-export const deleteAssociationRoles = async (association) => {
+export const kcDeleteAssociationRoles = async (association) => {
   const api = await kc.get();
-  const associationRoles = await getRolesForAssociation(association);
+  const associationRoles = await kcGetRolesForAssociation(association);
   return Promise.all(
     associationRoles.map((role) => {
       return api.roles.delByName({ name: role.name });
@@ -156,35 +144,21 @@ export const deleteAssociationRoles = async (association) => {
   );
 };
 
-export const createAssociationAdminRole = async (association) => {
-  return createRoleForAssociation(association, ADMIN_ROLE_CODE, `Admin role for ${association.name}`);
+export const kcCreateAssociationAdminRole = async (association) => {
+  return kcCreateRoleForAssociation(association, ADMIN_ROLE_CODE, `Admin role for ${association.name}`);
 };
 
-export const createApplicationClient = async (association) => {
+export const kcCreateApplicationClient = async (association) => {
   const api = await kc.get();
   const input = { name: association.name, clientId: association.code };
   await api.clients.create(input);
 };
 
-export const initPlatformAdmin = async () => {
-  const email = conf.get('association:admin');
-  const assoName = conf.get('association:name');
-  const assoCode = conf.get('association:identifier');
-  const adminRole = await createAssociationAdminRole({ code: assoCode, name: assoName });
-  let user = await getUserByName(email);
-  if (user !== null) {
-    if (!user.roles.includes(adminRole)) {
-      await grantRoleToUser(adminRole, user);
-    }
-    return user;
-  }
-  // User doesnt exists
+export const kcCreateUser = async (email) => {
   const api = await kc.get();
-  user = await api.users.create({
+  return api.users.create({
     email,
     emailVerified: true,
     enabled: true,
   });
-  await grantRoleToUser(adminRole, user);
-  return user;
 };

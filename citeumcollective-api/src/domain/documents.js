@@ -56,7 +56,10 @@ export const deleteDocument = async (ctx, documentId) => {
 };
 
 export const getAssociationDocuments = async (ctx, association) => {
+  const { memberships } = ctx.user;
   return ctx.db.queryRows(
-    sql`select * from documents where association_id = ${association.id} order by created_at desc`
+    sql`select d.* from documents d right join documents_memberships dm ON dm.document = d.id
+            where d.association_id = ${association.id} and dm.membership IN (${sql.bindings(memberships)})
+            order by d.created_at desc`
   );
 };

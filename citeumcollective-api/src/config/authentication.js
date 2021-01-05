@@ -4,7 +4,7 @@ import passport from 'passport';
 import jwt_decode from 'jwt-decode';
 import * as jwt from 'jsonwebtoken';
 import conf, { COOKIE_NAME, logger } from './conf';
-import { createUser, getUser, getUserByEmail } from '../domain/users';
+import { createUser, getUser, getUserByEmail, isUserExists } from '../domain/users';
 
 const generateJwtAccessToken = (user) => {
   const jwtBody = { id: user.sub };
@@ -52,11 +52,11 @@ export const extractUserFromRequest = (ctx, req) => {
 };
 
 const initUserInDatabase = async (db, user) => {
-  let existingUser = await getUserByEmail({ db }, user.email);
-  if (existingUser === undefined) {
-    existingUser = await createUser({ db }, user);
+  const isExists = await isUserExists({ db }, user.email);
+  if (!isExists) {
+    return createUser({ db }, user);
   }
-  return existingUser;
+  return getUserByEmail({ db }, user.email);
 };
 
 export const initProvider = (db) => {

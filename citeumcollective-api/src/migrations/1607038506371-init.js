@@ -2,11 +2,11 @@ import { bridgeSql } from '../database/postgre';
 import { sql } from '../utils/sql';
 import conf from '../config/conf';
 import { createAssociation } from '../domain/associations';
-import { getUserByName } from '../database/keycloak';
+import { kcGetUserByName } from '../database/keycloak';
 import { createMembership } from '../domain/memberships';
 
 export const up = async (knex, db = bridgeSql(knex)) => {
-  const admin = await getUserByName(conf.get('association:admin'));
+  const admin = await kcGetUserByName(conf.get('association:admin'));
   // Create structure
   await db.execute(sql`
         CREATE TABLE "users"

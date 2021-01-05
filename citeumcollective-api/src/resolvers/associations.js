@@ -4,16 +4,12 @@ import {
   deleteAssociation,
   getAssociationByCode,
   getAssociations,
-  addMember,
-  removeMember,
-  updateMember,
 } from '../domain/associations';
 import conf from '../config/conf';
 import {
   createMembership,
   updateMembership,
   getAssociationById,
-  getAssociationMembers,
   getAssociationMemberships,
   getMembershipAssociation,
   getMembershipByCode,
@@ -29,6 +25,7 @@ import {
   deleteApplication,
   getApplicationMemberships,
 } from '../domain/products';
+import { addMember, getAssociationMembers, removeMember, updateMember } from '../domain/users';
 
 const associationsResolvers = {
   Query: {
@@ -63,8 +60,8 @@ const associationsResolvers = {
     membershipDelete: (_, { id }, ctx) => deleteMembership(ctx, id),
     memberAdd: (_, { input }, ctx) => addMember(ctx, input),
     memberUpdate: (_, { input }, ctx) => updateMember(ctx, input),
-    // eslint-disable-next-line prettier/prettier
-    memberDelete: (_, { associationId, userId, membershipId }, ctx) => removeMember(ctx, associationId, userId, membershipId),
+    memberDelete: (_, { associationId, userId, membershipId }, ctx) =>
+      removeMember(ctx, associationId, userId, membershipId),
     productAdd: (_, { associationId, input }, ctx) => createProduct(ctx, associationId, input),
     productDelete: (_, { id }, ctx) => deleteProduct(ctx, id),
     applicationAdd: (_, { productId, input }, ctx) => createApplication(ctx, productId, input),
