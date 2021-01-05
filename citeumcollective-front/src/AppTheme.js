@@ -6,9 +6,9 @@ export default {
     primary: { main: '#90a4ae' },
     secondary: { main: '#f44336' },
     background: {
-      paper: '#182a31',
-      paperDark: '#0f242b',
-      default: '#162026',
+      paper: '#1f3a3e',
+      default: '#162326',
+      paperDark: '#0f282b',
     },
     divider: 'rgba(255, 255, 255, 0.2)',
   },
@@ -60,7 +60,7 @@ export default {
     h6: {
       color: '#ffffff',
       fontWeight: 600,
-      fontSize: 18,
+      fontSize: 20,
       textTransform: 'none',
     },
   },
