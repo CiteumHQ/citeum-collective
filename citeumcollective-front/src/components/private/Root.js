@@ -25,8 +25,6 @@ const QUERY_ME = gql`
     me {
       id
       email
-      firstName
-      lastName
       birthday
       address
       organization
@@ -34,6 +32,10 @@ const QUERY_ME = gql`
       is_organization
       roles
       organization_logo
+      providerInfo {
+        firstName
+        lastName
+      }
       associations {
         id
         name

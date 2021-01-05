@@ -33,9 +33,11 @@ const MUTATION_UPDATE_MEMBER = gql`
   mutation MemberUpdate($id: ID!, $input: MemberEditInput!) {
     memberUpdate(input: $input) {
       id
-      firstName
-      lastName
       email
+      providerInfo {
+        firstName
+        lastName
+      }
       subscription(associationId: $id) {
         id
         subscription_date

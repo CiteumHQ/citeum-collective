@@ -45,12 +45,14 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
       id
       members {
         id
-        firstName
-        lastName
         email
         is_organization
         organization
         organization_logo
+        providerInfo {
+          firstName
+          lastName
+        }
         subscription(associationId: $id) {
           subscription_date
           subscription_last_update
@@ -79,7 +81,7 @@ const Membership = () => {
       R.map((n) => ({
         name: n.is_organization
           ? n.organization
-          : `${n.firstName} ${n.lastName}`,
+          : `${n.providerInfo.firstName} ${n.providerInfo.lastName}`,
         email: n.email,
         organization_logo: n.organization_logo,
         subscription_date: n.subscription.subscription_date,

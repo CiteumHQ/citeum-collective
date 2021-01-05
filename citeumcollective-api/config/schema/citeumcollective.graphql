@@ -84,11 +84,14 @@ type Subscription {
     subscription_next_update: DateTime
 }
 
+type ProviderInfo {
+    firstName: String
+    lastName: String
+}
+
 type User {
     id: ID!
     email: String!
-    firstName: String
-    lastName: String
     birthday: DateTime
     address: String
     organization: String
@@ -100,6 +103,7 @@ type User {
     subscriptions: [Subscription]
     associations: [Association] @auth
     federatedIdentities: [Identity]
+    providerInfo: ProviderInfo
 }
 
 type Document {

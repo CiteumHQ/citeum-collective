@@ -48,9 +48,11 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
       id
       members {
         id
-        firstName
-        lastName
         email
+        providerInfo {
+          firstName
+          lastName
+        }
         subscription(associationId: $id) {
           id
           subscription_date
@@ -95,7 +97,7 @@ const Members = () => {
                   <Avatar src={memberGravatarUrl} className={classes.small} />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={`${member.firstName} ${member.lastName}`}
+                  primary={`${member.providerInfo.firstName} ${member.providerInfo.lastName}`}
                   secondary={member.email}
                 />
                 <Tooltip

@@ -146,19 +146,25 @@ const Documents = () => {
   if (data && data.association) {
     return (
       <div>
-        <Typography variant="h3">Information</Typography>
-        <Typography variant="h6">
-          Official documents of the organization
-        </Typography>
-        {renderList(
-          R.filter((n) => n.type === 'INFORMATION', data.association.documents),
-        )}
-        <Divider style={{ width: '100%', margin: '15px 0 15px 0' }} />
-        <Typography variant="h3">Minutes</Typography>
-        <Typography variant="h6">Official meetings minutes</Typography>
-        {renderList(
-          R.filter((n) => n.type === 'MINUTES', data.association.documents),
-        )}
+        <div style={{ marginBottom: 15 }}>
+          <Typography variant="h3">
+            Official documents of the organization
+          </Typography>
+          {renderList(
+            R.filter(
+              (n) => n.type === 'INFORMATION',
+              data.association.documents,
+            ),
+          )}
+        </div>
+        {R.filter((n) => n.type === 'INFORMATION', data.association.documents)
+          .length === 0 && <Divider style={{ width: '100%' }} />}
+        <div style={{ marginTop: 15 }}>
+          <Typography variant="h3">Official meetings minutes</Typography>
+          {renderList(
+            R.filter((n) => n.type === 'MINUTES', data.association.documents),
+          )}
+        </div>
         {isAdmin && <DocumentCreation refetchDocuments={refetch} />}
       </div>
     );

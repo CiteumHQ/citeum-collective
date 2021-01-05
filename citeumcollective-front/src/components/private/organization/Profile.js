@@ -14,14 +14,16 @@ import { UserContext } from '../Context';
 const MUTATION_UPDATE_PROFILE = gql`
   mutation UpdateProfile($input: UserEditInput!) {
     updateProfile(input: $input) {
-      firstName
-      lastName
       birthday
       address
       organization
       job_position
       is_organization
       organization_logo
+      providerInfo {
+        firstName
+        lastName
+      }
     }
   }
 `;

@@ -33,9 +33,11 @@ const QUERY_USERS = gql`
   query GetUsers($associationId: ID!) {
     users {
       id
-      firstName
-      lastName
       email
+      providerInfo {
+        firstName
+        lastName
+      }
       subscription(associationId: $associationId) {
         id
         membership {
@@ -143,7 +145,7 @@ const AddMember = ({ refetchMembers }) => {
                     component={Autocomplete}
                     fullWidth={true}
                     options={dataUsers.users}
-                    getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.email})`
+                    getOptionLabel={(option) => `${option.providerInfo.firstName} ${option.providerInfo.lastName} (${option.email})`
                     }
                     getOptionSelected={(option, value) => option === value
                       || option.id === value

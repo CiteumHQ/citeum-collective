@@ -4,7 +4,6 @@ import {
   ADMIN_ROLE_CODE,
   kcCreateUser,
   kcGetUserByName,
-  kcGetUserInfo,
   kcRemoveRoleFromUser,
   kcUpdateUserInfo,
   roleGen,
@@ -25,14 +24,12 @@ export const getUserMemberships = (ctx, user) => {
 };
 
 export const getUser = async (ctx, userId) => {
-  const user = await kcGetUserInfo(userId);
-  if (!user) return user;
-  const userData = await ctx.db.queryOne(sql`select * from users where id = ${user.id}`);
+  const user = await ctx.db.queryOne(sql`select * from users where id = ${userId}`);
   const userMemberships = await getUserMemberships(ctx, user);
   const userRoles = await getUserRoles(ctx, user.id);
   const memberships = userMemberships.map((m) => m.membership);
   const roles = [...userMemberships.map((m) => m.role), ...userRoles];
-  return { ...user, ...userData, memberships, roles };
+  return { ...user, memberships, roles };
 };
 
 export const isUserExists = async (ctx, email) => {
