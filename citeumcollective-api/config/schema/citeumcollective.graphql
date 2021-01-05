@@ -1,9 +1,11 @@
 ### DIRECTIVES
 
-directive @auth on OBJECT | FIELD_DEFINITION
+directive @auth(for: [Role] = [], and: Boolean = false) on OBJECT | FIELD_DEFINITION
 
 ### SCALAR
-
+enum Role {
+    admin
+}
 scalar DateTime
 scalar Upload
 
@@ -46,7 +48,7 @@ type Application {
     description: String!
     url: String!
     logo_url: String!
-    clients: [Client]
+    clients: [Client] @auth(for: [admin])
     memberships: [Membership]!
 }
 
@@ -67,13 +69,13 @@ type Association {
     logo_url: String
     subscription_url: String
     code: String!
-    members: [User]!
+    members: [UserProtected]!
     memberships: [Membership]!
     notifications: [Notification]
     documents: [Document]!
     products: [Product]!
-    clients: [Client]!
-    default_membership: String!
+    clients: [Client]! @auth(for: [admin])
+    default_membership: String! @auth(for: [admin])
 }
 
 type Subscription {
@@ -88,6 +90,18 @@ type Subscription {
     subscription_next_update: DateTime
 }
 
+type SubscriptionProtected {
+    id: String!
+    association_id: String
+    membership_id: String
+    user_id: String
+    association: Association!
+    membership: Membership!
+    subscription_date: DateTime
+    subscription_last_update: DateTime @auth(for: [admin])
+    subscription_next_update: DateTime @auth(for: [admin])
+}
+
 type ProviderInfo {
     firstName: String
     lastName: String
@@ -96,17 +110,29 @@ type ProviderInfo {
 type User {
     id: ID!
     email: String!
+    gravatar: String
     birthday: DateTime
     address: String
     organization: String
     organization_logo: String
-    job_position: String
     is_organization: Boolean
+    job_position: String
     roles: [String]
     subscription(associationId: ID!): Subscription
     subscriptions: [Subscription]
-    associations: [Association] @auth
+    associations: [Association]
     federatedIdentities: [Identity]
+    providerInfo: ProviderInfo
+}
+
+type UserProtected {
+    id: ID!
+    gravatar: String
+    organization: String
+    organization_logo: String
+    is_organization: Boolean
+    subscription(associationId: ID!): SubscriptionProtected
+    subscriptions: [SubscriptionProtected]
     providerInfo: ProviderInfo
 }
 
@@ -138,9 +164,9 @@ type Client {
 ### QUERIES
 
 type Query {
-    about: AppInfo
     me: User @auth
-    users: [User] @auth
+    about: AppInfo @auth(for: [admin])
+    users: [User] @auth(for: [admin])
     federation: Association @auth
     membership(id: ID!): Membership @auth
     association(id: ID!): Association @auth
@@ -241,25 +267,25 @@ input ApplicationAddInput {
 type Mutation {
     updateProfile(input: UserEditInput!): User @auth
     # Memberships
-    membershipAdd(input: MembershipAddInput!): Membership @auth
-    membershipUpdate(id: ID!, input: MembershipEditInput!): Membership @auth
-    membershipDelete(id: ID!): ID! @auth
+    membershipAdd(input: MembershipAddInput!): Membership @auth(for: [admin])
+    membershipUpdate(id: ID!, input: MembershipEditInput!): Membership @auth(for: [admin])
+    membershipDelete(id: ID!): ID! @auth(for: [admin])
     # Documents
-    documentAdd(organizationId: ID!, input: DocumentAddInput!, file: Upload!): Document @auth
-    documentDelete(id: ID!): ID! @auth
+    documentAdd(organizationId: ID!, input: DocumentAddInput!, file: Upload!): Document @auth(for: [admin])
+    documentDelete(id: ID!): ID! @auth(for: [admin])
     # Associations
-    associationAdd(input: AssociationAddInput!): Association @auth
-    associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth
-    associationDelete(id: ID!): ID! @auth
+    associationAdd(input: AssociationAddInput!): Association @auth(for: [admin])
+    associationUpdate(id: ID!, input: AssociationEditInput!): Association @auth(for: [admin])
+    associationDelete(id: ID!): ID! @auth(for: [admin])
     # Members
-    memberAdd(input: MemberAddInput!): ID! @auth
-    memberUpdate(input: MemberEditInput!): User @auth
-    memberDelete(associationId: String!, userId: String!, membershipId: String!): ID! @auth
+    memberAdd(input: MemberAddInput!): ID! @auth(for: [admin])
+    memberUpdate(input: MemberEditInput!): User @auth(for: [admin])
+    memberDelete(associationId: String!, userId: String!, membershipId: String!): ID! @auth(for: [admin])
     # Products
-    productAdd(associationId: ID!, input: ProductAddInput!): Product @auth
-    productDelete(id: ID!): ID! @auth
-    applicationAdd(productId: ID!, input: ApplicationAddInput!): Product @auth
-    applicationDelete(id: ID!): ID! @auth
-    clientAdd(applicationId: ID!): Client @auth
-    clientDelete(id: ID!): ID! @auth
+    productAdd(associationId: ID!, input: ProductAddInput!): Product @auth(for: [admin])
+    productDelete(id: ID!): ID! @auth(for: [admin])
+    applicationAdd(productId: ID!, input: ApplicationAddInput!): Product @auth(for: [admin])
+    applicationDelete(id: ID!): ID! @auth(for: [admin])
+    clientAdd(applicationId: ID!): Client @auth(for: [admin])
+    clientDelete(id: ID!): ID! @auth(for: [admin])
 }

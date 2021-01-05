@@ -96,6 +96,7 @@ const Documents = () => {
               divider={true}
               button={true}
               component="a"
+              target="_blank"
               href={`/storage/view/${document.id}`}
             >
               <ListItemIcon>{renderIcon(document.type)}</ListItemIcon>
@@ -121,20 +122,15 @@ const Documents = () => {
                 <Button
                   color="primary"
                   className={classes.date}
-                  style={{ right: isAdmin ? 70 : 10 }}
+                  style={{ right: 70 }}
                   startIcon={<EventOutlined />}
                 >
                   {format(parseISO(document.created_at), 'yyyy-LL-dd')}
                 </Button>
               </Tooltip>
-              {isAdmin && (
-                <ListItemSecondaryAction>
-                  <DocumentPopover
-                    id={document.id}
-                    refetchDocuments={refetch}
-                  />
-                </ListItemSecondaryAction>
-              )}
+              <ListItemSecondaryAction>
+                <DocumentPopover id={document.id} isAdmin={isAdmin} refetchDocuments={refetch}/>
+              </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>

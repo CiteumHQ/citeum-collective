@@ -44,6 +44,10 @@ const associationsResolvers = {
     association: (subscription, _, ctx) => getAssociationById(ctx, subscription.association_id),
     membership: (subscription, _, ctx) => getMembershipById(ctx, subscription.membership_id),
   },
+  SubscriptionProtected: {
+    association: (subscription, _, ctx) => getAssociationById(ctx, subscription.association_id),
+    membership: (subscription, _, ctx) => getMembershipById(ctx, subscription.membership_id),
+  },
   Association: {
     members: (association, _, ctx) => getAssociationMembers(ctx, association),
     memberships: (association, _, ctx) => getAssociationMemberships(ctx, association),

@@ -13,6 +13,11 @@ const usersResolvers = {
     subscription: (user, { associationId }, ctx) => userSubscription(ctx, user, associationId),
     subscriptions: (user, __, ctx) => userSubscriptions(ctx, user),
   },
+  UserProtected: {
+    providerInfo: (user) => kcGetUserInfo(user.id),
+    subscription: (user, { associationId }, ctx) => userSubscription(ctx, user, associationId),
+    subscriptions: (user, __, ctx) => userSubscriptions(ctx, user),
+  },
   Mutation: {
     updateProfile: (_, { input }, ctx) => updateUser(ctx, ctx.user.id, input),
   },

@@ -124,7 +124,8 @@ const Applications = () => {
                         subscription.membership.id,
                       );
                       return (
-                        <ListItem key={application.id} disabled={disabled}>
+                        <ListItem key={application.id} disabled={disabled} style={{ color: 'white' }}
+                                  component="a" href={application.url}>
                           <ListItemAvatar>
                             {disabled ? (
                               <Avatar
@@ -134,11 +135,7 @@ const Applications = () => {
                                 }}
                               />
                             ) : (
-                              <Avatar
-                                src={application.logo_url}
-                                component="a"
-                                href={application.url}
-                              />
+                              <Avatar src={application.logo_url}/>
                             )}
                           </ListItemAvatar>
                           <ListItemText

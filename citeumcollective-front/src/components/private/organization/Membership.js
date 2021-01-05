@@ -71,8 +71,6 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
         }
         subscription(associationId: $id) {
           subscription_date
-          subscription_last_update
-          subscription_next_update
           membership {
             name
             code
@@ -98,7 +96,7 @@ const Membership = () => {
         name: n.is_organization
           ? n.organization
           : `${n.providerInfo.firstName} ${n.providerInfo.lastName}`,
-        email: n.email,
+        gravatar: n.gravatar,
         organization_logo: n.organization_logo,
         subscription_date: n.subscription.subscription_date,
         subscription_name: n.subscription.membership.name,

@@ -29,7 +29,7 @@ const MUTATION_DELETE_DOCUMENT = gql`
   }
 `;
 
-const DocumentPopover = ({ id, refetchDocuments }) => {
+const DocumentPopover = ({ id, isAdmin, refetchDocuments }) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleClick = (event) => {
@@ -69,14 +69,14 @@ const DocumentPopover = ({ id, refetchDocuments }) => {
         <MenuItem component="a" href={`/storage/get/${id}`}>
           Download
         </MenuItem>
+        {isAdmin && (
         <MenuItem
-          onClick={() => {
-            handleClose();
-            setOpenDelete(true);
-          }}
-        >
+            onClick={() => {
+              handleClose();
+              setOpenDelete(true);
+            }}>
           Delete
-        </MenuItem>
+        </MenuItem>)}
       </Menu>
       <Dialog
         open={openDelete}

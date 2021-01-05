@@ -1,4 +1,5 @@
 /* eslint-disable no-await-in-loop */
+import * as gravatar from 'gravatar';
 import { sql } from '../utils/sql';
 import {
   ADMIN_ROLE_CODE,
@@ -31,7 +32,8 @@ export const getUser = async (ctx, userId) => {
   const userRoles = await getUserRoles(ctx, user.id);
   const memberships = userMemberships.map((m) => m.membership);
   const roles = [...userMemberships.map((m) => m.role), ...userRoles];
-  return { ...user, memberships, roles };
+  const gravatarUrl = gravatar.url(user.email, { protocol: 'https', s: '100' });
+  return { ...user, gravatar: gravatarUrl, memberships, roles };
 };
 
 export const isUserExists = async (ctx, email) => {

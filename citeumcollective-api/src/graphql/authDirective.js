@@ -1,8 +1,8 @@
 /* eslint-disable no-underscore-dangle,no-param-reassign */
 import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { includes, map } from 'ramda';
+import { filter, includes, map } from 'ramda';
 import { defaultFieldResolver } from 'graphql';
-import { AuthRequired } from '../config/errors';
+import { AuthRequired, ForbiddenAccess } from '../config/errors';
 
 export const AUTH_DIRECTIVE = 'auth';
 
@@ -12,21 +12,36 @@ class AuthDirective extends SchemaDirectiveVisitor {
   visitObject(type) {
     this.ensureFieldsWrapped(type);
     // noinspection JSUndefinedPropertyAssignment
-    type._requiredCapabilities = this.args.for;
+    type._requiredRoles = this.args.for;
     type._requiredAll = this.args.and;
   }
 
   visitFieldDefinition(field, details) {
     this.ensureFieldsWrapped(details.objectType);
-    field._requiredCapabilities = this.args.for;
+    field._requiredRoles = this.args.for;
     field._requiredAll = this.args.and;
   }
 
-  authenticationControl(func, args) {
+  authenticationControl(func, args, objectType, field) {
+    // Get the required Role from the field first, falling back
+    // to the objectType if no Role is required by the field:
+    const requiredRoles = field._requiredRoles || objectType._requiredRoles || [];
+    const requiredAll = field._requiredAll || objectType._requiredAll || false;
     // If a role is required
     const context = args[2];
     const { user } = context;
     if (!user) throw AuthRequired(); // User must be authenticated.
+    // Start checking roles
+    if (requiredRoles.length === 0) return func.apply(this, args);
+    // Check the user roles
+    const availableRoles = [];
+    for (let index = 0; index < requiredRoles.length; index += 1) {
+      const checkRole = requiredRoles[index];
+      const matchingRoles = filter((r) => includes(checkRole, r), user.roles);
+      if (matchingRoles.length > 0) availableRoles.push(checkRole);
+    }
+    if (availableRoles.length === 0) throw ForbiddenAccess();
+    if (requiredAll && availableRoles.length !== requiredRoles.length) throw ForbiddenAccess();
     return func.apply(this, args);
   }
 
