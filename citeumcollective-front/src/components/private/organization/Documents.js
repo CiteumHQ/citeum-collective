@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const OrganizationDocuments = gql`
+const QUERY_ASSOCIATION_DOCUMENTS = gql`
   query Documents($organizationId: ID!) {
     association(id: $organizationId) {
       documents {
@@ -60,7 +60,7 @@ const Documents = () => {
   const classes = useStyles();
   const { organization } = useContext(OrganizationContext);
   const { me } = useContext(UserContext);
-  const { data, refetch } = useBasicQuery(OrganizationDocuments, {
+  const { data, refetch } = useBasicQuery(QUERY_ASSOCIATION_DOCUMENTS, {
     organizationId: organization.id,
   });
   const isAdmin = R.includes(`asso_${organization.code}_admin`, me.roles);

@@ -52,6 +52,8 @@ type Application {
     id: ID!
     name: String!
     description: String!
+    url: String!
+    logo_url: String!
     memberships: [Membership]!
 }
 
@@ -59,6 +61,7 @@ type Product {
     id: ID!
     name: String!
     description: String!
+    logo_url: String!
     applications: [Application]!
 }
 
@@ -198,12 +201,14 @@ input DocumentAddInput {
 input ProductAddInput {
     name: String!
     description: String!
+    logo_url: String!
 }
 
 input ApplicationAddInput {
     name: String!
     description: String!
-    uri: String!
+    url: String!
+    logo_url: String!
     memberships: [ID]!
 }
 
@@ -225,6 +230,8 @@ type Mutation {
     memberUpdate(input: MemberEditInput!): User @auth
     memberDelete(associationId: ID!, userId: ID!, membershipId: ID!): User @auth
     # Products
-    productAdd(associationId: ID!, input: ProductAddInput!): Document @auth
-    applicationAdd(productId: ID!, input: ApplicationAddInput!): Document @auth
+    productAdd(associationId: ID!, input: ProductAddInput!): Product @auth
+    productDelete(id: ID!): ID! @auth
+    applicationAdd(productId: ID!, input: ApplicationAddInput!): Product @auth
+    applicationDelete(id: ID!): ID! @auth
 }

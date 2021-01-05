@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Formik, Form, Field } from 'formik';
-import { TextField, SimpleFileUpload, Select } from 'formik-material-ui';
+import { TextField } from 'formik-material-ui';
 import Fab from '@material-ui/core/Fab';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -12,9 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Add } from '@material-ui/icons';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
+import { UserContext } from '../Context';
 import { useBasicQuery } from '../../../network/Apollo';
 
 const useStyles = makeStyles(() => ({
@@ -30,65 +28,61 @@ const QUERY_ASSOCIATION_MEMBERSHIPS = gql`
   query GetAssociationMemberships($id: ID!) {
     association(id: $id) {
       id
-      memberships {
+      products {
         id
         name
+        description
+        logo_url
       }
     }
   }
 `;
 
-const MUTATION_CREATE_DOCUMENT = gql`
-  mutation DocumentAdd(
-    $organizationId: ID!
-    $input: DocumentAddInput!
-    $file: Upload!
-  ) {
-    documentAdd(organizationId: $organizationId, input: $input, file: $file) {
+const MUTATION_CREATE_PRODUCT = gql`
+  mutation ProductAdd($associationId: ID!, $input: ProductAddInput!) {
+    productAdd(associationId: $associationId, input: $input) {
       id
     }
   }
 `;
 
-const documentValidation = () => Yup.object().shape({
-  type: Yup.string().required('This field is required'),
+const productValidation = () => Yup.object().shape({
   name: Yup.string().required('This field is required'),
   description: Yup.string().required('This field is required'),
-  memberships: Yup.array().required('This field is required'),
+  logo_url: Yup.string().required('This field is required'),
 });
 
-const DocumentCreation = ({ refetchDocuments }) => {
+const ProductCreation = ({ refretchProducts }) => {
   const classes = useStyles();
   const { organizationId } = useParams();
   const [open, setOpen] = useState(false);
+  const { refetch: refetchUserContext } = useContext(UserContext);
   const { data: dataMemberships } = useBasicQuery(
     QUERY_ASSOCIATION_MEMBERSHIPS,
     {
       id: organizationId,
     },
   );
-  const [createDocument] = useMutation(MUTATION_CREATE_DOCUMENT, {
+  const [createProduct] = useMutation(MUTATION_CREATE_PRODUCT, {
     onCompleted() {
-      refetchDocuments();
+      refetchUserContext();
+      refretchProducts();
       setOpen(false);
     },
   });
   const formSubmit = (values, { setSubmitting }) => {
-    const {
-      type, name, description, memberships,
-    } = values;
+    // eslint-disable-next-line camelcase
+    const { name, description, logo_url } = values;
     const input = {
       name,
       description,
-      memberships,
-      type,
+      logo_url,
     };
     const variables = {
-      organizationId,
+      associationId: organizationId,
       input,
-      file: values.file,
     };
-    createDocument({ variables }).finally(() => setSubmitting(false));
+    createProduct({ variables }).finally(() => setSubmitting(false));
   };
   if (dataMemberships && dataMemberships.association) {
     return (
@@ -104,13 +98,11 @@ const DocumentCreation = ({ refetchDocuments }) => {
         <Formik
           enableReinitialize={true}
           initialValues={{
-            type: '',
             name: '',
             description: '',
-            memberships: [],
-            file: {},
+            logo_url: '',
           }}
-          validationSchema={documentValidation()}
+          validationSchema={productValidation()}
           onSubmit={formSubmit}
           onReset={() => setOpen(false)}
         >
@@ -121,24 +113,19 @@ const DocumentCreation = ({ refetchDocuments }) => {
                 onClose={() => setOpen(false)}
                 fullWidth={true}
               >
-                <DialogTitle>Create a file</DialogTitle>
+                <DialogTitle>Create a product</DialogTitle>
                 <DialogContent>
-                  <FormControl fullWidth={true}>
-                    <InputLabel>Type</InputLabel>
-                    <Field
-                      component={Select}
-                      name="type"
-                      inputProps={{ name: 'type', id: 'type' }}
-                    >
-                      <MenuItem value="INFORMATION">Information</MenuItem>
-                      <MenuItem value="MINUTES">Minutes</MenuItem>
-                      <MenuItem value="DOCUMENT">Document</MenuItem>
-                    </Field>
-                  </FormControl>
                   <Field
                     component={TextField}
                     name="name"
                     label="Name"
+                    fullWidth={true}
+                    multiline={false}
+                  />
+                  <Field
+                    component={TextField}
+                    name="logo_url"
+                    label="Logo URL"
                     fullWidth={true}
                     multiline={false}
                     style={{ marginTop: 20 }}
@@ -151,32 +138,6 @@ const DocumentCreation = ({ refetchDocuments }) => {
                     multiline={false}
                     style={{ marginTop: 20 }}
                   />
-                  <FormControl fullWidth={true} style={{ marginTop: 20 }}>
-                    <InputLabel>Membership</InputLabel>
-                    <Field
-                      component={Select}
-                      name="memberships"
-                      multiple={true}
-                      inputProps={{ name: 'memberships', id: 'memberships' }}
-                    >
-                      {dataMemberships.association.memberships.map(
-                        (membership) => (
-                          <MenuItem key={membership.id} value={membership.id}>
-                            {membership.name}
-                          </MenuItem>
-                        ),
-                      )}
-                    </Field>
-                  </FormControl>
-                  <div style={{ marginTop: 20 }}>
-                    <Field
-                      component={SimpleFileUpload}
-                      name="file"
-                      label="File"
-                      fullWidth={true}
-                      multiline={false}
-                    />
-                  </div>
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleReset} disabled={isSubmitting}>
@@ -200,4 +161,4 @@ const DocumentCreation = ({ refetchDocuments }) => {
   return <div />;
 };
 
-export default DocumentCreation;
+export default ProductCreation;
