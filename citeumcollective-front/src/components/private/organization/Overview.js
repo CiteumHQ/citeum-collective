@@ -98,6 +98,8 @@ const QUERY_ASSOCIATION = gql`
       members {
         id
         email
+        is_organization
+        organization
         providerInfo {
           firstName
           lastName
@@ -306,6 +308,7 @@ const Overview = () => {
         subscription_color: n.subscription.membership.color,
       })),
       R.uniqBy(R.prop('name')),
+      R.filter((n) => !n.subscription_name.includes('Supporter')),
       R.sortWith([R.ascend(R.prop('subscription_date'))]),
     )(data.association.members);
     const colors = {};

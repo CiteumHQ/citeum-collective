@@ -89,6 +89,7 @@ const Membership = () => {
         subscription_color: n.subscription.membership.color,
       })),
       R.uniqBy(R.prop('name')),
+      R.filter((n) => !n.subscription_name.includes('Supporter')),
       R.sortWith([R.ascend(R.prop('subscription_date'))]),
     )(association.members);
     return (
