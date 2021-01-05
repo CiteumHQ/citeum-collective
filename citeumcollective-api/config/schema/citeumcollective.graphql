@@ -69,6 +69,7 @@ type Association {
     notifications: [Notification]
     documents: [Document]!
     products: [Product]!
+    default_membership: String!
 }
 
 type Subscription {
@@ -157,6 +158,7 @@ input AssociationEditInput {
     description: String!
     email: String!
     website: String
+    default_membership: String!
 }
 
 input UserEditInput {

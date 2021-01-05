@@ -29,7 +29,8 @@ export const up = async (knex, db = bridgeSql(knex)) => {
             description VARCHAR(255) UNIQUE,
             email       VARCHAR(255) UNIQUE,
             website     VARCHAR(255) UNIQUE,
-            register_at timestamp  DEFAULT CURRENT_TIMESTAMP
+            register_at timestamp  DEFAULT CURRENT_TIMESTAMP,
+            default_membership VARCHAR(255) NOT NULL
         );
         CREATE TABLE "memberships"
         (
@@ -44,6 +45,19 @@ export const up = async (knex, db = bridgeSql(knex)) => {
             CONSTRAINT fk_association
               FOREIGN KEY (association_id)
                 REFERENCES associations (id)
+        );
+        CREATE TABLE "users_memberships"
+        (
+            membership         VARCHAR(255) NOT NULL,
+            association        VARCHAR(255) NOT NULL,
+            CONSTRAINT associations_default_memberships_association_key
+              UNIQUE (association),
+            CONSTRAINT associations_default_memberships_association_fkey
+              FOREIGN KEY (association)
+                REFERENCES associations (id),
+            CONSTRAINT associations_default_memberships_membership_fkey
+              FOREIGN KEY (membership)
+                REFERENCES memberships (id)                
         );
         CREATE TABLE "notifications"
         (

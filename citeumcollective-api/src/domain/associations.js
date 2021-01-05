@@ -31,6 +31,13 @@ const associationsRelatedToUser = async (ctx, user) => {
         order by name`);
 };
 
+export const getAssociationDefaultMembership = async (ctx, association) => {
+  const defaultMembership = await ctx.db.queryOne(
+    sql`select * from associations_default_memberships where association = ${association.id}`
+  );
+  return defaultMembership.membership;
+};
+
 export const userAssociations = async (ctx, user) => associationsRelatedToUser(ctx, user);
 
 export const userSubscriptions = async (ctx, user) => {
@@ -88,6 +95,11 @@ export const updateAssociation = async (ctx, id, input) => {
       input.email
     }, website = ${input.website || null} WHERE id = ${id}`
   );
+  if (input.default_membership) {
+    await ctx.db.execute(
+      sql`UPDATE associations_default_memberships SET membership = ${input.default_membership} WHERE association = ${id}`
+    );
+  }
   await createNotification(ctx, {
     association_id: id,
     type: 'update',

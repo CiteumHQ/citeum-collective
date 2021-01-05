@@ -4,6 +4,7 @@ import {
   deleteAssociation,
   getAssociationByCode,
   getAssociations,
+  getAssociationDefaultMembership,
 } from '../domain/associations';
 import conf from '../config/conf';
 import {
@@ -41,6 +42,7 @@ const associationsResolvers = {
     members: (association, _, ctx) => getAssociationMembers(ctx, association),
     memberships: (association, _, ctx) => getAssociationMemberships(ctx, association),
     products: (association, _, ctx) => getAssociationProducts(ctx, association),
+    default_membership: (association, _, ctx) => getAssociationDefaultMembership(ctx, association),
   },
   Product: {
     applications: (product, _, ctx) => getProductApplications(ctx, product),
