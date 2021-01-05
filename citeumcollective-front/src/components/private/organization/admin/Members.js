@@ -86,15 +86,10 @@ const Members = () => {
     return (
       <div>
         <List style={{ marginTop: -15 }}>
-          {members.map((member) => {
-            const memberGravatarUrl = gravatar.url(member.email, {
-              protocol: 'https',
-              s: '100',
-            });
-            return (
+          {members.map((member) => (
               <ListItem key={member.id} divider={true}>
                 <ListItemAvatar>
-                  <Avatar src={memberGravatarUrl} className={classes.small} />
+                  <Avatar src={member.gravatar} className={classes.small} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={`${member.providerInfo.firstName} ${member.providerInfo.lastName}`}
@@ -145,8 +140,7 @@ const Members = () => {
                   />
                 </ListItemSecondaryAction>
               </ListItem>
-            );
-          })}
+          ))}
         </List>
         <AddMember refetchMembers={refetch} />
       </div>

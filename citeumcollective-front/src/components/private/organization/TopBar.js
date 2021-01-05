@@ -77,10 +77,6 @@ const TopBar = ({ location }) => {
     protocol: 'https',
     s: '100',
   });
-  const userGravatarUrl = gravatar.url(me.email, {
-    protocol: 'https',
-    s: '100',
-  });
   // eslint-disable-next-line no-useless-escape
   const regex = new RegExp(`/${organization.id}/([a-z]+)`, 'g');
   const match = [...location.pathname.matchAll(regex)];
@@ -101,7 +97,7 @@ const TopBar = ({ location }) => {
             </Typography>
           </div>
           <IconButton onClick={handleOpenMenu} className={classes.topAvatar}>
-            <Avatar src={userGravatarUrl} className={classes.small} />
+            <Avatar src={me.gravatar} className={classes.small} />
           </IconButton>
           <Menu
             id="menu-appbar"

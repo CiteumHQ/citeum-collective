@@ -15,8 +15,9 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
-import { HandHeartOutline } from 'mdi-material-ui';
+import { HandHeartOutline, PuzzleHeartOutline } from 'mdi-material-ui';
 import * as R from 'ramda';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { useBasicQuery } from '../../../network/Apollo';
 import { OrganizationContext } from '../Context';
 
@@ -41,6 +42,9 @@ const useStyles = makeStyles(() => ({
   subscribe: {
     marginTop: 20,
   },
+  fee: {
+    width: 80,
+  },
 }));
 
 const QUERY_ASSOCIATION_MEMBERS = gql`
@@ -48,6 +52,14 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
     association(id: $id) {
       id
       subscription_url
+      memberships {
+        id
+        name
+        code
+        fee
+        description
+        color
+      }
       members {
         id
         email
@@ -157,6 +169,35 @@ const Membership = () => {
               </Grid>
             </Grid>
           </Paper>
+          <Typography variant="h3" style={{ marginTop: 30 }}>
+            All subscriptions
+          </Typography>
+          <List style={{ marginTop: -15 }}>
+            {association.memberships.map((membership) => (
+              <ListItem key={membership.id} divider={true}>
+                <ListItemIcon
+                  style={{
+                    color: membership.color ? membership.color : '#ffffff',
+                  }}
+                >
+                  <PuzzleHeartOutline />
+                </ListItemIcon>
+                <ListItemText
+                  primary={membership.name}
+                  secondary={membership.description}
+                />
+                <Chip
+                  label={`${membership.fee}€`}
+                  variant="outlined"
+                  className={classes.fee}
+                  style={{
+                    border: `1px solid ${membership.color}`,
+                    color: membership.color,
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
           {association.subscription_url && (
             <Button
               variant="outlined"
@@ -172,19 +213,14 @@ const Membership = () => {
         </Grid>
         <Grid item xs={6}>
           <List style={{ marginTop: -15 }}>
-            {members.map((member) => {
-              const memberGravatarUrl = gravatar.url(member.email, {
-                protocol: 'https',
-                s: '100',
-              });
-              return (
+            {members.map((member) => (
                 <ListItem key={member.id} divider={true}>
                   <ListItemAvatar>
                     <Avatar
                       src={
                         member.organization_logo
                           ? member.organization_logo
-                          : memberGravatarUrl
+                          : member.gravatar
                       }
                       className={classes.small}
                     />
@@ -212,8 +248,7 @@ const Membership = () => {
                     }}
                   />
                 </ListItem>
-              );
-            })}
+            ))}
           </List>
         </Grid>
       </Grid>
