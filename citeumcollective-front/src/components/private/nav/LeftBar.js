@@ -56,7 +56,7 @@ const LeftBar = ({ location }) => {
               <img src={federationGravatarUrl} alt="logo" />
             </ListItemIcon>
           </MenuItem>
-          {R.filter((n) => n.id !== federation.id, me.associations).map(
+          {R.reverse(R.filter((n) => n.id !== federation.id, me.associations)).map(
             (association) => {
               const associationGravatarUrl = gravatar.url(association.email, {
                 protocol: 'https',
