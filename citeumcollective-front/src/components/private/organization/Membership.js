@@ -157,14 +157,18 @@ const Membership = () => {
               </Grid>
             </Grid>
           </Paper>
-          <Button
-            variant="outlined"
-            color="secondary"
-            className={classes.subscribe}
-            startIcon={<HandHeartOutline />}
-          >
-            Upgrade your subscription
-          </Button>
+          {association.subscription_url && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              className={classes.subscribe}
+              startIcon={<HandHeartOutline />}
+              component="a"
+              href={association.subscription_url}
+            >
+              Upgrade your subscription
+            </Button>
+          )}
         </Grid>
         <Grid item xs={6}>
           <List style={{ marginTop: -15 }}>
