@@ -154,7 +154,14 @@ export const kcCreateApplicationClient = async (association, application) => {
   const api = await kc.get();
   const name = `${association.name} ${application.name}`;
   const url = application.url.endsWith('/') ? `${application.url}*` : `${application.url}/*`;
-  const input = { name, clientId: id, protocol: 'openid-connect', redirectUris: [url], webOrigins: [url] };
+  const input = {
+    name,
+    publicClient: false,
+    clientId: id,
+    protocol: 'openid-connect',
+    redirectUris: [url],
+    webOrigins: [url],
+  };
   const createdClient = await api.clients.create(input);
   return createdClient.id;
 };
@@ -164,7 +171,7 @@ export const kcGetClient = async (client) => {
   const cli = await api.clients.findOne({ id: client.id });
   const credential = await api.clients.getClientSecret({ id: client.id });
   const issuer = 'https://auth.citeum.org/auth/realms/citeum';
-  return { ...cli, client_id: client.id, client_secret: credential.value, issuer };
+  return { ...cli, client_id: cli.clientId, client_secret: credential.value, issuer };
 };
 
 export const kcDeleteClient = async (clientId) => {
