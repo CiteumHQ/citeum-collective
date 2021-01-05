@@ -11,7 +11,7 @@ const applicationMemberships = (ctx, id) => {
     select m.* from applications d
         left join applications_memberships dm ON d.id = dm.application
         left join memberships m on dm.membership = m.id
-        where d.id = ${id}
+        where d.id = ${id} order by m.name asc
   `);
 };
 export const getApplicationById = async (ctx, id) => {

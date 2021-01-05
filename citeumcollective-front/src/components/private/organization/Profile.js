@@ -35,8 +35,6 @@ const userValidation = () => Yup.object().shape({
   address: Yup.string(),
   organization: Yup.string(),
   job_position: Yup.string(),
-  is_organization: Yup.boolean(),
-  organization_logo: Yup.string(),
 });
 
 const Profile = () => {
@@ -72,10 +70,11 @@ const Profile = () => {
     };
     updateProfile({ variables: { input } }).finally(() => setSubmitting(false));
   };
+  const initialValues = { ...me, ...me.providerInfo };
   return (
     <Formik
       enableReinitialize={true}
-      initialValues={me}
+      initialValues={initialValues}
       validationSchema={userValidation()}
       onSubmit={formSubmit}
     >

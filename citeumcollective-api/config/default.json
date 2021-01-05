@@ -42,8 +42,8 @@
   "database": {
     "host": "127.0.0.1",
     "port": "5432",
-    "user": "filigran_dev",
-    "password": "filigran_dev",
-    "base": "filigran"
+    "user": "dev",
+    "password": "dev",
+    "base": "dev"
   }
 }

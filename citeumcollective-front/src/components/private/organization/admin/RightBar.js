@@ -21,8 +21,9 @@ const useStyles = makeStyles((theme) => ({
     flexShrink: 0,
   },
   drawerPaper: {
-    marginTop: 283,
+    paddingTop: 290,
     width: 180,
+    zIndex: 500,
   },
   menuList: {
     height: '100%',

@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     height: '100%',
     flexGrow: 1,
-    padding: '20px 40px 40px 40px',
+    padding: '300px 40px 40px 40px',
     minWidth: 0,
   },
 }));

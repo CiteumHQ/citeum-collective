@@ -92,7 +92,7 @@ const TopBar = ({ location }) => {
   const isAdmin = R.includes(`asso_${organization.code}_admin`, me.roles);
   return (
     <div className={classes.root}>
-      <AppBar position="static" className={classes.appBar}>
+      <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <div className={classes.container}>
             <img src={organizationGravatarUrl} alt="logo" />
@@ -122,65 +122,67 @@ const TopBar = ({ location }) => {
             </MenuItem>
           </Menu>
         </Toolbar>
-        <Tabs
-          indicatorColor="secondary"
-          textColor="primary"
-          variant="fullWidth"
-          value={page}
-        >
-          <Tab
-            icon={<DashboardOutlined />}
-            value="overview"
-            label="Overview"
-            component={Link}
-            to={`/dashboard/organizations/${organization.id}/overview`}
-            className={classes.tab}
-          />
-          <Tab
-            icon={<DnsOutlined />}
-            value="applications"
-            label="Applications"
-            component={Link}
-            to={`/dashboard/organizations/${organization.id}/applications`}
-            className={classes.tab}
-          />
-          <Tab
-            icon={<FileDocumentMultipleOutline />}
-            value="documents"
-            label="Documents"
-            component={Link}
-            to={`/dashboard/organizations/${organization.id}/documents`}
-            className={classes.tab}
-          />
-          <Tab
-            icon={<WalletTravel />}
-            value="membership"
-            label="Membership"
-            component={Link}
-            to={`/dashboard/organizations/${organization.id}/membership`}
-            className={classes.tab}
-          />
-          {organization.id === federation.id && (
+        <div style={{ paddingLeft: 60 }}>
+          <Tabs
+            indicatorColor="secondary"
+            textColor="primary"
+            variant="fullWidth"
+            value={page}
+          >
             <Tab
-              icon={<PersonOutlined />}
-              value="profile"
-              label="Profile"
+              icon={<DashboardOutlined />}
+              value="overview"
+              label="Overview"
               component={Link}
-              to={`/dashboard/organizations/${organization.id}/profile`}
+              to={`/dashboard/organizations/${organization.id}/overview`}
               className={classes.tab}
             />
-          )}
-          {isAdmin && (
             <Tab
-              icon={<SettingsOutlined />}
-              value="admin"
-              label="Administration"
+              icon={<DnsOutlined />}
+              value="applications"
+              label="Applications"
               component={Link}
-              to={`/dashboard/organizations/${organization.id}/admin`}
+              to={`/dashboard/organizations/${organization.id}/applications`}
               className={classes.tab}
             />
-          )}
-        </Tabs>
+            <Tab
+              icon={<FileDocumentMultipleOutline />}
+              value="documents"
+              label="Documents"
+              component={Link}
+              to={`/dashboard/organizations/${organization.id}/documents`}
+              className={classes.tab}
+            />
+            <Tab
+              icon={<WalletTravel />}
+              value="membership"
+              label="Membership"
+              component={Link}
+              to={`/dashboard/organizations/${organization.id}/membership`}
+              className={classes.tab}
+            />
+            {organization.id === federation.id && (
+              <Tab
+                icon={<PersonOutlined />}
+                value="profile"
+                label="Profile"
+                component={Link}
+                to={`/dashboard/organizations/${organization.id}/profile`}
+                className={classes.tab}
+              />
+            )}
+            {isAdmin && (
+              <Tab
+                icon={<SettingsOutlined />}
+                value="admin"
+                label="Administration"
+                component={Link}
+                to={`/dashboard/organizations/${organization.id}/admin`}
+                className={classes.tab}
+              />
+            )}
+          </Tabs>
+        </div>
       </AppBar>
     </div>
   );
