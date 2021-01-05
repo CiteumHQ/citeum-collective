@@ -182,7 +182,7 @@ export const kcGetClient = async (client) => {
   const api = await kc.get();
   const cli = await api.clients.findOne({ id: client.id });
   const credential = await api.clients.getClientSecret({ id: client.id });
-  const issuer = 'https://auth.citeum.org/auth/realms/citeum';
+  const issuer = conf.get('app:auth_provider:issuer');
   return { ...cli, client_id: cli.clientId, client_secret: credential.value, issuer };
 };
 
