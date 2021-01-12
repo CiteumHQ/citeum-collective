@@ -8,7 +8,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
   EventOutlined,
-  SettingsRemoteOutlined,
+  AssignmentOutlined,
   DescriptionOutlined,
 } from '@material-ui/icons';
 import { ScaleBalance } from 'mdi-material-ui';
@@ -79,7 +79,7 @@ const Documents = () => {
       case 'INFORMATION':
         return <ScaleBalance />;
       case 'MINUTES':
-        return <SettingsRemoteOutlined />;
+        return <AssignmentOutlined />;
       case 'DOCUM%ENT':
         return <DescriptionOutlined />;
       default:

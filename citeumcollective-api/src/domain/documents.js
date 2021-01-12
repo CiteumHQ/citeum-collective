@@ -13,7 +13,7 @@ export const documentMemberships = async (ctx, id) => {
     select m.* from documents d
         left join documents_memberships dm ON d.id = dm.document
         left join memberships m on dm.membership = m.id
-        where d.id = ${id}
+        where d.id = ${id} order by m.name
   `);
 };
 export const loadDocument = async (ctx, id) => {

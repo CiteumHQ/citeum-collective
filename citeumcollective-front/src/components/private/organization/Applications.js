@@ -124,8 +124,13 @@ const Applications = () => {
                         subscription.membership.id,
                       );
                       return (
-                        <ListItem key={application.id} disabled={disabled} style={{ color: 'white' }}
-                                  component="a" href={application.url}>
+                        <ListItem
+                          key={application.id}
+                          disabled={disabled}
+                          style={{ color: 'white' }}
+                          component="a"
+                          href={application.url}
+                        >
                           <ListItemAvatar>
                             {disabled ? (
                               <Avatar
@@ -135,7 +140,7 @@ const Applications = () => {
                                 }}
                               />
                             ) : (
-                              <Avatar src={application.logo_url}/>
+                              <Avatar src={application.logo_url} />
                             )}
                           </ListItemAvatar>
                           <ListItemText
@@ -146,7 +151,9 @@ const Applications = () => {
                             {application.memberships.map((membership) => (
                               <Chip
                                 key={membership.id}
-                                label={membership.name.substring(0, 3).toUpperCase()}
+                                label={membership.name
+                                  .substring(0, 3)
+                                  .toUpperCase()}
                                 variant="outlined"
                                 style={{
                                   borderColor: membership.color,
