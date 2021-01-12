@@ -118,7 +118,13 @@ const createApp = async (apolloServer) => {
       res.sendStatus(403);
       return;
     }
-    res.setHeader('Content-disposition', `inline; filename="${document.name}"`);
+    res.setHeader(
+      'Content-disposition',
+      `inline; filename="${document.name.replace(
+        /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+        ''
+      )}"`
+    );
     res.setHeader('Content-type', document.mimetype);
     const stream = await downloadFile(file);
     stream.pipe(res);
