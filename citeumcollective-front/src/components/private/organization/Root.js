@@ -85,11 +85,11 @@ const Root = () => {
           <TopBar />
           <div className={classes.container}>
             <Switch>
-              <Route exact path="/dashboard/organizations/:organizationId">
-                <Redirect
-                  to={`/dashboard/organizations/${organizationId}/overview`}
-                />
-              </Route>
+              <Redirect
+                exact
+                from={`/dashboard/organizations/${organizationId}`}
+                to={`/dashboard/organizations/${organizationId}/overview`}
+              />
               <Route
                 exact
                 path="/dashboard/organizations/:organizationId/overview"
