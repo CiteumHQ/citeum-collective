@@ -4,12 +4,14 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import BarChart from 'recharts/lib/chart/BarChart';
-import XAxis from 'recharts/lib/cartesian/XAxis';
-import YAxis from 'recharts/lib/cartesian/YAxis';
-import Cell from 'recharts/lib/component/Cell';
-import Bar from 'recharts/lib/cartesian/Bar';
-import ResponsiveContainer from 'recharts/lib/component/ResponsiveContainer';
+import {
+  BarChart,
+  XAxis,
+  YAxis,
+  Cell,
+  Bar,
+  ResponsiveContainer,
+} from 'recharts';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import {
@@ -364,54 +366,52 @@ const Overview = () => {
               </Grid>
             </Grid>
           </Paper>
-          <Grid container spacing={3} style={{ marginTop: 20 }}>
-            <Grid item xs={12}>
-              <Typography variant="h3" style={{ float: 'left' }}>
-                Number of members
-              </Typography>
-              <Button
-                style={{ float: 'left', margin: '-5px 0 0 10px' }}
-                color="secondary"
-                endIcon={<VisibilityOutlined />}
-                component={Link}
-                to={`/dashboard/organizations/${organization.id}/membership`}
+          <div style={{ marginTop: 20 }}>
+            <Typography variant="h3" style={{ float: 'left' }}>
+              Number of members
+            </Typography>
+            <Button
+              style={{ float: 'left', margin: '-5px 0 0 10px' }}
+              color="secondary"
+              endIcon={<VisibilityOutlined />}
+              component={Link}
+              to={`/dashboard/organizations/${organization.id}/membership`}
+            >
+              View all
+            </Button>
+            <div className="clearfix" />
+            <ResponsiveContainer height={280} width="100%">
+              <BarChart
+                layout="vertical"
+                data={membersDistribution}
+                margin={{
+                  top: 20,
+                  right: 20,
+                  bottom: 0,
+                  left: 0,
+                }}
               >
-                View all
-              </Button>
-              <div className="clearfix" />
-              <ResponsiveContainer height={280} width="100%">
-                <BarChart
-                  layout="vertical"
-                  data={membersDistribution}
-                  margin={{
-                    top: 20,
-                    right: 20,
-                    bottom: 0,
-                    left: 0,
-                  }}
-                >
-                  <XAxis
-                    type="number"
-                    dataKey="value"
-                    stroke="#ffffff"
-                    allowDecimals={false}
-                  />
-                  <YAxis
-                    stroke="#ffffff"
-                    dataKey="label"
-                    type="category"
-                    angle={-30}
-                    textAnchor="end"
-                  />
-                  <Bar dataKey="value" barSize={20}>
-                    {membersDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Grid>
-          </Grid>
+                <XAxis
+                  type="number"
+                  dataKey="value"
+                  stroke="#ffffff"
+                  allowDecimals={false}
+                />
+                <YAxis
+                  stroke="#ffffff"
+                  dataKey="label"
+                  type="category"
+                  angle={-30}
+                  textAnchor="end"
+                />
+                <Bar dataKey="value" barSize={20}>
+                  {membersDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h3">Latest notifications</Typography>
