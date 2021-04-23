@@ -70,6 +70,7 @@ type Association {
     subscription_url: String
     code: String!
     members: [UserProtected]!
+    subscribers: [UserProtected]!
     memberships: [Membership]!
     notifications: [Notification]
     documents: [Document]!

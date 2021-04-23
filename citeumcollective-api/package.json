@@ -24,14 +24,14 @@
     ]
   },
   "engines": {
-    "node": ">= 12.* < 13.0.0"
+    "node": ">= 12.* < 16.0.0"
   },
   "dependencies": {
     "@babel/core": "^7.12.17",
     "@babel/runtime": "^7.12.18",
     "amqplib": "^0.6.0",
     "apollo-errors": "^1.9.0",
-    "apollo-server-express": "^2.21.2",
+    "apollo-server-express": "^2.23.0",
     "async-lock": "^1.2.8",
     "await": "^0.2.6",
     "bcryptjs": "^2.4.3",
@@ -48,13 +48,13 @@
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
     "express-session": "^1.17.1",
-    "graphql": "^15.4.0",
+    "graphql": "^15.5.0",
     "graphql-constraint-directive": "^2.1.1",
     "graphql-import": "^1.0.2",
     "graphql-iso-date": "^3.6.1",
     "graphql-redis-subscriptions": "^2.3.1",
     "graphql-relay": "^0.6.0",
-    "graphql-subscriptions": "^1.1.0",
+    "graphql-subscriptions": "^1.2.1",
     "graphql-tools": "^7.0.4",
     "gravatar": "^1.8.1",
     "helmet": "^4.2.0",
@@ -87,7 +87,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.12.17",
     "@babel/plugin-transform-runtime": "^7.12.17",
     "@babel/preset-env": "^7.12.17",
-    "apollo-server-testing": "^2.19.2",
+    "apollo-server-testing": "^2.23.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "babel-plugin-require-context-hook": "^1.0.0",

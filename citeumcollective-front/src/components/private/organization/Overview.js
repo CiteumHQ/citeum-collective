@@ -97,7 +97,7 @@ const QUERY_ASSOCIATION = gql`
         type
         content
       }
-      members {
+      subscribers {
         id
         is_organization
         organization
@@ -308,7 +308,7 @@ const Overview = () => {
       R.uniqBy(R.prop('name')),
       R.filter((n) => !n.subscription_name.includes('Supporter')),
       R.sortWith([R.ascend(R.prop('subscription_date'))]),
-    )(data.association.members);
+    )(data.association.subscribers);
     const colors = {};
     for (const member of members) {
       colors[member.subscription_name] = member.subscription_color;

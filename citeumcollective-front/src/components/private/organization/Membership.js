@@ -59,7 +59,7 @@ const QUERY_ASSOCIATION_MEMBERS = gql`
         description
         color
       }
-      members {
+      subscribers {
         id
         gravatar
         is_organization
@@ -105,7 +105,7 @@ const Membership = () => {
       R.uniqBy(R.prop('name')),
       R.filter((n) => !n.subscription_name.includes('Supporter')),
       R.sortWith([R.ascend(R.prop('subscription_date'))]),
-    )(association.members);
+    )(association.subscribers);
     return (
       <Grid container spacing={3}>
         <Grid item xs={6}>

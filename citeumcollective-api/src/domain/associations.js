@@ -43,16 +43,16 @@ export const getAssociationDefaultMembership = async (ctx, association) => {
 
 export const userAssociations = async (ctx, user) => associationsRelatedToUser(ctx, user);
 
+const ship = (e) => ({ id: `${e.user_id}_${e.membership_id}`, ...e });
 export const userSubscriptions = async (ctx, user) => {
   const subscriptions = await ctx.db.queryRows(
-    sql`select role, subscription_date, subscription_last_update, subscription_next_update, account as user_id, membership as membership_id, association as association_id from users_memberships where account = ${user.id}`
+    sql`select role, subscription_date, subscription_last_update, subscription_next_update, 
+               account as user_id, membership as membership_id, association as association_id from users_memberships 
+               where account = ${user.id}`
   );
-  const result = [];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const subscription of subscriptions) {
-    result.push({ id: `${subscription.user_id}_${subscription.membership_id}`, ...subscription });
-  }
-  return result;
+  // noinspection UnnecessaryLocalVariableJS
+  const data = subscriptions.map((s) => ship(s));
+  return data;
 };
 
 export const isDocumentAccessibleFromUser = async (ctx, user, document) => {
@@ -65,9 +65,17 @@ export const isDocumentAccessibleFromUser = async (ctx, user, document) => {
   return fileMemberships.some((o) => userMemberships.includes(o));
 };
 
-export const userSubscription = async (ctx, user, associationId) => {
-  const subscriptions = await userSubscriptions(ctx, user);
-  return R.head(R.filter((n) => n.association_id === associationId, subscriptions));
+export const batchUserSubscription = async (ctx, userIds) => {
+  const { associationId } = ctx;
+  const subscriptions = await ctx.db.queryRows(
+    sql`select role, subscription_date, subscription_last_update, subscription_next_update, 
+               account as user_id, membership as membership_id, association as association_id from users_memberships 
+               where account IN (${sql.bindings(userIds)}) and association = ${associationId}`
+  );
+  const perUsers = R.groupBy((s) => s.user_id, subscriptions);
+  // noinspection UnnecessaryLocalVariableJS
+  const data = userIds.map((id) => (perUsers[id] ? ship(perUsers[id][0]) : undefined));
+  return data;
 };
 
 export const createAssociation = async (ctx, input) => {

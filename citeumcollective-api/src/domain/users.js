@@ -1,14 +1,8 @@
 /* eslint-disable no-await-in-loop */
 import * as gravatar from 'gravatar';
+import * as R from 'ramda';
 import { sql } from '../utils/sql';
-import {
-  ADMIN_ROLE_CODE,
-  kcCreateUser,
-  kcGetUserByName,
-  kcRemoveRoleFromUser,
-  kcUpdateUserInfo,
-  roleGen,
-} from '../database/keycloak';
+import { ADMIN_ROLE_CODE, kcCreateUser, kcGetUserByName, kcRemoveRoleFromUser, roleGen } from '../database/keycloak';
 import { FunctionalError } from '../config/errors';
 import conf from '../config/conf';
 // eslint-disable-next-line import/no-cycle
@@ -25,11 +19,44 @@ export const getUserMemberships = (ctx, user) => {
   `);
 };
 
+export const listUsers = async (ctx, asso, onlySubscribers) => {
+  // Get users of the association
+  const usersP = ctx.db.queryRows(sql`select u.* from users u
+                                        right join users_memberships um ON u.id = um.account
+                                        right join memberships m ON m.id = um.membership
+                                        where um.association = ${asso.id}
+                                        and m.code != ${onlySubscribers ? 'supporter' : 'all'}`);
+  // Get memberships
+  const allUserMembershipsP = ctx.db.queryRows(sql` select * from users_memberships where association = ${asso.id}`);
+  // Get roles
+  const allUserRolesP = ctx.db.queryRows(
+    sql`select a.code as association, r.name as role, ur.user_id as account 
+                                from users_roles ur
+                                right join roles r ON ur.role_name = r.name
+                                right join associations a on a.id = ur.association_id
+                                where a.id = ${asso.id}`
+  );
+  const [users, allUserMemberships, allUserRoles] = await Promise.all([usersP, allUserMembershipsP, allUserRolesP]);
+  const userMemberships = R.groupBy((g) => g.account, allUserMemberships);
+  const reworkedRoles = allUserRoles.map((r) => ({ account: r.account, role: `asso_${r.association}_${r.role}` }));
+  const userRoles = R.groupBy((g) => g.account, reworkedRoles);
+  // Rebuild the expected result
+  // noinspection UnnecessaryLocalVariableJS
+  const data = users.map((user) => {
+    const gravatarUrl = gravatar.url(user.email, { protocol: 'https', s: '100' });
+    const memberships = userMemberships[user.id].map((m) => m.membership);
+    const roles = [...userMemberships[user.id].map((m) => m.role), ...(userRoles[user.id] || [])];
+    return { ...user, gravatar: gravatarUrl, memberships, roles };
+  });
+  return data;
+};
+
 export const getUser = async (ctx, userId) => {
   const user = await ctx.db.queryOne(sql`select * from users where id = ${userId}`);
   if (!user) return user;
-  const userMemberships = await getUserMemberships(ctx, user);
-  const userRoles = await getUserRoles(ctx, user.id);
+  const userMembershipsPromise = getUserMemberships(ctx, user);
+  const userRolesPromise = getUserRoles(ctx, user.id);
+  const [userMemberships, userRoles] = await Promise.all([userMembershipsPromise, userRolesPromise]);
   const memberships = userMemberships.map((m) => m.membership);
   const roles = [...userMemberships.map((m) => m.role), ...userRoles];
   const gravatarUrl = gravatar.url(user.email, { protocol: 'https', s: '100' });
@@ -56,21 +83,28 @@ export const updateUser = async (ctx, id, input) => {
     throw FunctionalError('Unknown user', { id });
   }
   const { firstName, lastName } = input;
-  await kcUpdateUserInfo(id, { firstName, lastName });
+  // await kcUpdateUserInfo(id, { firstName, lastName });
+  const birthday = input.birthday || currentUser.birthday.toString();
+  const address = input.address || '';
+  const organization = input.organization || '';
+  const position = input.job_position || '';
+  const isOrganization = input.is_organization || false;
   await ctx.db.execute(
-    sql`UPDATE users SET birthday = ${input.birthday || currentUser.birthday.toString()}, address = ${
-      input.address || ''
-    }, organization = ${input.organization || ''}, job_position = ${input.job_position || ''}, is_organization = ${
-      input.is_organization || false
-    } WHERE id = ${id}`
+    sql`UPDATE users SET birthday = ${birthday}, address = ${address}, 
+                         organization = ${organization}, job_position = ${position}, 
+                         is_organization = ${isOrganization},
+                         first_name = ${firstName},
+                         last_name = ${lastName}
+                     WHERE id = ${id}`
   );
   return getUser(ctx, id);
 };
 
 export const createUser = async (ctx, user) => {
-  const { sub: id, email } = user;
+  const { sub: id, email, given_name: firstName, family_name: lastName } = user;
   await ctx.db.execute(
-    sql`insert INTO users (id, email, is_organization, register_at) values (${id}, ${email}, false, current_timestamp)`
+    sql`insert INTO users (id, first_name, last_name, email, is_organization, register_at) 
+               values (${id}, ${firstName}, ${lastName}, ${email}, false, current_timestamp)`
   );
   // We need to assign the created user to all default association membership
   const associations = await getAssociations(ctx);
@@ -83,18 +117,8 @@ export const createUser = async (ctx, user) => {
   return getUserByEmail(ctx, email);
 };
 
-export const getAssociationMembers = async (ctx, association) => {
-  const members = [];
-  const usersMemberships = await ctx.db.queryRows(
-    sql`select * from users_memberships where association = ${association.id}`
-  );
-  for (let index = 0; index < usersMemberships.length; index += 1) {
-    const { account } = usersMemberships[index];
-    // eslint-disable-next-line no-await-in-loop
-    const user = await getUser(ctx, account);
-    members.push(user);
-  }
-  return members;
+export const getAssociationMembers = (ctx, association, onlySubscribers = false) => {
+  return listUsers(ctx, association, onlySubscribers);
 };
 
 const extractMemberNeededInfo = async (ctx, userId, associationId, membershipId) => {
@@ -168,7 +192,7 @@ export const initPlatformAdmin = async (ctx) => {
   if (user === null) {
     // User doesnt exists
     user = await kcCreateUser(email);
-    const databaseUser = await createUser(ctx, { sub: user.id, email });
+    const databaseUser = await createUser(ctx, { sub: user.id, firstName: 'admin', lastName: 'admin', email });
     const association = await getAssociationByCode(ctx, assoCode);
     await grantRoleToUser(ctx, databaseUser.id, association.id, ADMIN_ROLE_CODE);
   }

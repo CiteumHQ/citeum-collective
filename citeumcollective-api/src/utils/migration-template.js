@@ -1,4 +1,5 @@
-import { sql } from './sql';
+// eslint-disable-next-line
+import { sql } from '../utils/sql';
 import { bridgeSql } from '../database/postgre';
 
 export const up = async (knex, db = bridgeSql(knex)) => {

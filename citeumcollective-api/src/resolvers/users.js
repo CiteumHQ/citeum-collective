@@ -1,6 +1,8 @@
 import { updateUser, getUsers } from '../domain/users';
-import { userSubscriptions, userAssociations, userSubscription } from '../domain/associations';
-import { kcGetUserInfo } from '../database/keycloak';
+import { userSubscriptions, userAssociations, batchUserSubscription } from '../domain/associations';
+import { batchLoader } from '../utils/sql';
+
+const subscriptionLoader = batchLoader(batchUserSubscription);
 
 const usersResolvers = {
   Query: {
@@ -8,14 +10,14 @@ const usersResolvers = {
     users: (_, __, ctx) => getUsers(ctx),
   },
   User: {
-    providerInfo: (user) => kcGetUserInfo(user.id),
+    providerInfo: (user) => ({ firstName: user.first_name, lastName: user.last_name }),
     associations: (user, __, ctx) => userAssociations(ctx, user),
-    subscription: (user, { associationId }, ctx) => userSubscription(ctx, user, associationId),
+    subscription: (user, { associationId }, ctx) => subscriptionLoader.load({ associationId, ...ctx }, user.id),
     subscriptions: (user, __, ctx) => userSubscriptions(ctx, user),
   },
   UserProtected: {
-    providerInfo: (user) => kcGetUserInfo(user.id),
-    subscription: (user, { associationId }, ctx) => userSubscription(ctx, user, associationId),
+    providerInfo: (user) => ({ firstName: user.first_name, lastName: user.last_name }),
+    subscription: (user, { associationId }, ctx) => subscriptionLoader.load({ associationId, ...ctx }, user.id),
     subscriptions: (user, __, ctx) => userSubscriptions(ctx, user),
   },
   Mutation: {

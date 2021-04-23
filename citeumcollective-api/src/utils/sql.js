@@ -1,3 +1,24 @@
+import DataLoader from 'dataloader';
+import * as R from 'ramda';
+
+export const MAX_BATCH_SIZE = 300;
+
+export const batchLoader = (loader) => {
+  const dataLoader = new DataLoader(
+    (objects) => {
+      const { ctx } = R.head(objects);
+      const ids = objects.map((i) => i.id);
+      return loader(ctx, ids);
+    },
+    { maxBatchSize: MAX_BATCH_SIZE }
+  );
+  return {
+    load: (ctx, id) => {
+      return dataLoader.load({ ctx, id });
+    },
+  };
+};
+
 const sqlTag = (parts, ...tokens) => {
   let sql = '';
   let bindings = [];
